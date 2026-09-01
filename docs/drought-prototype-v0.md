@@ -3,13 +3,13 @@
 ## 문서 상태
 
 ```text
-STATUS = PROVISIONAL / DESIGN ITEMS 1-7 APPROVED
+STATUS = PROVISIONAL / DESIGN ITEMS 1-8 APPROVED
 IMPLEMENTATION AUTHORIZATION = NOT GRANTED
 SCOPE = DESIGN DOCUMENT ONLY
-PENDING DISCUSSION = ITEM 8
+PENDING DISCUSSION = NONE
 ```
 
-이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 구체적인 수치, 게임 엔진, 프로그래밍 언어, UI, 저장 형식은 아직 결정하지 않는다.
+이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했으며, 구체적인 수치, UI 상세 및 저장 형식은 아직 결정하지 않는다.
 
 ## 1. 검증 목적
 
@@ -328,8 +328,89 @@ NPC는 사건 전체가 아니라 자신이 보거나 들은 내용만 기억한
 단서 제공 기준 = 플레이어 캐릭터의 지식·기억·관계·직업
 ```
 
-## 11. 후속 토론 사항 8
+## 11. 승인된 잠정 설계 8
 
-8. 가뭄 프로토타입에 사용할 게임 엔진과 프로그래밍 언어
+### 결정 8. 게임 엔진과 프로그래밍 언어
 
-이 항목은 자동 확정하지 않고 사용자와의 후속 토론을 거쳐 결정한다.
+가뭄 프로토타입은 다음 조합을 사용한다.
+
+```text
+ENGINE = Godot 4.7.2 stable
+EDITION = Standard
+LANGUAGE = GDScript
+TYPING = STATIC TYPING REQUIRED
+FIRST TARGET = Windows Desktop
+PROJECT MODE = 2D / UI 중심
+```
+
+이 결정은 완성형 게임의 영구 기술 선택이 아니라 가뭄 프로토타입을 낮은 진입 비용으로 검증하기 위한 잠정안이다.
+
+#### 버전 정책
+
+- 개발판인 Godot 4.8 계열은 사용하지 않음
+- 가뭄 프로토타입이 종료될 때까지 Godot 4.7.2에서 업그레이드하지 않음
+- 버전 변경이 필요하면 별도 설계 변경과 회귀 검증을 거침
+
+#### 언어 정책
+
+- GDScript의 정적 타입 표기를 기본이 아니라 필수로 사용함
+- 주요 변수, 함수 매개변수 및 반환값에 타입을 명시함
+- 빠른 작성 편의를 이유로 무제한 Dictionary와 Variant 의존을 허용하지 않음
+- 성능 문제가 실제 측정으로 확인되기 전에는 C#이나 네이티브 확장을 추가하지 않음
+
+#### 구조적 제한
+
+시뮬레이션과 화면 표현을 분리한다.
+
+```text
+시뮬레이션 계층
+- NPC 데이터
+- 가구와 자원
+- 관계와 기억
+- 사건과 정보
+- 행동 후보와 판단
+- 시간 진행
+
+표현 계층
+- 선택지 화면
+- 인물 정보
+- 마을 상태
+- 사건 기록
+```
+
+- NPC 60명을 각각 독립적인 화면 Node로 구현하지 않음
+- NPC는 기본적으로 데이터 객체로 존재함
+- UI는 시뮬레이션 상태를 읽어 표시하고 플레이어의 행동 요청을 전달함
+- 버튼 코드가 성향·관계·자원을 직접 변경하지 않음
+- 플레이어와 NPC가 같은 행동 처리 경로를 사용함
+- 화면을 표시하지 않는 상태에서도 같은 입력과 난수 시드로 같은 결과가 나와야 함
+
+행동 처리 흐름은 다음 경계를 따른다.
+
+```text
+UI 입력
+→ 행동 요청
+→ 실행 가능성 확인
+→ 결과 계산
+→ 세계 상태 변경
+→ UI 갱신
+```
+
+#### 데이터와 저장의 초기 방향
+
+- 성향과 행동 정의: Git에서 비교 가능한 텍스트 기반 데이터
+- 실행 중 세계 상태: 정적 타입 GDScript 객체
+- 저장파일: 개발자가 검사할 수 있는 명시적 구조
+- 난수 시드: 저장 상태에 반드시 포함
+- 개발 로그: 행동 후보, 평가 근거, 선택 의도 및 결과 기록
+
+정확한 파일 형식과 저장 스키마는 구현 전 별도로 결정한다.
+
+#### 공식 참고자료
+
+- [Godot 공식 배포 목록](https://godotengine.org/download/archive/)
+- [Godot 2D 문서](https://docs.godotengine.org/en/stable/tutorials/2d/index.html)
+- [Godot UI 문서](https://docs.godotengine.org/en/stable/tutorials/ui/index.html)
+- [GDScript 문서](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html)
+- [GDScript 정적 타입 문서](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/static_typing.html)
+- [Godot Resource 문서](https://docs.godotengine.org/en/stable/tutorials/scripting/resources.html)
