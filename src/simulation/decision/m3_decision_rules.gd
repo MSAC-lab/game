@@ -43,6 +43,12 @@ const CARE_DEPENDENT_CAP: int = 4
 
 const RELATION_PAIR_DIVISOR: int = 2
 const TARGET_RELATION_DIVISOR: int = 3
+const AUTHORITY_RELATION_POSITIVE_FIELDS: Array[String] = ["trust", "obligation"]
+const DEPENDENT_RELATION_POSITIVE_FIELDS: Array[String] = ["affection", "obligation"]
+const TARGET_RELATION_POSITIVE_FIELDS: Array[String] = [
+	"trust", "affection", "obligation"
+]
+const TARGET_RELATION_NEGATIVE_FIELDS: Array[String] = ["fear", "resentment"]
 
 const RISK_BASE_SCALE: int = 1000
 const RISK_TAKING_COEFFICIENT: int = 6
@@ -158,12 +164,12 @@ static func to_data() -> Dictionary:
 			ACTION_THEFT: THEFT_OPPORTUNITY_COST,
 		},
 		"relation": {
-			"authority_positive_fields": ["trust", "obligation"],
-			"dependent_positive_fields": ["affection", "obligation"],
+			"authority_positive_fields": AUTHORITY_RELATION_POSITIVE_FIELDS.duplicate(),
+			"dependent_positive_fields": DEPENDENT_RELATION_POSITIVE_FIELDS.duplicate(),
 			"pair_divisor": RELATION_PAIR_DIVISOR,
 			"percent_scale": PERCENT_SCALE,
-			"target_negative_fields": ["fear", "resentment"],
-			"target_positive_fields": ["trust", "affection", "obligation"],
+			"target_negative_fields": TARGET_RELATION_NEGATIVE_FIELDS.duplicate(),
+			"target_positive_fields": TARGET_RELATION_POSITIVE_FIELDS.duplicate(),
 			"target_divisor": TARGET_RELATION_DIVISOR,
 		},
 		"request_fact_types": REQUEST_FACT_TYPES.duplicate(),

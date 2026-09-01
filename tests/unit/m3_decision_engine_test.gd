@@ -426,6 +426,7 @@ func _test_ruleset_hash_covers_constants() -> void:
 	var authority: Dictionary = rules["authority"]
 	var opportunity_cost: Dictionary = rules["opportunity_cost"]
 	var norm_conflict: Dictionary = rules["norm_conflict"]
+	var relation: Dictionary = rules["relation"]
 	_expect(
 		str(authority["fact_type_id"]) == M3DecisionRules.FACT_VILLAGE_AUTHORITY,
 		"M3 ruleset publishes the authority fact input"
@@ -441,6 +442,17 @@ func _test_ruleset_hash_covers_constants() -> void:
 		int(norm_conflict["norm_weight"]) == M3DecisionRules.NORM_WEIGHT
 		and int(norm_conflict["duty_weight"]) == M3DecisionRules.DUTY_WEIGHT,
 		"M3 ruleset publishes norm-conflict coefficients"
+	)
+	_expect(
+		relation["authority_positive_fields"]
+		== M3DecisionRules.AUTHORITY_RELATION_POSITIVE_FIELDS
+		and relation["dependent_positive_fields"]
+		== M3DecisionRules.DEPENDENT_RELATION_POSITIVE_FIELDS
+		and relation["target_positive_fields"]
+		== M3DecisionRules.TARGET_RELATION_POSITIVE_FIELDS
+		and relation["target_negative_fields"]
+		== M3DecisionRules.TARGET_RELATION_NEGATIVE_FIELDS,
+		"M3 ruleset publishes the relation field sets consumed by the engine"
 	)
 	var changed_rules: Dictionary = rules.duplicate(true)
 	changed_rules["near_tie_threshold"] = int(rules["near_tie_threshold"]) + 1

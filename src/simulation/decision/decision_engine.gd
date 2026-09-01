@@ -321,7 +321,9 @@ static func _dependent_bond(
 			strongest = maxi(
 				strongest,
 				M3DecisionRules.round_div(
-					relation.affection + relation.obligation,
+					_sum_relation_fields(
+						relation, M3DecisionRules.DEPENDENT_RELATION_POSITIVE_FIELDS
+					),
 					M3DecisionRules.RELATION_PAIR_DIVISOR
 				)
 			)
@@ -333,11 +335,10 @@ static func _target_relation(world: WorldState, actor_id: String, target_id: Str
 	if relation == null:
 		return 0
 	return M3DecisionRules.round_div(
-		relation.trust
-		+ relation.affection
-		+ relation.obligation
-		- relation.fear
-		- relation.resentment,
+		_sum_relation_fields(relation, M3DecisionRules.TARGET_RELATION_POSITIVE_FIELDS)
+		- _sum_relation_fields(
+			relation, M3DecisionRules.TARGET_RELATION_NEGATIVE_FIELDS
+		),
 		M3DecisionRules.TARGET_RELATION_DIVISOR
 	)
 
@@ -361,12 +362,23 @@ static func _authority_bond(
 			strongest = maxi(
 				strongest,
 				M3DecisionRules.round_div(
-					relation.trust + relation.obligation,
+					_sum_relation_fields(
+						relation, M3DecisionRules.AUTHORITY_RELATION_POSITIVE_FIELDS
+					),
 					M3DecisionRules.RELATION_PAIR_DIVISOR
 				)
 			)
 	used_fact_ids.sort()
 	return {"bond": strongest, "fact_ids": used_fact_ids}
+
+
+static func _sum_relation_fields(
+	relation: RelationState, field_names: Array[String]
+) -> int:
+	var total: int = 0
+	for field_name: String in field_names:
+		total += int(relation.get(field_name))
+	return total
 
 
 static func _adjusted_risk(
