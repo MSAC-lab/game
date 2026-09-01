@@ -3,13 +3,14 @@
 ## 문서 상태
 
 ```text
-STATUS = PROVISIONAL / DESIGN ITEMS 1-17 APPROVED
+STATUS = PROVISIONAL / DESIGN ITEMS 1-18 APPROVED
 IMPLEMENTATION AUTHORIZATION = M0 ONLY
+M1 IMPLEMENTATION AUTHORIZATION = NOT GRANTED
 IMPLEMENTATION STATUS = M0 COMPLETE / PASS
 AUTOMATED VERIFICATION = PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FULL ACCEPTANCE = PASS
-SCOPE = M0 FOUNDATION ONLY
+SCOPE = M0 COMPLETE / M1 CONTRACT APPROVED
 PENDING DISCUSSION = NONE
 ```
 
@@ -1840,6 +1841,8 @@ M0에서는 NPC나 가뭄을 구현하지 않는다.
 - NPC가 Node로 구현되지 않음
 - I02의 기초 시험 통과
 
+구체적인 ID, 직렬화, 표준 상태, 해시 범위 및 시험 계약은 승인된 잠정 설계 18을 따른다.
+
 #### M2 — 하루 진행과 자원 보존
 
 구현 내용은 다음과 같다.
@@ -2088,4 +2091,220 @@ M9가 끝날 때까지 다음은 구현하지 않는다.
 - 효용 가중치 변경은 이유와 전후 검증 결과를 기록함
 - M7과 M9 통과 시 태그를 생성함
 
-이 구현 로드맵의 승인은 코딩 권한을 자동으로 부여하지 않는다. 최초 구현은 별도의 `M0 구현 승인`을 받아야 시작한다.
+이 구현 로드맵과 단계별 설계의 승인은 코딩 권한을 자동으로 부여하지 않는다. M0는 별도 승인을 받아 완료했으며, M1은 별도의 `M1 구현 승인`을 받아야 시작한다.
+
+## 21. 승인된 잠정 설계 18
+
+### 결정 18. M1 상태 모델과 직렬화 계약
+
+M1은 인물이 판단하거나 시간이 흐르는 단계가 아니다. 세 명의 인물과 그들의 가구, 방향성 관계, 사건, 정보 및 기억을 모호하지 않게 표현하고, 저장 순서와 운영체제에 관계없이 동일하게 복원·식별할 수 있는지를 검증한다.
+
+M1이 통과해도 인간다운 판단, 인과 모델의 유용성 또는 게임의 재미를 주장하지 않는다.
+
+#### 기본 기술 선택
+
+```text
+MODEL OBJECT = STATICALLY TYPED GDSCRIPT RefCounted
+REFERENCE = OBJECT POINTER가 아닌 STRING ID
+SAVE FORMAT = HUMAN-READABLE JSON
+SIMULATION NUMBER = BOUNDED INTEGER ONLY
+64-BIT SEED / RNG STATE = HEX STRING
+CANONICAL HASH = SHA-256
+TEST CAST = 3 PERSONS
+```
+
+모델은 `Node`, `SceneTree` 및 UI에 의존하지 않는다. 모델 사이에는 직접 객체 참조를 연결하지 않고 ID만 저장한다. 이 규칙은 순환 참조, 숨은 소유권 및 직렬화 순서 의존성을 방지한다.
+
+공식 API 기준은 다음과 같다.
+
+- [Godot 4.7 RefCounted](https://docs.godotengine.org/en/4.7/classes/class_refcounted.html)
+- [Godot 4.7 JSON](https://docs.godotengine.org/en/4.7/classes/class_json.html)
+- [Godot 4.7 HashingContext](https://docs.godotengine.org/en/4.7/classes/class_hashingcontext.html)
+
+#### 모델별 책임
+
+| 모델 | M1에서 표현하는 최소 상태 |
+|---|---|
+| `WorldState` | 스키마 버전, 시나리오 ID, 날짜, RNG 상태, ID counter, ruleset 식별자, 플레이어 인물 ID 및 상태 collection |
+| `PersonState` | 신원, 가구·직업·역할 ID, 생존·건강, 성향, 가치관, 감정, 욕구, 목표 및 관련 상태 ID |
+| `HouseholdState` | 구성원 ID, 식량, 재산, 하루 필요량, 생업, 부양 부담 및 거주 상태 |
+| `RelationState` | 방향성 있는 신뢰, 애정, 두려움, 원한 및 의무감 |
+| `EventRecord` | 실제 사건, 발생일, 행위자, 대상, 행동, 결과, 장소, 목격자 및 공개 여부 |
+| `InformationState` | 주장, 보유자, 목격·전언 구분, 최초 정보원, 전달자, 신뢰도, 비밀 여부 및 습득일 |
+| `MemoryState` | 소유자, 연결 사건·정보, 인식한 행동·결과, 관련 인물, 감정, 중요도, 발생일 및 기억 단계 |
+| `ActionDefinition` | 행동 정의 ID, 버전 및 M1에서 검증 가능한 정적 의미 정보 |
+| `DecisionRecord` | 후보, 불가 사유, 평가 근거, 의도, 선택, 결과 및 변화 압력에 대한 감사 기록 |
+
+`DecisionRecord`는 감사용 불변 기록이며 simulation이 미래 판단을 위해 다시 읽지 않는다. 미래의 성향 변화에 필요한 누적 압력은 M5에서 명시적인 mutable state로 도입한다. 로그가 숨은 게임 상태가 되어서는 안 된다.
+
+`ActionDefinition`은 mutable `WorldState`에 복제하지 않는다. 세계 상태에는 사용한 `ruleset_id`와 `ruleset_hash`만 포함하여 규칙 변경 여부를 식별한다.
+
+#### ID와 참조
+
+무작위 UUID를 사용하지 않는다. 모든 동적 ID는 종류별 단조 증가 counter로 생성하며, counter 자체를 `WorldState`에 저장한다.
+
+```text
+person:000001
+household:000001
+event:000001
+information:000001
+memory:000001
+decision:000001
+```
+
+방향성 관계 ID는 양 끝의 인물 ID를 명시한다.
+
+```text
+relation:person:000001->person:000003
+relation:person:000003->person:000001
+```
+
+두 관계는 서로 다른 상태다. 모든 참조는 유효한 ID를 가리켜야 하며, 중복 ID와 끊어진 참조는 불러오기 단계에서 거부한다.
+
+플레이어 전용 상태 클래스는 만들지 않는다. `WorldState.player_person_id`가 일반 `PersonState` 하나를 가리킨다.
+
+#### 직렬화 표현
+
+각 모델은 명시적인 primitive data로 변환한다. 저장 payload에는 다음 형식만 허용한다.
+
+```text
+String
+bounded int
+bool
+null
+Array
+Dictionary with String keys
+```
+
+Godot JSON은 JSON number에서 정수와 실수 타입을 구분하지 않으므로 다음 규칙을 적용한다.
+
+- 성향, 감정, 관계, 자원 및 날짜는 안전 범위의 정수만 사용함
+- JSON parse 후 각 필드를 명시적인 정적 타입으로 검증·복원함
+- ID는 항상 문자열로 저장함
+- 64비트 seed와 RNG state는 16진수 문자열로 저장함
+- simulation state에서 임의 float, `NaN` 및 무한대를 금지함
+- writer는 strict JSON만 생성하며 reader는 schema와 모든 필드 타입을 다시 검증함
+
+저장 envelope의 최소 구조는 다음과 같다.
+
+```text
+schema_version
+ruleset_id
+ruleset_hash
+state
+audit
+state_hash
+```
+
+`state`에는 미래 결과에 영향을 줄 수 있는 mutable state가 들어간다. `audit`에는 simulation이 읽지 않는 `DecisionRecord`가 들어간다. 저장 시각, 파일 경로 및 UI 상태는 payload의 의미 상태에 포함하지 않는다.
+
+M1에서는 schema migration을 구현하지 않는다. 알 수 없는 `schema_version`은 명시적으로 실패한다.
+
+#### 표준 상태와 상태 해시
+
+표준화 절차는 다음 순서를 고정한다.
+
+```text
+WorldState
+→ primitive data 변환
+→ Dictionary key 사전순 정렬
+→ 모든 entity collection ID순 정렬
+→ 참조 ID collection 정렬
+→ 공백 없는 canonical JSON
+→ UTF-8 bytes
+→ SHA-256
+```
+
+Dictionary key 정렬만으로는 충분하지 않다. JSON array는 원래 순서를 유지하므로, 의미상 순서가 없는 모든 collection을 명시적으로 ID순 정렬한 뒤 직렬화한다.
+
+상태 해시에는 미래 simulation 결과에 영향을 줄 수 있는 다음 요소를 포함한다.
+
+```text
+INCLUDE
+- schema와 ruleset 식별자
+- 날짜와 RNG 상태
+- 종류별 ID counter
+- player_person_id
+- 인물, 가구 및 방향성 관계
+- 객관적 사건, 정보 및 기억
+```
+
+다음은 상태 해시에서 제외한다.
+
+```text
+EXCLUDE
+- 저장 시각과 파일 경로
+- JSON 들여쓰기와 key 입력 순서
+- UI 및 editor 상태
+- simulation이 읽지 않는 DecisionRecord 감사 로그
+```
+
+어떤 데이터가 미래 결과에 영향을 주기 시작하면 반드시 mutable state로 승격하고 상태 해시에 포함한 뒤에만 사용할 수 있다.
+
+#### 세 명의 기준 fixture
+
+M1 기준 상태는 다음 세 명으로 제한한다.
+
+```text
+person:000001 = 플레이어 / 공동창고 하급 관리 보조
+person:000002 = 배우자 / 같은 가구
+person:000003 = 촌장 / 별도 가구
+```
+
+fixture에는 최소한 다음을 둔다.
+
+- 두 개의 가구
+- 플레이어에서 촌장으로 향하는 관계와 촌장에서 플레이어로 향하는 서로 다른 관계
+- 객관적 사건 하나
+- 플레이어만 보유한 정보 하나
+- 플레이어가 가진 기억 하나
+- 감사용 판단 기록 하나
+- `player_person_id = person:000001`
+
+M1에서는 이 인물들이 판단하거나 행동하지 않는다. fixture는 상태 표현과 직렬화 검증만을 위한 것이다.
+
+#### M1 필수 시험
+
+| ID | 시험 | 합격 기준 |
+|---|---|---|
+| M1-T01 | 저장 후 복원 | 의미 상태와 감사 기록 완전 동일 |
+| M1-T02 | collection 순서 변경 | canonical state hash 동일 |
+| M1-T03 | 의미 있는 값 하나 변경 | canonical state hash 변경 |
+| M1-T04 | 중복 ID 입력 | validation 실패 |
+| M1-T05 | 존재하지 않는 ID 참조 | validation 실패 |
+| M1-T06 | 알 수 없는 `schema_version` | 명시적 실패 |
+| M1-T07 | 플레이어 구조 확인 | 일반 `PersonState`를 사용하고 별도 `PlayerState`가 없음 |
+| M1-T08 | 모델 계층 확인 | 모든 simulation model이 `Node`와 `SceneTree`에 비의존 |
+| M1-T09 | RNG와 ID counter 복원 | 직렬화 전후 값 완전 동일 |
+| M1-T10 | frozen fixture 교차 운영체제 실행 | Linux와 Windows의 SHA-256 완전 동일 |
+
+추가로 JSON writer가 생성한 canonical payload와 frozen fixture SHA-256을 저장소에 보존한다. 해시가 바뀌면 스키마 변경인지 결함인지 명시적으로 판정해야 하며 기대값을 조용히 갱신하지 않는다.
+
+#### M1 비범위
+
+```text
+시간 진행
+식량 소비와 이전
+가뭄 및 수확 계산
+행동 후보 생성
+효용 계산과 선택
+행동 성공·실패 및 발각
+정보 전파
+기억 생성·망각·압축
+성향 변화
+60명 생성
+플레이어 UI
+최종 세이브 슬롯
+```
+
+M1에서는 각 상태의 구조와 불변조건만 구현한다. 상태 변화 규칙은 해당 마일스톤이 승인되기 전까지 추가하지 않는다.
+
+#### M1 합격 주장 경계
+
+M1 통과가 증명하는 것은 다음뿐이다.
+
+> 세 명의 인물과 그들의 관계·사건·정보·기억을 모호하지 않은 상태로 표현하고, 저장 순서와 운영체제에 관계없이 동일하게 복원·식별할 수 있다.
+
+M1 통과는 NPC 판단의 개연성, 인과 모델의 외부 타당성, 장기 simulation 안정성 또는 게임의 재미를 증명하지 않는다.
+
+이 결정 18의 승인은 문서 계약만 확정한다. M1 구현 권한은 별도의 `M1 구현 승인` 전까지 부여되지 않는다.
