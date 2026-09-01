@@ -2,7 +2,7 @@
 
 가상의 중세~르네상스 난세에서 한 개인의 선택과 변화가 주변 인물과 역사에 영향을 주는 개인 중심 시뮬레이션 게임 프로젝트다.
 
-M0 기반 구현과 Linux·Windows 자동 검증을 완료했다. M0의 전체 합격 판정에는 Windows Godot 편집기에서의 수동 `F5` 실행 증거가 아직 필요하다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
+M0 기반 구현과 Linux·Windows 자동 검증을 완료했으며, Windows Godot 편집기에서의 수동 `F5` 실행도 확인했다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
 
 > 인물의 성향·상태·관계·기억 → 판단과 선택 → 사건의 결과 → 인물과 세계의 변화 → 이후의 다른 판단
 
@@ -29,16 +29,19 @@ M0 기반 구현과 Linux·Windows 자동 검증을 완료했다. M0의 전체 �
 ## 현재 상태
 
 ```text
-STATUS = M0 PROVISIONAL PASS / GUI EVIDENCE PENDING
+STATUS = M0 PASS
 IMPLEMENTATION = PROJECT SKELETON / SMOKE TEST COMPLETE
 AUTOMATED_VERIFICATION = LINUX + WINDOWS HEADLESS PASS
+GUI_VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FIRST_PROTOTYPE = DROUGHT / PROVISIONAL
 ENGINE = GODOT 4.7.2 STABLE STANDARD
 LANGUAGE = STATICALLY TYPED GDSCRIPT
-M1 = NOT AUTHORIZED / HOLD
+M1 = NOT AUTHORIZED
 ```
 
 NPC, 가뭄, 자원 및 판단 시스템은 아직 구현하지 않았다.
+
+Windows 편집기 실행 증거는 [M0 Windows GUI 검증 기록](docs/evidence/m0-windows-gui-2026-09-01.md)에 보존한다.
 
 ## 요구 환경
 
