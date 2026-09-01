@@ -3,19 +3,20 @@
 ## 문서 상태
 
 ```text
-STATUS = PROVISIONAL / DESIGN ITEMS 1-21 APPROVED
-IMPLEMENTATION AUTHORIZATION = M0 + M1 + M2
+STATUS = PROVISIONAL / DESIGN ITEMS 1-22 APPROVED
+IMPLEMENTATION AUTHORIZATION = M0 + M1 + M2 + M3
 M1 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 M2 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
-IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS / M2 COMPLETE / PASS
-AUTOMATED VERIFICATION = M0 + M1 + M2 LOCAL / LINUX / WINDOWS PASS
+M3 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
+IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS / M2 COMPLETE / PASS / M3 COMPLETE / MECHANICS PASS
+AUTOMATED VERIFICATION = M0 + M1 + M2 + M3 LOCAL / LINUX / WINDOWS PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
-FULL ACCEPTANCE = M0 + M1 + M2 PASS
-SCOPE = M0 + M1 + M2 COMPLETE / M3 IMPLEMENTED / LOCAL MECHANICS PASS
-PENDING GATE = M3 LINUX + WINDOWS CI / M4 CONTRACT NOT APPROVED
+FULL ACCEPTANCE = M0 + M1 + M2 + M3 MECHANICS PASS / M3 BEHAVIOR OBSERVED
+SCOPE = M0 + M1 + M2 + M3 COMPLETE / M4 NOT SPECIFIED / M4 NOT AUTHORIZED
+PENDING DISCUSSION = DESIGN ITEM 23 / M4 CONTRACT
 ```
 
-이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, M1 상태 직렬화 형식만 결정 18의 계약으로 고정했다.
+이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, 구현된 M1~M3 경계는 결정 18~22의 해당 계약과 동결 artifact로 고정했다.
 
 ## 1. 검증 목적
 
@@ -3153,7 +3154,7 @@ evaluate(WorldState, DecisionRequest) -> DecisionResult
 - 세계의 순차 RNG 상태
 - canonical state JSON과 SHA-256
 
-`DecisionRecord`는 판단의 반환 artifact이며 M3에서는 세계 상태에 삽입하지 않는다. 따라서 그 기록 자체 때문에 canonical state hash가 변하지 않는다.
+M3의 `DecisionResult`는 별도 반환 artifact이며 세계 상태에 삽입하지 않는다. legacy `DecisionRecord`와 M1 audit 형식도 변경하지 않는다. 따라서 M3 판단 기록 자체 때문에 canonical state hash가 변하지 않는다.
 
 #### 효용 계산과 제한 난수 경계
 

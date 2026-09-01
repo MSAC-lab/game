@@ -29,21 +29,21 @@ M0 기반, M1 상태 모델, M2 하루·식량 진행기와 M3 최초 판단 엔
 ## 현재 상태
 
 ```text
-STATUS = M0 PASS / M1 PASS / M2 PASS / M3 LOCAL PASS
+STATUS = M0 PASS / M1 PASS / M2 PASS / M3 PASS
 IMPLEMENTATION = FOUNDATION + STATE / TIME / FOOD + PURE DECISION EVALUATION
-AUTOMATED_VERIFICATION = M0-M2 LOCAL + LINUX + WINDOWS PASS / M3 LOCAL PASS
+AUTOMATED_VERIFICATION = M0-M3 LOCAL + LINUX + WINDOWS PASS
 GUI_VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FIRST_PROTOTYPE = DROUGHT / PROVISIONAL
 ENGINE = GODOT 4.7.2 STABLE STANDARD
 LANGUAGE = STATICALLY TYPED GDSCRIPT
 M1 = COMPLETE / PASS
 M2 = COMPLETE / PASS
-M3 = IMPLEMENTED / LOCAL MECHANICS PASS / CROSS-PLATFORM CI PENDING
+M3 = COMPLETE / MECHANICS PASS / BEHAVIOR OBSERVED
 ```
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다.
 
-M2는 schema 2의 자원 저장소와 거래 원장, 원자적 하루 진행, 결정론적 가구 내 식량 배분, 굶주림·건강 변화를 구현한다. 세 가구·여덟 명 fixture를 10일 진행하면 초기 식량 181 중 81을 소비하고 공동창고 100만 남는다. NPC 판단, 가뭄·생산·수확, 촌장 배급 결정, 절도 및 UI는 아직 구현하지 않았다.
+M2는 schema 2의 자원 저장소와 거래 원장, 원자적 하루 진행, 결정론적 가구 내 식량 배분, 굶주림·건강 변화를 구현한다. 세 가구·여덟 명 fixture를 10일 진행하면 초기 식량 181 중 81을 소비하고 공동창고 100만 남는다. M2 자체는 NPC 판단, 가뭄·생산·수확, 촌장 배급 결정, 행동 결과 처리 또는 UI를 포함하지 않는다.
 
 M3는 schema 3의 구조화된 주관적 사실만 이용해 `A00 현재 행동 유지`, `A04 도움 요청`, `A11 절도`를 평가한다. 외부 창고의 실제 수량·보안, 자연어 `claim`, 사건·기억과 플레이어 여부는 판단 입력이 아니다. 계산 정확성, 결정론, 정보 경계, 입력 상태 불변성과 감사 가능성만 기계적으로 판정한다. C01~C05에서 모두 A04가 선택됐지만 이는 성공 조건이 아니라 최초 동결 규칙에서 나온 관찰값이다.
 
