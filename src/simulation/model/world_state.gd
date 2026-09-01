@@ -3,7 +3,8 @@ extends RefCounted
 
 const SCHEMA_VERSION_M1: int = 1
 const SCHEMA_VERSION_M2: int = 2
-const CURRENT_SCHEMA_VERSION: int = SCHEMA_VERSION_M2
+const SCHEMA_VERSION_M3: int = 3
+const CURRENT_SCHEMA_VERSION: int = SCHEMA_VERSION_M3
 const SUPPORTED_SCHEMA_VERSION: int = CURRENT_SCHEMA_VERSION
 const DAY_END_PHASE: String = "DAY_END"
 
@@ -46,12 +47,18 @@ func to_state_data() -> Dictionary:
 		"households": household_data,
 		"relations": ModelData.object_array_to_data(relations),
 		"events": ModelData.object_array_to_data(events),
-		"information": ModelData.object_array_to_data(information),
 		"memories": ModelData.object_array_to_data(memories),
 	}
-	if schema_version == SCHEMA_VERSION_M2:
+	var information_data: Array = []
+	for fact: InformationState in information:
+		information_data.append(fact.to_data(schema_version))
+	data["information"] = information_data
+	if schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3]:
 		data["day_phase"] = day_phase
-		data["resource_stores"] = ModelData.object_array_to_data(resource_stores)
+		var resource_store_data: Array = []
+		for store: ResourceStoreState in resource_stores:
+			resource_store_data.append(store.to_data(schema_version))
+		data["resource_stores"] = resource_store_data
 	return data
 
 
@@ -62,7 +69,7 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 	world.ruleset_hash = str(metadata.get("ruleset_hash", ""))
 	world.scenario_id = str(state_data.get("scenario_id", ""))
 	world.day_index = int(state_data.get("day_index", 0))
-	if world.schema_version == SCHEMA_VERSION_M2:
+	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3]:
 		world.day_phase = str(state_data.get("day_phase", ""))
 	world.season_id = str(state_data.get("season_id", ""))
 	world.rng_seed_hex = str(state_data.get("rng_seed_hex", ""))
@@ -78,10 +85,10 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 	for item: Variant in household_data:
 		world.households.append(HouseholdState.from_data(item, world.schema_version))
 
-	if world.schema_version == SCHEMA_VERSION_M2:
+	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3]:
 		var resource_store_data: Array = state_data.get("resource_stores", [])
 		for item: Variant in resource_store_data:
-			world.resource_stores.append(ResourceStoreState.from_data(item))
+			world.resource_stores.append(ResourceStoreState.from_data(item, world.schema_version))
 
 	var relation_data: Array = state_data.get("relations", [])
 	for item: Variant in relation_data:
@@ -93,7 +100,7 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 
 	var information_data: Array = state_data.get("information", [])
 	for item: Variant in information_data:
-		world.information.append(InformationState.from_data(item))
+		world.information.append(InformationState.from_data(item, world.schema_version))
 
 	var memory_data: Array = state_data.get("memories", [])
 	for item: Variant in memory_data:

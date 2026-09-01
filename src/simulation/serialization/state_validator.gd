@@ -12,14 +12,22 @@ static func validate_envelope(envelope: Dictionary) -> Array[String]:
 		errors.append("schema_version must be an integer")
 	else:
 		schema_version = int(envelope.get("schema_version"))
-		if schema_version not in [WorldState.SCHEMA_VERSION_M1, WorldState.SCHEMA_VERSION_M2]:
+		if schema_version not in [
+			WorldState.SCHEMA_VERSION_M1,
+			WorldState.SCHEMA_VERSION_M2,
+			WorldState.SCHEMA_VERSION_M3,
+		]:
 			errors.append("unsupported schema_version: %s" % str(schema_version))
 	_require_nonempty_string(envelope, "ruleset_id", "envelope", errors)
 	_require_pattern(envelope, "ruleset_hash", HASH_PATTERN, "envelope", errors)
 	if typeof(envelope.get("state")) != TYPE_DICTIONARY:
 		errors.append("state must be a dictionary")
 		return errors
-	if schema_version in [WorldState.SCHEMA_VERSION_M1, WorldState.SCHEMA_VERSION_M2]:
+	if schema_version in [
+		WorldState.SCHEMA_VERSION_M1,
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+	]:
 		_validate_state(envelope.get("state"), schema_version, errors)
 	return errors
 
@@ -56,7 +64,7 @@ static func _validate_state(
 	var information: Dictionary = _index_collection(state, "information", errors)
 	var memories: Dictionary = _index_collection(state, "memories", errors)
 	var resource_stores: Dictionary = {}
-	if schema_version == WorldState.SCHEMA_VERSION_M2:
+	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
 		resource_stores = _index_collection(state, "resource_stores", errors)
 
 	var player_id: String = str(state.get("player_person_id", ""))
@@ -67,7 +75,7 @@ static func _validate_state(
 	_validate_households(households, persons, resource_stores, schema_version, errors)
 	_validate_relations(relations, persons, errors)
 	_validate_events(events, persons, errors)
-	_validate_information(information, persons, events, errors)
+	_validate_information(information, persons, events, resource_stores, schema_version, errors)
 	_validate_memories(memories, persons, events, information, errors)
 	_validate_persons(
 		persons, households, relations, information, memories, schema_version, errors
@@ -164,6 +172,9 @@ static func _validate_households(
 			_forbid_key(
 				household, "resource_store_id", "schema 1 household %s" % household_id, errors
 			)
+			_forbid_key(
+				household, "dependent_person_ids", "schema 1 household %s" % household_id, errors
+			)
 		else:
 			_forbid_key(household, "food_units", "schema 2 household %s" % household_id, errors)
 			_forbid_key(
@@ -185,6 +196,29 @@ static func _validate_households(
 					errors.append(
 					"household %s.resource_store_id must reference its own household store"
 					% household_id
+					)
+			if schema_version == WorldState.SCHEMA_VERSION_M3:
+				_validate_reference_array(
+					household,
+					"dependent_person_ids",
+					persons,
+					"household %s" % household_id,
+					errors
+				)
+				var member_ids: Array = household.get("member_ids", [])
+				var dependent_ids: Array = household.get("dependent_person_ids", [])
+				for dependent_id: Variant in dependent_ids:
+					if not member_ids.has(dependent_id):
+						errors.append(
+							"household %s dependent is not a member: %s"
+							% [household_id, str(dependent_id)]
+						)
+			else:
+				_forbid_key(
+					household,
+					"dependent_person_ids",
+					"schema 2 household %s" % household_id,
+					errors
 				)
 
 
@@ -194,7 +228,7 @@ static func _validate_resource_stores(
 	schema_version: int,
 	errors: Array[String]
 ) -> void:
-	if schema_version != WorldState.SCHEMA_VERSION_M2:
+	if schema_version not in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
 		return
 	for store_id: Variant in stores.keys():
 		var store: Dictionary = stores[store_id]
@@ -202,6 +236,10 @@ static func _validate_resource_stores(
 		_require_string(store, "owner_id", "store %s" % store_id, errors)
 		_require_exact_string(store, "resource_type_id", "food", "store %s" % store_id, errors)
 		_require_integer(store, "quantity", 0, 2147483647, "store %s" % store_id, errors)
+		if schema_version == WorldState.SCHEMA_VERSION_M3:
+			_require_integer(store, "security_level", 0, 100, "store %s" % store_id, errors)
+		else:
+			_forbid_key(store, "security_level", "schema 2 store %s" % store_id, errors)
 		var owner_kind: String = str(store.get("owner_kind", ""))
 		var owner_id: String = str(store.get("owner_id", ""))
 		if owner_kind == "household":
@@ -247,8 +285,14 @@ static func _validate_events(events: Dictionary, persons: Dictionary, errors: Ar
 
 
 static func _validate_information(
-	information: Dictionary, persons: Dictionary, events: Dictionary, errors: Array[String]
+	information: Dictionary,
+	persons: Dictionary,
+	events: Dictionary,
+	resource_stores: Dictionary,
+	schema_version: int,
+	errors: Array[String]
 ) -> void:
+	var structured_keys: Dictionary = {}
 	for info_id: Variant in information.keys():
 		var info: Dictionary = information[info_id]
 		for key: String in ["claim", "acquisition_type"]:
@@ -262,6 +306,67 @@ static func _validate_information(
 		_require_integer(
 			info, "learned_day_index", 0, 2147483647, "information %s" % info_id, errors
 		)
+		if schema_version == WorldState.SCHEMA_VERSION_M3:
+			_validate_structured_information(
+				str(info_id), info, persons, resource_stores, structured_keys, errors
+			)
+		else:
+			for key: String in ["fact_type_id", "subject_kind", "subject_id", "belief_value"]:
+				_forbid_key(info, key, "schema %d information %s" % [schema_version, info_id], errors)
+
+
+static func _validate_structured_information(
+	info_id: String,
+	info: Dictionary,
+	persons: Dictionary,
+	resource_stores: Dictionary,
+	structured_keys: Dictionary,
+	errors: Array[String]
+) -> void:
+	var context: String = "information %s" % info_id
+	_require_nonempty_string(info, "fact_type_id", context, errors)
+	_require_nonempty_string(info, "subject_id", context, errors)
+	_require_integer(info, "belief_value", 0, 100, context, errors)
+	var subject_kind: String = str(info.get("subject_kind", ""))
+	var subject_id: String = str(info.get("subject_id", ""))
+	var fact_type_id: String = str(info.get("fact_type_id", ""))
+	var person_fact_types: Array[String] = [
+		"request_food_access",
+		"request_food_capacity",
+		"request_success_expectation",
+		"request_social_risk",
+		"village_authority",
+	]
+	var store_fact_types: Array[String] = [
+		"food_stock_level",
+		"theft_access",
+		"theft_opportunity",
+		"detection_risk",
+		"sanction_severity",
+	]
+	if subject_kind == "person":
+		if not persons.has(subject_id):
+			errors.append("%s.subject_id references missing person: %s" % [context, subject_id])
+		if not person_fact_types.has(fact_type_id):
+			errors.append("%s has invalid person fact_type_id: %s" % [context, fact_type_id])
+	elif subject_kind == "resource_store":
+		if not resource_stores.has(subject_id):
+			errors.append("%s.subject_id references missing resource store: %s" % [context, subject_id])
+		if not store_fact_types.has(fact_type_id):
+			errors.append("%s has invalid resource store fact_type_id: %s" % [context, fact_type_id])
+	else:
+		errors.append("%s.subject_kind must be person or resource_store" % context)
+	if fact_type_id in ["request_food_access", "village_authority"]:
+		var belief_value: int = int(info.get("belief_value", -1))
+		if belief_value not in [0, 100]:
+			errors.append("%s.belief_value must be 0 or 100 for %s" % [context, fact_type_id])
+	var unique_key: String = "%s|%s|%s" % [
+		str(info.get("owner_person_id", "")), fact_type_id, subject_id
+	]
+	if structured_keys.has(unique_key):
+		errors.append("duplicate structured information key: %s" % unique_key)
+	else:
+		structured_keys[unique_key] = true
 
 
 static func _validate_memories(
