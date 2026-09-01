@@ -1,0 +1,58 @@
+class_name PersonState
+extends RefCounted
+
+var id: String = ""
+var display_name: String = ""
+var household_id: String = ""
+var occupation_id: String = ""
+var role_ids: Array[String] = []
+var alive: bool = true
+var health: int = 100
+var trait_scores: Dictionary = {}
+var value_scores: Dictionary = {}
+var emotion_scores: Dictionary = {}
+var need_scores: Dictionary = {}
+var goal_ids: Array[String] = []
+var information_ids: Array[String] = []
+var memory_ids: Array[String] = []
+var relation_ids: Array[String] = []
+
+
+func to_data() -> Dictionary:
+	return {
+		"id": id,
+		"display_name": display_name,
+		"household_id": household_id,
+		"occupation_id": occupation_id,
+		"role_ids": role_ids.duplicate(),
+		"alive": alive,
+		"health": health,
+		"trait_scores": trait_scores.duplicate(true),
+		"value_scores": value_scores.duplicate(true),
+		"emotion_scores": emotion_scores.duplicate(true),
+		"need_scores": need_scores.duplicate(true),
+		"goal_ids": goal_ids.duplicate(),
+		"information_ids": information_ids.duplicate(),
+		"memory_ids": memory_ids.duplicate(),
+		"relation_ids": relation_ids.duplicate(),
+	}
+
+
+static func from_data(data: Dictionary) -> PersonState:
+	var state: PersonState = PersonState.new()
+	state.id = str(data.get("id", ""))
+	state.display_name = str(data.get("display_name", ""))
+	state.household_id = str(data.get("household_id", ""))
+	state.occupation_id = str(data.get("occupation_id", ""))
+	state.role_ids = ModelData.copy_string_array(data.get("role_ids", []))
+	state.alive = bool(data.get("alive", false))
+	state.health = int(data.get("health", 0))
+	state.trait_scores = ModelData.copy_string_int_dictionary(data.get("trait_scores", {}))
+	state.value_scores = ModelData.copy_string_int_dictionary(data.get("value_scores", {}))
+	state.emotion_scores = ModelData.copy_string_int_dictionary(data.get("emotion_scores", {}))
+	state.need_scores = ModelData.copy_string_int_dictionary(data.get("need_scores", {}))
+	state.goal_ids = ModelData.copy_string_array(data.get("goal_ids", []))
+	state.information_ids = ModelData.copy_string_array(data.get("information_ids", []))
+	state.memory_ids = ModelData.copy_string_array(data.get("memory_ids", []))
+	state.relation_ids = ModelData.copy_string_array(data.get("relation_ids", []))
+	return state

@@ -1,0 +1,248 @@
+{
+  "audit": [
+    {
+      "actor_person_id": "person:000001",
+      "candidate_action_ids": [
+        "action:request_food_aid",
+        "action:wait"
+      ],
+      "change_pressure": {
+        "desperation": 12,
+        "distrust": 9
+      },
+      "day_index": 7,
+      "evaluation_reasons": [
+        "authority is still trusted",
+        "legal route remains available"
+      ],
+      "id": "decision:000001",
+      "result_event_id": "",
+      "selected_action_id": "action:request_food_aid",
+      "selected_intent": "protect_household_legally",
+      "unavailable_reasons": {
+        "action:steal_food": "need pressure below threshold"
+      }
+    }
+  ],
+  "ruleset_hash": "3055d08fb022320d17d86b09ffb792fae716c5ffc2f967f706955861d42f6524",
+  "ruleset_id": "drought-prototype-rules-v1",
+  "schema_version": 1,
+  "state": {
+    "day_index": 7,
+    "events": [
+      {
+        "action_id": "action:count_public_grain",
+        "actor_ids": [
+          "person:000003"
+        ],
+        "day_index": 6,
+        "event_type": "overheard_storehouse_count",
+        "id": "event:000001",
+        "is_public": false,
+        "location_id": "location:village_storehouse",
+        "result_id": "result:reserve_lower_than_claimed",
+        "target_ids": [],
+        "witness_ids": [
+          "person:000001"
+        ]
+      }
+    ],
+    "households": [
+      {
+        "daily_food_need_units": 4,
+        "dependency_load": 1,
+        "food_units": 36,
+        "id": "household:000001",
+        "livelihood_id": "mixed_labor",
+        "member_ids": [
+          "person:000001",
+          "person:000002"
+        ],
+        "residence_id": "residence:south_lane_03",
+        "wealth_units": 18
+      },
+      {
+        "daily_food_need_units": 2,
+        "dependency_load": 0,
+        "food_units": 52,
+        "id": "household:000002",
+        "livelihood_id": "village_administration",
+        "member_ids": [
+          "person:000003"
+        ],
+        "residence_id": "residence:headman_compound",
+        "wealth_units": 41
+      }
+    ],
+    "information": [
+      {
+        "acquisition_type": "direct_observation",
+        "claim": "The public grain reserve is lower than the announced amount.",
+        "confidence": 88,
+        "current_source_person_id": "",
+        "id": "information:000001",
+        "is_secret": true,
+        "learned_day_index": 6,
+        "linked_event_id": "event:000001",
+        "original_source_person_id": "person:000003",
+        "owner_person_id": "person:000001"
+      }
+    ],
+    "memories": [
+      {
+        "emotion_scores": {
+          "distrust": 31,
+          "worry": 44
+        },
+        "id": "memory:000001",
+        "importance": 57,
+        "linked_event_id": "event:000001",
+        "linked_information_id": "information:000001",
+        "occurred_day_index": 6,
+        "owner_person_id": "person:000001",
+        "perceived_action_id": "action:count_public_grain",
+        "perceived_result_id": "result:reserve_lower_than_claimed",
+        "related_person_ids": [
+          "person:000003"
+        ],
+        "tier": "recent"
+      }
+    ],
+    "next_ids": {
+      "decision": 2,
+      "event": 2,
+      "household": 3,
+      "information": 2,
+      "memory": 2,
+      "person": 4
+    },
+    "persons": [
+      {
+        "alive": true,
+        "display_name": "한결",
+        "emotion_scores": {
+          "anxiety": 35
+        },
+        "goal_ids": [
+          "goal:protect_household"
+        ],
+        "health": 100,
+        "household_id": "household:000001",
+        "id": "person:000001",
+        "information_ids": [
+          "information:000001"
+        ],
+        "memory_ids": [
+          "memory:000001"
+        ],
+        "need_scores": {
+          "hunger": 28,
+          "security": 44
+        },
+        "occupation_id": "store_assistant",
+        "relation_ids": [
+          "relation:person:000001->person:000003"
+        ],
+        "role_ids": [
+          "player_window"
+        ],
+        "trait_scores": {
+          "courage": 42,
+          "discipline": 61
+        },
+        "value_scores": {
+          "family": 78,
+          "law": 55
+        }
+      },
+      {
+        "alive": true,
+        "display_name": "미라",
+        "emotion_scores": {
+          "anxiety": 22
+        },
+        "goal_ids": [],
+        "health": 100,
+        "household_id": "household:000001",
+        "id": "person:000002",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 24,
+          "security": 40
+        },
+        "occupation_id": "weaver",
+        "relation_ids": [],
+        "role_ids": [],
+        "trait_scores": {
+          "courage": 37,
+          "discipline": 68
+        },
+        "value_scores": {
+          "family": 82,
+          "law": 64
+        }
+      },
+      {
+        "alive": true,
+        "display_name": "도윤",
+        "emotion_scores": {
+          "anxiety": 16
+        },
+        "goal_ids": [],
+        "health": 100,
+        "household_id": "household:000002",
+        "id": "person:000003",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 12,
+          "security": 25
+        },
+        "occupation_id": "village_head",
+        "relation_ids": [
+          "relation:person:000003->person:000001"
+        ],
+        "role_ids": [
+          "village_authority"
+        ],
+        "trait_scores": {
+          "courage": 58,
+          "discipline": 73
+        },
+        "value_scores": {
+          "family": 48,
+          "law": 80
+        }
+      }
+    ],
+    "player_person_id": "person:000001",
+    "relations": [
+      {
+        "affection": 18,
+        "fear": 9,
+        "from_person_id": "person:000001",
+        "id": "relation:person:000001->person:000003",
+        "obligation": 25,
+        "resentment": 6,
+        "to_person_id": "person:000003",
+        "trust": 62
+      },
+      {
+        "affection": 12,
+        "fear": 3,
+        "from_person_id": "person:000003",
+        "id": "relation:person:000003->person:000001",
+        "obligation": 14,
+        "resentment": 8,
+        "to_person_id": "person:000001",
+        "trust": 47
+      }
+    ],
+    "rng_seed_hex": "0123456789abcdef",
+    "rng_state_hex": "fedcba9876543210",
+    "scenario_id": "three-person-state-fixture",
+    "season_id": "late_spring"
+  },
+  "state_hash": "6c581e746efb0c2fff6f81bc939ef84a0b60fd6021a94c79344de5d9d431926d"
+}

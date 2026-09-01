@@ -1,4 +1,4 @@
-name: M0 smoke
+name: M0-M1 verification
 
 on:
   pull_request:
@@ -45,6 +45,14 @@ jobs:
           "$godot" --headless --path . --script res://tests/smoke_test.gd
           "$godot" --headless --path . --quit-after 1
 
+      - name: Run M1 state-model tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot=".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          "$godot" --headless --editor --path . --quit
+          "$godot" --headless --path . --script res://tests/m1_test_runner.gd
+
   windows-smoke:
     name: Windows / Godot 4.7.2
     runs-on: windows-latest
@@ -82,4 +90,14 @@ jobs:
           & $godot --headless --path . --script res://tests/smoke_test.gd
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & $godot --headless --path . --quit-after 1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run M1 state-model tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $godot = ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
+          & $godot --headless --editor --path . --quit
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $godot --headless --path . --script res://tests/m1_test_runner.gd
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

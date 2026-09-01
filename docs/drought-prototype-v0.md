@@ -4,17 +4,17 @@
 
 ```text
 STATUS = PROVISIONAL / DESIGN ITEMS 1-18 APPROVED
-IMPLEMENTATION AUTHORIZATION = M0 ONLY
-M1 IMPLEMENTATION AUTHORIZATION = NOT GRANTED
-IMPLEMENTATION STATUS = M0 COMPLETE / PASS
-AUTOMATED VERIFICATION = PASS
+IMPLEMENTATION AUTHORIZATION = M0 + M1
+M1 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
+IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS
+AUTOMATED VERIFICATION = M0 + M1 LOCAL / LINUX / WINDOWS PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
-FULL ACCEPTANCE = PASS
-SCOPE = M0 COMPLETE / M1 CONTRACT APPROVED
+FULL ACCEPTANCE = M0 + M1 PASS
+SCOPE = M0 + M1 COMPLETE / M2 NOT AUTHORIZED
 PENDING DISCUSSION = NONE
 ```
 
-이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했으며, 구체적인 수치, UI 상세 및 저장 형식은 아직 결정하지 않는다.
+이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, M1 상태 직렬화 형식만 결정 18의 계약으로 고정했다.
 
 ## 1. 검증 목적
 
@@ -2307,4 +2307,4 @@ M1 통과가 증명하는 것은 다음뿐이다.
 
 M1 통과는 NPC 판단의 개연성, 인과 모델의 외부 타당성, 장기 simulation 안정성 또는 게임의 재미를 증명하지 않는다.
 
-이 결정 18의 승인은 문서 계약만 확정한다. M1 구현 권한은 별도의 `M1 구현 승인` 전까지 부여되지 않는다.
+결정 18의 계약에 따라 M1 구현이 승인되었고, 세 명의 기준 fixture와 M1-T01~T10을 구현했다. 로컬·Linux·Windows에서 동일한 frozen fixture SHA-256과 전체 시험 통과를 확인하여 `M1 PASS`로 확정한다. M2 시간·자원 시스템의 구현 권한은 부여되지 않았다.
