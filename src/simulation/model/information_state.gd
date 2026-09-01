@@ -11,10 +11,14 @@ var current_source_person_id: String = ""
 var confidence: int = 0
 var is_secret: bool = false
 var learned_day_index: int = 0
+var fact_type_id: String = ""
+var subject_kind: String = ""
+var subject_id: String = ""
+var belief_value: int = 0
 
 
-func to_data() -> Dictionary:
-	return {
+func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M1) -> Dictionary:
+	var data: Dictionary = {
 		"id": id,
 		"claim": claim,
 		"owner_person_id": owner_person_id,
@@ -26,9 +30,17 @@ func to_data() -> Dictionary:
 		"is_secret": is_secret,
 		"learned_day_index": learned_day_index,
 	}
+	if schema_version == WorldState.SCHEMA_VERSION_M3:
+		data["fact_type_id"] = fact_type_id
+		data["subject_kind"] = subject_kind
+		data["subject_id"] = subject_id
+		data["belief_value"] = belief_value
+	return data
 
 
-static func from_data(data: Dictionary) -> InformationState:
+static func from_data(
+	data: Dictionary, schema_version: int = WorldState.SCHEMA_VERSION_M1
+) -> InformationState:
 	var state: InformationState = InformationState.new()
 	state.id = str(data.get("id", ""))
 	state.claim = str(data.get("claim", ""))
@@ -40,4 +52,9 @@ static func from_data(data: Dictionary) -> InformationState:
 	state.confidence = int(data.get("confidence", 0))
 	state.is_secret = bool(data.get("is_secret", false))
 	state.learned_day_index = int(data.get("learned_day_index", 0))
+	if schema_version == WorldState.SCHEMA_VERSION_M3:
+		state.fact_type_id = str(data.get("fact_type_id", ""))
+		state.subject_kind = str(data.get("subject_kind", ""))
+		state.subject_id = str(data.get("subject_id", ""))
+		state.belief_value = int(data.get("belief_value", 0))
 	return state

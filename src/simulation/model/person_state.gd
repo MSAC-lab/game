@@ -38,7 +38,7 @@ func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M1) -> Dictionary:
 		"memory_ids": memory_ids.duplicate(),
 		"relation_ids": relation_ids.duplicate(),
 	}
-	if schema_version == WorldState.SCHEMA_VERSION_M2:
+	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
 		data["daily_food_need_units"] = daily_food_need_units
 		data["severe_hunger_days"] = severe_hunger_days
 	return data
@@ -55,7 +55,7 @@ static func from_data(
 	state.role_ids = ModelData.copy_string_array(data.get("role_ids", []))
 	state.alive = bool(data.get("alive", false))
 	state.health = int(data.get("health", 0))
-	if schema_version == WorldState.SCHEMA_VERSION_M2:
+	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
 		state.daily_food_need_units = int(data.get("daily_food_need_units", 0))
 		state.severe_hunger_days = int(data.get("severe_hunger_days", 0))
 	state.trait_scores = ModelData.copy_string_int_dictionary(data.get("trait_scores", {}))

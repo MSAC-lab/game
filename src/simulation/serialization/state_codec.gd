@@ -12,7 +12,7 @@ static func encode(
 		audit_data.append(record.to_data())
 	var envelope: Dictionary = StateHasher.state_payload(world)
 	envelope["audit"] = audit_data
-	if world.schema_version == WorldState.SCHEMA_VERSION_M2:
+	if world.schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
 		var resource_audit_data: Array = []
 		for record: ResourceTransactionRecord in resource_records:
 			resource_audit_data.append(record.to_data())
@@ -34,9 +34,9 @@ static func decode(json_text: String) -> Dictionary:
 	if typeof(envelope.get("audit")) != TYPE_ARRAY:
 		errors.append("audit must be an array")
 	var schema_version: int = int(envelope.get("schema_version", 0))
-	if schema_version == WorldState.SCHEMA_VERSION_M2:
+	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
 		if typeof(envelope.get("resource_audit")) != TYPE_ARRAY:
-			errors.append("resource_audit must be an array for schema 2")
+			errors.append("resource_audit must be an array for schema 2 or 3")
 	elif schema_version == WorldState.SCHEMA_VERSION_M1 and envelope.has("resource_audit"):
 		errors.append("schema 1 envelope forbids resource_audit")
 	if typeof(envelope.get("state_hash")) != TYPE_STRING or len(str(envelope.get("state_hash"))) != 64:
@@ -62,7 +62,7 @@ static func decode(json_text: String) -> Dictionary:
 		audit_records.append(DecisionRecord.from_data(record_data))
 
 	var resource_records: Array[ResourceTransactionRecord] = []
-	if schema_version == WorldState.SCHEMA_VERSION_M2:
+	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
 		var resource_audit_data: Array = envelope.get("resource_audit")
 		var transaction_ids: Dictionary = {}
 		var consumer_days: Dictionary = {}

@@ -2,7 +2,7 @@
 
 가상의 중세~르네상스 난세에서 한 개인의 선택과 변화가 주변 인물과 역사에 영향을 주는 개인 중심 시뮬레이션 게임 프로젝트다.
 
-M0 기반, M1 상태 모델 및 M2 하루·식량 진행기를 완료했다. Linux·Windows 자동 검증과 Windows Godot 편집기의 수동 `F5` 실행도 확인했다. M3 최초 판단 엔진은 결과를 유도하지 않고 관찰하는 계약까지만 승인됐다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
+M0 기반, M1 상태 모델, M2 하루·식량 진행기와 M3 최초 판단 엔진을 완료했다. M3는 결과를 유도하지 않고 세 행동의 후보·효용·선택을 관찰한다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
 
 > 인물의 성향·상태·관계·기억 → 판단과 선택 → 사건의 결과 → 인물과 세계의 변화 → 이후의 다른 판단
 
@@ -29,23 +29,23 @@ M0 기반, M1 상태 모델 및 M2 하루·식량 진행기를 완료했다. Lin
 ## 현재 상태
 
 ```text
-STATUS = M0 PASS / M1 PASS / M2 PASS
-IMPLEMENTATION = FOUNDATION + STATE MODEL / SERIALIZATION + TIME / FOOD / HUNGER / HEALTH
-AUTOMATED_VERIFICATION = LOCAL + LINUX + WINDOWS PASS
+STATUS = M0 PASS / M1 PASS / M2 PASS / M3 LOCAL PASS
+IMPLEMENTATION = FOUNDATION + STATE / TIME / FOOD + PURE DECISION EVALUATION
+AUTOMATED_VERIFICATION = M0-M2 LOCAL + LINUX + WINDOWS PASS / M3 LOCAL PASS
 GUI_VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FIRST_PROTOTYPE = DROUGHT / PROVISIONAL
 ENGINE = GODOT 4.7.2 STABLE STANDARD
 LANGUAGE = STATICALLY TYPED GDSCRIPT
 M1 = COMPLETE / PASS
 M2 = COMPLETE / PASS
-M3 = CONTRACT APPROVED / DETAILED SPEC NOT APPROVED / IMPLEMENTATION NOT AUTHORIZED
+M3 = IMPLEMENTED / LOCAL MECHANICS PASS / CROSS-PLATFORM CI PENDING
 ```
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다.
 
 M2는 schema 2의 자원 저장소와 거래 원장, 원자적 하루 진행, 결정론적 가구 내 식량 배분, 굶주림·건강 변화를 구현한다. 세 가구·여덟 명 fixture를 10일 진행하면 초기 식량 181 중 81을 소비하고 공동창고 100만 남는다. NPC 판단, 가뭄·생산·수확, 촌장 배급 결정, 절도 및 UI는 아직 구현하지 않았다.
 
-M3 계약은 `A00 현재 행동 유지`, `A04 도움 요청`, `A11 절도`의 후보와 효용을 같은 규칙으로 계산하되, 특정 행동·효용 방향·이야기 결과를 합격 조건으로 삼지 않는다. 계산 정확성, 결정론, 주관적 정보 경계, 입력 상태 불변성과 감사 가능성만 기계적으로 판정한다. 반대 조건에서 나온 행동과 점수 변화는 정답이 아니라 관찰 결과로 기록한다. 기존 효용 가중치·범위와 관찰 프로브 정의는 계약에 포함되지만, 구성요소별 세부 정수식, schema 필드, 제한 난수 배분, fixture 값·hash와 코드는 후속 승인 전까지 작성하지 않는다.
+M3는 schema 3의 구조화된 주관적 사실만 이용해 `A00 현재 행동 유지`, `A04 도움 요청`, `A11 절도`를 평가한다. 외부 창고의 실제 수량·보안, 자연어 `claim`, 사건·기억과 플레이어 여부는 판단 입력이 아니다. 계산 정확성, 결정론, 정보 경계, 입력 상태 불변성과 감사 가능성만 기계적으로 판정한다. C01~C05에서 모두 A04가 선택됐지만 이는 성공 조건이 아니라 최초 동결 규칙에서 나온 관찰값이다.
 
 Windows 편집기 실행 증거는 [M0 Windows GUI 검증 기록](docs/evidence/m0-windows-gui-2026-09-01.md)에 보존한다.
 
@@ -157,3 +157,32 @@ M2에는 다음만 포함한다.
 - M2-T01~T12 및 M2-R01~R08 자동 시험
 
 M2의 계약과 구현 명세는 설계 결정 19·20으로 고정했다. M2는 NPC 판단, 가뭄, 생산, 촌장 배급 판단, 절도, 정보 전파, 기억 변화 또는 플레이 UI를 포함하지 않는다.
+
+## M3 판단 엔진 시험
+
+M1·M2 시험과 같은 editor scan 후 M3 시험을 실행한다.
+
+```powershell
+& "C:\path\to\Godot_v4.7.2-stable_win64_console.exe" `
+    --headless --editor --path . --quit
+& "C:\path\to\Godot_v4.7.2-stable_win64_console.exe" `
+    --headless --path . --script res://tests/m3_test_runner.gd
+```
+
+성공하면 `M3 PASS`와 종료 코드 `0`을 반환한다. 이 PASS는 판단 기계의 계산·재현·정보 경계만 뜻한다. C01~C05 관찰 artifact의 SHA-256은 다음과 같다.
+
+```text
+267ca08432790a5e8d6d1ac7e923e333260de15c2fd3ef78662deac40be57e71
+```
+
+## M3 범위
+
+- schema 3 구조화된 주관적 사실과 명시적 부양가족·실제 보안 필드
+- 세계를 변경하지 않는 순수 `DecisionEngine.evaluate()`
+- A00·A04·A11 후보 생성과 제외 이유
+- 정수 N·G·V·R·M·K·C·T 및 `U_SCALED`
+- 500 미만 근접 후보에만 적용되는 상태 없는 SHA-256 제한 난수
+- 별도 canonical 판단 artifact와 C01~C05 동결 관찰 보고서
+- M3-T01~T12 및 M3-R01~R04 자동 시험
+
+M3는 상대의 응답, 절도의 성공·발각, 자원 이전, 날짜 pipeline 통합, 사건·기억·관계·성향 변화, 다수 NPC scheduler 또는 플레이 UI를 포함하지 않는다.

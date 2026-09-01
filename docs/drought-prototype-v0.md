@@ -11,8 +11,8 @@ IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS / M2 COMPLETE / 
 AUTOMATED VERIFICATION = M0 + M1 + M2 LOCAL / LINUX / WINDOWS PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FULL ACCEPTANCE = M0 + M1 + M2 PASS
-SCOPE = M0 + M1 + M2 COMPLETE / M3 CONTRACT APPROVED / M3 DETAILED SPEC NOT APPROVED / M3 IMPLEMENTATION NOT AUTHORIZED
-PENDING DISCUSSION = DESIGN ITEM 22 / M3 DETAILED IMPLEMENTATION SPEC
+SCOPE = M0 + M1 + M2 COMPLETE / M3 IMPLEMENTED / LOCAL MECHANICS PASS
+PENDING GATE = M3 LINUX + WINDOWS CI / M4 CONTRACT NOT APPROVED
 ```
 
 이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, M1 상태 직렬화 형식만 결정 18의 계약으로 고정했다.
@@ -1908,7 +1908,7 @@ A11 절도
 - Linux와 Windows의 동결 fixture 판단 artifact SHA-256이 동일함
 - M1·M2 동결 시험과 해시가 유지됨
 
-C01~C05는 합격 시험이 아니라 반대 조건 관찰 프로브다. 특정 행동, 효용 방향 또는 이야기 결과는 M3 합격 조건이 아니다. 절도가 나오거나 나오지 않는다는 이유로 강제 이벤트를 추가하거나 수치를 조정하지 않는다. 세부 계약은 결정 21을 따른다.
+C01~C05는 합격 시험이 아니라 반대 조건 관찰 프로브다. 특정 행동, 효용 방향 또는 이야기 결과는 M3 합격 조건이 아니다. 절도가 나오거나 나오지 않는다는 이유로 강제 이벤트를 추가하거나 수치를 조정하지 않는다. 세부 계약과 구현 명세는 결정 21·22를 따른다.
 
 #### M4 — 행동 결과 처리
 
@@ -3254,6 +3254,87 @@ M3 PASS
 
 #### 승인과 다음 게이트
 
-결정 21의 승인은 이 계약을 문서에 반영할 권한만 부여한다. M3에 구조화된 주관적 정보와 새로운 version 경계가 필요하다는 방향은 승인하지만, schema 번호·필드·canonical 직렬화, 구성요소별 계산표, 제한 난수 알고리즘, fixture 값과 artifact hash는 아직 동결하지 않는다.
+결정 21은 관찰 우선 계약을 고정했다. 세부 schema·정수 계산·제한 난수·fixture와 구현 파일은 결정 22를 따른다.
 
-이 항목들은 결정 22 `M3 세부 구현 명세`에서 별도로 토론하고 승인한다. 결정 22 승인 뒤에도 실제 코드 작성은 명시적인 `M3 구현 승인` 전에는 시작하지 않는다.
+### 결정 22. M3 세부 구현 명세
+
+결정 22와 후속 `M3 구현 승인`에 따라 다음을 동결한다.
+
+#### schema와 입력 경계
+
+- `SCHEMA_VERSION_M3 = 3`, `CURRENT_SCHEMA_VERSION = 3`
+- ruleset ID는 `drought-prototype-rules-v3`
+- schema 1·2 자동 migration은 하지 않으며 기존 동결 artifact를 그대로 보존한다.
+- `InformationState`에 `fact_type_id`, `subject_kind`, `subject_id`, `belief_value`를 추가한다.
+- 유효 믿음값은 `ROUND_DIV(belief_value × confidence, 100)`이다.
+- 같은 소유자·사실 유형·대상 조합은 하나만 허용한다.
+- `HouseholdState.dependent_person_ids`는 `member_ids`의 부분집합이다. legacy `dependency_load`는 M3 판단에서 읽지 않는다.
+- `ResourceStoreState.security_level`은 객관적 실제값이지만 M3 판단에서는 읽지 않는다.
+- 자연어 `claim`, 사건, 기억, 외부 실제 식량·보안, 대상의 사적 상태와 `player_person_id`는 판단 입력이 아니다.
+
+구조화된 사실 유형은 다음으로 제한한다.
+
+| 대상 | 사실 유형 |
+|---|---|
+| person | `request_food_access`, `request_food_capacity`, `request_success_expectation`, `request_social_risk`, `village_authority` |
+| resource_store | `food_stock_level`, `theft_access`, `theft_opportunity`, `detection_risk`, `sanction_severity` |
+
+`request_food_access`와 `village_authority`의 `belief_value`는 0 또는 100만 허용한다. 후보에 필요한 구조화된 사실이 하나라도 없으면 기본값을 발명하지 않고 후보를 제외한다.
+
+#### 순수 평가 API와 artifact
+
+```text
+DecisionEngine.evaluate(WorldState, DecisionRequest) -> DecisionResult
+```
+
+`DecisionRequest`는 `actor_person_id`, `decision_key`만 가진다. `DecisionResult`는 입력 상태 hash, ruleset hash, 후보별 입력 사실과 N·G·V·R·M·K·C·T, 총효용, 제외 이유, 선택 방식과 제한 난수 감사값을 보존한다. 이 결과는 별도 canonical artifact이며 세계 상태와 세계 hash에 삽입하지 않는다.
+
+M3 평가는 세계 날짜·자원·상태·순차 RNG를 변경하지 않는다. 상대 응답, 절도 성공·발각, 자원 이전과 사건·기억·관계·성향 변화는 M4 이후의 책임이다.
+
+#### 후보 자격
+
+- `A00||`은 항상 정확히 한 번 존재하고 모든 구성요소가 0이다.
+- A04는 식량 압력이 양수이고 `goal:secure_household_food`가 있으며, 같은 사람에 대한 요청 사실 네 개가 모두 있고 유효 접근값이 50 이상일 때 생성한다.
+- A11은 같은 목표·압력 조건에서 같은 저장소에 대한 절도 사실 다섯 개가 모두 있고 유효 재고가 1 이상, 접근·기회가 각각 50 이상일 때 생성한다.
+- 행위자 자신과 자기 가구 저장소는 대상에서 제외한다.
+
+후보 ID는 각각 `A00||`, `A04|person|<person-id>`, `A11|resource_store|<store-id>` 형식이다.
+
+#### 정수 계산
+
+모든 나눗셈은 부동소수점 없이 다음 반올림을 사용한다.
+
+```text
+ROUND_DIV(n,d) = sign(n) × floor((2 × abs(n) + d) / (2 × d))
+```
+
+이는 정확히 절반인 값을 0에서 먼 방향으로 반올림한다. 총효용은 결정 21의 `U_SCALED`를 그대로 사용한다.
+
+- N은 가구 생존 인원의 10일 필요량 대비 자기 가구 식량 부족, 최대 굶주림과 최대 4명의 명시적 부양가족 배수를 결합한다.
+- G는 승인된 식량 확보 목표를 가진 유효 후보에서 100이다.
+- V는 `family_protection`, `community_survival`, `legitimate_order`, `fairness_reciprocity`, `property_autonomy`, `life_protection`과 행동별 의미 profile의 정수 내적이다.
+- R은 행위자에서 대상으로 향하는 관계와 부양가족 유대만 사용한다. 절도의 권위자 노출 손실은 행위자가 `village_authority`라고 믿는 사람의 관계와 알려진 발각 위험만 사용한다.
+- M은 요청의 알려진 수용능력·성공기대 최솟값 또는 절도의 알려진 재고·접근·기회 최솟값이다.
+- K는 알려진 기본 위험에 `risk_taking`과 현재 `fear`를 적용한다.
+- C는 규범 준수와 정당 질서를 반영하며 A04는 0, A11은 규범 위반 100을 사용한다. 창고 직원·경비 역할에는 의무 위반도 더한다.
+- T는 A00=0, A04=25, A11=50이다.
+
+정확한 의미 profile, 계수, clamp 순서와 ruleset hash 입력은 `M3DecisionRules.to_data()`가 실행 가능한 단일 기준이다.
+
+#### 선택과 상태 없는 제한 난수
+
+후보는 총효용 내림차순, 후보 ID 오름차순으로 정렬한다. 양수인 비-A00 후보가 없으면 A00을 고른다. 최고·차순위 차이가 500 이상이면 최고 후보를 난수 없이 선택한다.
+
+차이가 500 미만이면 최고점과의 차이가 500 미만인 후보 중 음수 비-A00을 제외하고 근접 후보군을 만든다. 가중치는 `500 - (최고점 - 후보점)`이다. 알고리즘 ID, 세계 seed, 날짜, 행위자, 판단 키와 ID 순으로 정렬한 후보·점수·가중치를 canonical JSON으로 직렬화해 SHA-256을 구한다. 앞 15 hex의 60-bit 정수를 총가중치로 나눈 나머지를 사용한다. 세계의 순차 RNG 상태는 소비하지 않는다.
+
+#### 동결 관찰 fixture
+
+C01~C05는 3인 가구의 가구주, 배우자·자녀, 촌장과 공동창고를 사용하는 고정 입력이다. C05A와 C05C는 알려진 위험이 같고 실제 보안만 다르므로 입력 세계 hash는 달라도 `input_state_hash`를 제외한 판단 core가 같아야 한다. C05B는 알려진 위험도 다르게 해 재계산만 관찰한다.
+
+최초 기계적으로 올바른 실행 결과를 `tests/fixtures/m3_observation_report.json`과 `.sha256`에 동결했다. 모든 C01~C05 상태에서 A04가 선택됐지만 이것은 합격 조건도 인간다움의 증거도 아니다. 동결 artifact hash는 다음과 같다.
+
+```text
+267ca08432790a5e8d6d1ac7e923e333260de15c2fd3ef78662deac40be57e71
+```
+
+결정 22 구현은 M3-T01~T12, M3-R01~R04와 추가 schema·입력 경계 회귀 시험을 통과해야 한다. M4 계약과 구현은 별도 승인 전까지 시작하지 않는다.
