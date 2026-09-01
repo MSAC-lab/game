@@ -25,7 +25,9 @@ func effective_value(subject_kind: String, subject_id: String, fact_type_id: Str
 	var fact: InformationState = get_fact(subject_kind, subject_id, fact_type_id)
 	if fact == null:
 		return -1
-	return M3DecisionRules.round_div(fact.belief_value * fact.confidence, 100)
+	return M3DecisionRules.round_div(
+		fact.belief_value * fact.confidence, M3DecisionRules.PERCENT_SCALE
+	)
 
 
 func fact_ids(subject_kind: String, subject_id: String, fact_type_ids: Array[String]) -> Array[String]:

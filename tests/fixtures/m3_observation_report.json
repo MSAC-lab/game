@@ -75,17 +75,17 @@
         "decision_key": "daily_food_strategy",
         "errors": [],
         "excluded_candidates": [],
-        "input_state_hash": "817c3fc7e205637a09a136202682fae07d49d3ad538b069f7d507f25b686cd83",
+        "input_state_hash": "af1325e61d4fb25ed2b8fa9d66e978de2abfe6e14be2f9c5fd1f047d551ad75a",
         "near_tie_candidate_ids": [],
         "ok": true,
         "random_digest_hex": "",
         "random_draw": -1,
         "random_total_weight": 0,
-        "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
         "selected_candidate_id": "A04|person|person:000004",
         "selection_mode": "deterministic_margin"
       },
-      "world_state_hash": "817c3fc7e205637a09a136202682fae07d49d3ad538b069f7d507f25b686cd83"
+      "world_state_hash": "af1325e61d4fb25ed2b8fa9d66e978de2abfe6e14be2f9c5fd1f047d551ad75a"
     },
     {
       "case_id": "C02",
@@ -160,17 +160,17 @@
         "decision_key": "daily_food_strategy",
         "errors": [],
         "excluded_candidates": [],
-        "input_state_hash": "239f50724a5b1ca26bc5e68646806378b3f13a2295a491065d453ddbedd6819e",
+        "input_state_hash": "ca3bd1c4d2d43ae6f6b1178c5a0e53a389a18e949ef1ff29cbd952e6a84402bb",
         "near_tie_candidate_ids": [],
         "ok": true,
         "random_digest_hex": "",
         "random_draw": -1,
         "random_total_weight": 0,
-        "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
         "selected_candidate_id": "A04|person|person:000004",
         "selection_mode": "deterministic_margin"
       },
-      "world_state_hash": "239f50724a5b1ca26bc5e68646806378b3f13a2295a491065d453ddbedd6819e"
+      "world_state_hash": "ca3bd1c4d2d43ae6f6b1178c5a0e53a389a18e949ef1ff29cbd952e6a84402bb"
     },
     {
       "case_id": "C03",
@@ -245,17 +245,17 @@
         "decision_key": "daily_food_strategy",
         "errors": [],
         "excluded_candidates": [],
-        "input_state_hash": "d9981a395e02ee427f157919c02b0cbaec296c33a5b8c1c25e56f0fb2c43460c",
+        "input_state_hash": "7cd309ca724af7992d0081bfbea4b741ab3519f1697ab874c0990f2752a5964b",
         "near_tie_candidate_ids": [],
         "ok": true,
         "random_digest_hex": "",
         "random_draw": -1,
         "random_total_weight": 0,
-        "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
         "selected_candidate_id": "A04|person|person:000004",
         "selection_mode": "deterministic_margin"
       },
-      "world_state_hash": "d9981a395e02ee427f157919c02b0cbaec296c33a5b8c1c25e56f0fb2c43460c"
+      "world_state_hash": "7cd309ca724af7992d0081bfbea4b741ab3519f1697ab874c0990f2752a5964b"
     },
     {
       "case_id": "C04",
@@ -330,17 +330,17 @@
         "decision_key": "daily_food_strategy",
         "errors": [],
         "excluded_candidates": [],
-        "input_state_hash": "fcb29ad7bb37968a1767150adb586918a4912e7cb221dfbfb540d00a8bac03d2",
+        "input_state_hash": "9f34fbacfdfe8e8d662c285a158004f76e9599872db1c6a16ed547fd0f26ebed",
         "near_tie_candidate_ids": [],
         "ok": true,
         "random_digest_hex": "",
         "random_draw": -1,
         "random_total_weight": 0,
-        "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
         "selected_candidate_id": "A04|person|person:000004",
         "selection_mode": "deterministic_margin"
       },
-      "world_state_hash": "fcb29ad7bb37968a1767150adb586918a4912e7cb221dfbfb540d00a8bac03d2"
+      "world_state_hash": "9f34fbacfdfe8e8d662c285a158004f76e9599872db1c6a16ed547fd0f26ebed"
     },
     {
       "case_id": "C05A",
@@ -415,17 +415,17 @@
         "decision_key": "daily_food_strategy",
         "errors": [],
         "excluded_candidates": [],
-        "input_state_hash": "3d89e10ff533a98f5e52486785d9bc07fd2fe46016ee11fcd9c3629db47ea290",
+        "input_state_hash": "7c843c57890f922f941bab2b53487d1e219de635fbc4a406b3327d11340972f1",
         "near_tie_candidate_ids": [],
         "ok": true,
         "random_digest_hex": "",
         "random_draw": -1,
         "random_total_weight": 0,
-        "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
         "selected_candidate_id": "A04|person|person:000004",
         "selection_mode": "deterministic_margin"
       },
-      "world_state_hash": "3d89e10ff533a98f5e52486785d9bc07fd2fe46016ee11fcd9c3629db47ea290"
+      "world_state_hash": "7c843c57890f922f941bab2b53487d1e219de635fbc4a406b3327d11340972f1"
     },
     {
       "case_id": "C05B",
@@ -500,17 +500,17 @@
         "decision_key": "daily_food_strategy",
         "errors": [],
         "excluded_candidates": [],
-        "input_state_hash": "b80f6a3f2e110c2c20a9d827726e4c019e30a89d1cb03720db7435013126181a",
+        "input_state_hash": "72717cb7154f01595494d68e211540321da083689a68ea7b1798972b3ad612d2",
         "near_tie_candidate_ids": [],
         "ok": true,
         "random_digest_hex": "",
         "random_draw": -1,
         "random_total_weight": 0,
-        "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
         "selected_candidate_id": "A04|person|person:000004",
         "selection_mode": "deterministic_margin"
       },
-      "world_state_hash": "b80f6a3f2e110c2c20a9d827726e4c019e30a89d1cb03720db7435013126181a"
+      "world_state_hash": "72717cb7154f01595494d68e211540321da083689a68ea7b1798972b3ad612d2"
     },
     {
       "case_id": "C05C",
@@ -585,20 +585,20 @@
         "decision_key": "daily_food_strategy",
         "errors": [],
         "excluded_candidates": [],
-        "input_state_hash": "5c67a0d58b32d4d1b8c8ad144f129297e39125b52d9ca31e5037de3923f1837b",
+        "input_state_hash": "9da20d6d80ca9ebae328d700e2c11da4c1254295bf426b79bf5f6ea13f9903f5",
         "near_tie_candidate_ids": [],
         "ok": true,
         "random_digest_hex": "",
         "random_draw": -1,
         "random_total_weight": 0,
-        "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
         "selected_candidate_id": "A04|person|person:000004",
         "selection_mode": "deterministic_margin"
       },
-      "world_state_hash": "5c67a0d58b32d4d1b8c8ad144f129297e39125b52d9ca31e5037de3923f1837b"
+      "world_state_hash": "9da20d6d80ca9ebae328d700e2c11da4c1254295bf426b79bf5f6ea13f9903f5"
     }
   ],
   "mechanics_contract": "M3-T01..T12_AND_M3-R01..R04",
-  "ruleset_hash": "adc92f606fd0b5adbfab59c17f32df84c31345add603965283f87622adb4e3de",
+  "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
   "ruleset_id": "drought-prototype-rules-v3"
 }

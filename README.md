@@ -172,7 +172,7 @@ M1·M2 시험과 같은 editor scan 후 M3 시험을 실행한다.
 성공하면 `M3 PASS`와 종료 코드 `0`을 반환한다. 이 PASS는 판단 기계의 계산·재현·정보 경계만 뜻한다. C01~C05 관찰 artifact의 SHA-256은 다음과 같다.
 
 ```text
-267ca08432790a5e8d6d1ac7e923e333260de15c2fd3ef78662deac40be57e71
+2b4a65a99fcf795999ee4a8e34f9ace9a0b791e659a631b8efa1b34da8602357
 ```
 
 ## M3 범위
