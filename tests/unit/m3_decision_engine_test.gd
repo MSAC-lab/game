@@ -228,6 +228,31 @@ func _test_t08_near_tie_uses_stateless_randomness() -> void:
 		"M3-T08 near-tie helper is independent of caller candidate order"
 	)
 
+	var threshold_result: DecisionResult = DecisionResult.new()
+	var positive: DecisionCandidateEvaluation = DecisionCandidateEvaluation.new()
+	positive.candidate_id = "A04|person|person:positive"
+	positive.action_id = M3DecisionRules.ACTION_REQUEST_FOOD
+	positive.target_kind = "person"
+	positive.target_id = "person:positive"
+	positive.utility_scaled = M3DecisionRules.POSITIVE_ACTION_THRESHOLD + 1
+	var boundary: DecisionCandidateEvaluation = DecisionCandidateEvaluation.new()
+	boundary.candidate_id = "A11|resource_store|resource_store:boundary"
+	boundary.action_id = M3DecisionRules.ACTION_THEFT
+	boundary.target_kind = "resource_store"
+	boundary.target_id = "resource_store:boundary"
+	boundary.utility_scaled = M3DecisionRules.POSITIVE_ACTION_THRESHOLD
+	var distant_wait: DecisionCandidateEvaluation = DecisionCandidateEvaluation.new()
+	distant_wait.candidate_id = "A00||"
+	distant_wait.action_id = M3DecisionRules.ACTION_WAIT
+	distant_wait.utility_scaled = -M3DecisionRules.NEAR_TIE_THRESHOLD
+	threshold_result.candidate_evaluations = [positive, boundary, distant_wait]
+	DecisionEngine._select(world, M3FixtureFactory.create_request(), threshold_result)
+	_expect(
+		threshold_result.selected_candidate_id == positive.candidate_id
+		and not threshold_result.near_tie_candidate_ids.has(boundary.candidate_id),
+		"M3-T08 a non-wait candidate equal to the positive threshold is ineligible"
+	)
+
 
 func _test_t09_input_world_is_immutable() -> void:
 	var world: WorldState = M3FixtureFactory.create_world("C02")

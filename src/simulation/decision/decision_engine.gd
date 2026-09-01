@@ -478,10 +478,7 @@ static func _select(
 	ranked.sort_custom(_ranked_less)
 	var has_positive_action: bool = false
 	for candidate: DecisionCandidateEvaluation in ranked:
-		if (
-			candidate.action_id != M3DecisionRules.ACTION_WAIT
-			and candidate.utility_scaled > M3DecisionRules.POSITIVE_ACTION_THRESHOLD
-		):
+		if _is_positive_action_eligible(candidate):
 			has_positive_action = true
 			break
 	if not has_positive_action:
@@ -500,7 +497,7 @@ static func _select(
 			continue
 		if (
 			candidate.action_id != M3DecisionRules.ACTION_WAIT
-			and candidate.utility_scaled < M3DecisionRules.POSITIVE_ACTION_THRESHOLD
+			and not _is_positive_action_eligible(candidate)
 		):
 			continue
 		near_tie.append(candidate)
@@ -512,6 +509,13 @@ static func _select(
 	result.random_digest_hex = str(random_result.get("random_digest_hex", ""))
 	result.random_draw = int(random_result.get("random_draw", -1))
 	result.random_total_weight = int(random_result.get("random_total_weight", 0))
+
+
+static func _is_positive_action_eligible(candidate: DecisionCandidateEvaluation) -> bool:
+	return (
+		candidate.action_id != M3DecisionRules.ACTION_WAIT
+		and candidate.utility_scaled > M3DecisionRules.POSITIVE_ACTION_THRESHOLD
+	)
 
 
 static func _candidate_id_less(
