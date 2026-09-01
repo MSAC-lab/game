@@ -1,0 +1,810 @@
+{
+  "audit": [],
+  "resource_audit": [
+    {
+      "consumer_person_id": "person:000001",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000001",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000002",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000002",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000004",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000003",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000004",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 3,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000005",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 4,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000006",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 5,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000007",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000007",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 6,
+      "source_store_id": "resource_store:household:000003"
+    },
+    {
+      "consumer_person_id": "person:000008",
+      "day_index": 1,
+      "destination_store_id": "",
+      "id": "resource_transaction:000008",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 7,
+      "source_store_id": "resource_store:household:000003"
+    },
+    {
+      "consumer_person_id": "person:000001",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000009",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000002",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000010",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000004",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000011",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000012",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 3,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000013",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 4,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000014",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 5,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000007",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000015",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 6,
+      "source_store_id": "resource_store:household:000003"
+    },
+    {
+      "consumer_person_id": "person:000008",
+      "day_index": 2,
+      "destination_store_id": "",
+      "id": "resource_transaction:000016",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 7,
+      "source_store_id": "resource_store:household:000003"
+    },
+    {
+      "consumer_person_id": "person:000001",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000017",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000002",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000018",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000004",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000019",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000020",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 3,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000021",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 4,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000022",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 5,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000007",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000023",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 6,
+      "source_store_id": "resource_store:household:000003"
+    },
+    {
+      "consumer_person_id": "person:000008",
+      "day_index": 3,
+      "destination_store_id": "",
+      "id": "resource_transaction:000024",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 7,
+      "source_store_id": "resource_store:household:000003"
+    },
+    {
+      "consumer_person_id": "person:000001",
+      "day_index": 4,
+      "destination_store_id": "",
+      "id": "resource_transaction:000025",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000002",
+      "day_index": 4,
+      "destination_store_id": "",
+      "id": "resource_transaction:000026",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000004",
+      "day_index": 4,
+      "destination_store_id": "",
+      "id": "resource_transaction:000027",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 4,
+      "destination_store_id": "",
+      "id": "resource_transaction:000028",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 3,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 4,
+      "destination_store_id": "",
+      "id": "resource_transaction:000029",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 4,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 4,
+      "destination_store_id": "",
+      "id": "resource_transaction:000030",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 5,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000008",
+      "day_index": 4,
+      "destination_store_id": "",
+      "id": "resource_transaction:000031",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 6,
+      "source_store_id": "resource_store:household:000003"
+    },
+    {
+      "consumer_person_id": "person:000002",
+      "day_index": 5,
+      "destination_store_id": "",
+      "id": "resource_transaction:000032",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000004",
+      "day_index": 5,
+      "destination_store_id": "",
+      "id": "resource_transaction:000033",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000001"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 5,
+      "destination_store_id": "",
+      "id": "resource_transaction:000034",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 5,
+      "destination_store_id": "",
+      "id": "resource_transaction:000035",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 3,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 5,
+      "destination_store_id": "",
+      "id": "resource_transaction:000036",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 4,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 6,
+      "destination_store_id": "",
+      "id": "resource_transaction:000037",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 6,
+      "destination_store_id": "",
+      "id": "resource_transaction:000038",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 6,
+      "destination_store_id": "",
+      "id": "resource_transaction:000039",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 7,
+      "destination_store_id": "",
+      "id": "resource_transaction:000040",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 7,
+      "destination_store_id": "",
+      "id": "resource_transaction:000041",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 7,
+      "destination_store_id": "",
+      "id": "resource_transaction:000042",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 8,
+      "destination_store_id": "",
+      "id": "resource_transaction:000043",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 8,
+      "destination_store_id": "",
+      "id": "resource_transaction:000044",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 8,
+      "destination_store_id": "",
+      "id": "resource_transaction:000045",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 9,
+      "destination_store_id": "",
+      "id": "resource_transaction:000046",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000005",
+      "day_index": 9,
+      "destination_store_id": "",
+      "id": "resource_transaction:000047",
+      "quantity": 2,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 1,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000006",
+      "day_index": 9,
+      "destination_store_id": "",
+      "id": "resource_transaction:000048",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 2,
+      "source_store_id": "resource_store:household:000002"
+    },
+    {
+      "consumer_person_id": "person:000003",
+      "day_index": 10,
+      "destination_store_id": "",
+      "id": "resource_transaction:000049",
+      "quantity": 1,
+      "reason_id": "daily_food_consumption",
+      "resource_type_id": "food",
+      "sequence_index": 0,
+      "source_store_id": "resource_store:household:000002"
+    }
+  ],
+  "ruleset_hash": "3c5da58d0e0168c9427b827c0e37c4b9dd1e4582834b8c33efc5a6e6c9015f03",
+  "ruleset_id": "drought-prototype-rules-v2",
+  "schema_version": 2,
+  "state": {
+    "day_index": 10,
+    "day_phase": "DAY_END",
+    "events": [],
+    "households": [
+      {
+        "dependency_load": 0,
+        "id": "household:000001",
+        "livelihood_id": "mixed_labor",
+        "member_ids": [
+          "person:000001",
+          "person:000002",
+          "person:000004"
+        ],
+        "residence_id": "residence:south_lane_03",
+        "resource_store_id": "resource_store:household:000001",
+        "wealth_units": 0
+      },
+      {
+        "dependency_load": 0,
+        "id": "household:000002",
+        "livelihood_id": "village_administration",
+        "member_ids": [
+          "person:000003",
+          "person:000005",
+          "person:000006"
+        ],
+        "residence_id": "residence:headman_compound",
+        "resource_store_id": "resource_store:household:000002",
+        "wealth_units": 0
+      },
+      {
+        "dependency_load": 0,
+        "id": "household:000003",
+        "livelihood_id": "field_labor",
+        "member_ids": [
+          "person:000007",
+          "person:000008"
+        ],
+        "residence_id": "residence:north_lane_02",
+        "resource_store_id": "resource_store:household:000003",
+        "wealth_units": 0
+      }
+    ],
+    "information": [],
+    "memories": [],
+    "next_ids": {
+      "decision": 1,
+      "event": 1,
+      "household": 4,
+      "information": 1,
+      "memory": 1,
+      "person": 9,
+      "resource_transaction": 50
+    },
+    "persons": [
+      {
+        "alive": true,
+        "daily_food_need_units": 2,
+        "display_name": "한결",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 90,
+        "household_id": "household:000001",
+        "id": "person:000001",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 100
+        },
+        "occupation_id": "store_assistant",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 3,
+        "trait_scores": {},
+        "value_scores": {}
+      },
+      {
+        "alive": true,
+        "daily_food_need_units": 2,
+        "display_name": "미라",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 90,
+        "household_id": "household:000001",
+        "id": "person:000002",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 100
+        },
+        "occupation_id": "weaver",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 3,
+        "trait_scores": {},
+        "value_scores": {}
+      },
+      {
+        "alive": true,
+        "daily_food_need_units": 2,
+        "display_name": "도윤",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 100,
+        "household_id": "household:000002",
+        "id": "person:000003",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 12
+        },
+        "occupation_id": "village_head",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 0,
+        "trait_scores": {},
+        "value_scores": {}
+      },
+      {
+        "alive": true,
+        "daily_food_need_units": 1,
+        "display_name": "나리",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 95,
+        "household_id": "household:000001",
+        "id": "person:000004",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 100
+        },
+        "occupation_id": "child",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 2,
+        "trait_scores": {},
+        "value_scores": {}
+      },
+      {
+        "alive": true,
+        "daily_food_need_units": 2,
+        "display_name": "서린",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 100,
+        "household_id": "household:000002",
+        "id": "person:000005",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 24
+        },
+        "occupation_id": "household_manager",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 0,
+        "trait_scores": {},
+        "value_scores": {}
+      },
+      {
+        "alive": true,
+        "daily_food_need_units": 1,
+        "display_name": "백운",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 100,
+        "household_id": "household:000002",
+        "id": "person:000006",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 24
+        },
+        "occupation_id": "elder",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 0,
+        "trait_scores": {},
+        "value_scores": {}
+      },
+      {
+        "alive": true,
+        "daily_food_need_units": 2,
+        "display_name": "태오",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 85,
+        "household_id": "household:000003",
+        "id": "person:000007",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 100
+        },
+        "occupation_id": "field_worker",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 4,
+        "trait_scores": {},
+        "value_scores": {}
+      },
+      {
+        "alive": true,
+        "daily_food_need_units": 2,
+        "display_name": "라온",
+        "emotion_scores": {},
+        "goal_ids": [],
+        "health": 85,
+        "household_id": "household:000003",
+        "id": "person:000008",
+        "information_ids": [],
+        "memory_ids": [],
+        "need_scores": {
+          "hunger": 100
+        },
+        "occupation_id": "field_worker",
+        "relation_ids": [],
+        "role_ids": [],
+        "severe_hunger_days": 4,
+        "trait_scores": {},
+        "value_scores": {}
+      }
+    ],
+    "player_person_id": "person:000001",
+    "relations": [],
+    "resource_stores": [
+      {
+        "id": "resource_store:household:000001",
+        "owner_id": "household:000001",
+        "owner_kind": "household",
+        "quantity": 0,
+        "resource_type_id": "food"
+      },
+      {
+        "id": "resource_store:household:000002",
+        "owner_id": "household:000002",
+        "owner_kind": "household",
+        "quantity": 0,
+        "resource_type_id": "food"
+      },
+      {
+        "id": "resource_store:household:000003",
+        "owner_id": "household:000003",
+        "owner_kind": "household",
+        "quantity": 0,
+        "resource_type_id": "food"
+      },
+      {
+        "id": "resource_store:village_granary",
+        "owner_id": "village:main",
+        "owner_kind": "village",
+        "quantity": 100,
+        "resource_type_id": "food"
+      }
+    ],
+    "rng_seed_hex": "0123456789abcdef",
+    "rng_state_hex": "fedcba9876543210",
+    "scenario_id": "m2-three-household-eight-person-fixture",
+    "season_id": "early_summer"
+  },
+  "state_hash": "4a8aebeacebf9d9e63dce45fb8de73e46722ca6918089609e3e581c5e73ba26e"
+}

@@ -1,4 +1,4 @@
-name: M0-M1 verification
+name: M0-M2 verification
 
 on:
   pull_request:
@@ -53,6 +53,13 @@ jobs:
           "$godot" --headless --editor --path . --quit
           "$godot" --headless --path . --script res://tests/m1_test_runner.gd
 
+      - name: Run M2 time-resource tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot=".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          "$godot" --headless --path . --script res://tests/m2_test_runner.gd
+
   windows-smoke:
     name: Windows / Godot 4.7.2
     runs-on: windows-latest
@@ -100,4 +107,12 @@ jobs:
           & $godot --headless --editor --path . --quit
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & $godot --headless --path . --script res://tests/m1_test_runner.gd
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run M2 time-resource tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $godot = ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
+          & $godot --headless --path . --script res://tests/m2_test_runner.gd
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
