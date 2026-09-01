@@ -213,6 +213,20 @@ func _test_t08_near_tie_uses_stateless_randomness() -> void:
 		"M3-T08 stateless random selection reproduces exactly"
 	)
 	_expect(world.rng_state_hex == before_rng, "M3-T08 stateless selection leaves world RNG unchanged")
+	var near_candidates: Array[DecisionCandidateEvaluation] = []
+	for candidate_id: String in first.near_tie_candidate_ids:
+		var candidate: DecisionCandidateEvaluation = _find_candidate(first, candidate_id)
+		if candidate != null:
+			near_candidates.append(candidate)
+	near_candidates.reverse()
+	var unsorted_result: Dictionary = StatelessNearTie.select(
+		world, M3FixtureFactory.create_request(), near_candidates
+	)
+	_expect(
+		str(unsorted_result["selected_candidate_id"]) == first.selected_candidate_id
+		and str(unsorted_result["random_digest_hex"]) == first.random_digest_hex,
+		"M3-T08 near-tie helper is independent of caller candidate order"
+	)
 
 
 func _test_t09_input_world_is_immutable() -> void:
@@ -409,6 +423,25 @@ func _test_presentation_and_history_are_not_inputs() -> void:
 
 func _test_ruleset_hash_covers_constants() -> void:
 	var rules: Dictionary = M3DecisionRules.to_data()
+	var authority: Dictionary = rules["authority"]
+	var opportunity_cost: Dictionary = rules["opportunity_cost"]
+	var norm_conflict: Dictionary = rules["norm_conflict"]
+	_expect(
+		str(authority["fact_type_id"]) == M3DecisionRules.FACT_VILLAGE_AUTHORITY,
+		"M3 ruleset publishes the authority fact input"
+	)
+	_expect(
+		int(opportunity_cost[M3DecisionRules.ACTION_REQUEST_FOOD])
+		== M3DecisionRules.REQUEST_OPPORTUNITY_COST
+		and int(opportunity_cost[M3DecisionRules.ACTION_THEFT])
+		== M3DecisionRules.THEFT_OPPORTUNITY_COST,
+		"M3 ruleset publishes action opportunity costs"
+	)
+	_expect(
+		int(norm_conflict["norm_weight"]) == M3DecisionRules.NORM_WEIGHT
+		and int(norm_conflict["duty_weight"]) == M3DecisionRules.DUTY_WEIGHT,
+		"M3 ruleset publishes norm-conflict coefficients"
+	)
 	var changed_rules: Dictionary = rules.duplicate(true)
 	changed_rules["near_tie_threshold"] = int(rules["near_tie_threshold"]) + 1
 	_expect(
