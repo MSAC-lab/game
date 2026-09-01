@@ -3,14 +3,14 @@
 ## 문서 상태
 
 ```text
-STATUS = PROVISIONAL / DESIGN ITEMS 1-19 APPROVED
+STATUS = PROVISIONAL / DESIGN ITEMS 1-20 APPROVED
 IMPLEMENTATION AUTHORIZATION = M0 + M1
 M1 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS
 AUTOMATED VERIFICATION = M0 + M1 LOCAL / LINUX / WINDOWS PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FULL ACCEPTANCE = M0 + M1 PASS
-SCOPE = M0 + M1 COMPLETE / M2 CONTRACT APPROVED / M2 IMPLEMENTATION NOT AUTHORIZED
+SCOPE = M0 + M1 COMPLETE / M2 CONTRACT + IMPLEMENTATION SPEC APPROVED / M2 IMPLEMENTATION NOT AUTHORIZED
 PENDING DISCUSSION = NONE
 ```
 
@@ -2482,3 +2482,585 @@ M2 통과가 증명하는 것은 다음뿐이다.
 M2 통과는 가뭄의 현실성, 배급의 정당성, 인물의 판단, 사회적 인과 또는 재미를 증명하지 않는다.
 
 결정 19의 승인은 M2 계약만 확정한다. M2 구현 권한은 별도의 `M2 구현 승인` 전까지 부여되지 않는다.
+
+## 23. 승인된 잠정 설계 20
+
+### 결정 20. M2 세부 구현 명세
+
+결정 20은 결정 19의 M2 계약을 실제 코드 작업 단위, schema, 상수, fixture 및 시험 순서로 고정한다. 이 명세는 구현 중 임의 해석과 수치 조정을 막기 위한 사전 계약이다.
+
+#### Schema 전략
+
+M2는 기존 schema 1에 선택 필드를 덧붙이지 않는다. schema 1과 schema 2를 명시적으로 분리한다.
+
+```text
+SCHEMA 1
+= M1 상태 모델
+= 기존 frozen fixture와 SHA-256 보존
+
+SCHEMA 2
+= M2 시간·자원 상태
+= ResourceStoreState와 하루 진행 상태 추가
+```
+
+구현 규칙은 다음과 같다.
+
+- schema 1과 schema 2를 각각 읽고 쓸 수 있음
+- schema 1을 schema 2로 자동 변환하지 않음
+- schema별 validation과 primitive data 변환을 분리함
+- 기존 M1 fixture와 SHA-256을 변경하지 않음
+- M2 전용 fixture와 SHA-256을 별도로 생성함
+- 알 수 없는 schema는 명시적으로 거부함
+- 새 `WorldState`의 기본 schema는 2로 변경함
+- M1 fixture factory는 schema 1을 명시함
+
+이는 schema migration 구현이 아니다. 두 frozen schema를 각각 독립적으로 지원하는 방식이다.
+
+#### PersonState 확장
+
+schema 2의 `PersonState`에 다음을 추가한다.
+
+```text
+daily_food_need_units: int
+severe_hunger_days: int
+```
+
+굶주림은 기존 `need_scores["hunger"]`를 유일한 원본으로 사용한다. 별도의 `hunger` 필드를 추가하지 않는다.
+
+```text
+health = 1~100
+need_scores["hunger"] = 0~100
+daily_food_need_units = 0~10
+severe_hunger_days = 0~365
+```
+
+M2는 사망을 구현하지 않는다. 건강 갱신 결과가 0 이하가 될 상황에서는 1로 조용히 고정하거나 `alive`를 변경하지 않고, `M2_DEATH_NOT_IMPLEMENTED` 오류로 그날 진행 전체를 실패시킨다.
+
+#### HouseholdState 확장과 legacy 필드
+
+schema 2의 `HouseholdState`에 다음을 추가한다.
+
+```text
+resource_store_id: String
+```
+
+기존 필드 중 다음은 schema 1 전용 legacy 필드로 남긴다.
+
+```text
+food_units
+daily_food_need_units
+```
+
+schema 2에서는 두 legacy 필드를 직렬화, validation 및 계산에 사용하지 않는다. 가구의 하루 필요량은 생존 구성원의 `daily_food_need_units` 합계로 계산한다. schema 2 식량의 유일한 원본은 `ResourceStoreState.quantity`다.
+
+#### ResourceStoreState
+
+`ResourceStoreState`는 다음 필드를 가진 `RefCounted` 데이터 객체다.
+
+```text
+id: String
+owner_kind: String
+owner_id: String
+resource_type_id: String
+quantity: int
+```
+
+M2 허용 범위는 다음과 같다.
+
+```text
+owner_kind = village | household
+resource_type_id = food
+quantity = 0~2,147,483,647
+```
+
+저장소 ID는 결정 19의 형식을 그대로 사용한다.
+
+```text
+resource_store:village_granary
+resource_store:household:000001
+resource_store:household:000002
+resource_store:household:000003
+```
+
+`owner_kind = household`이면 `owner_id`는 존재하는 `HouseholdState`를 가리켜야 한다. `owner_kind = village`이면 M2에서는 `owner_id = village:main`만 허용한다.
+
+#### ResourceTransactionRecord
+
+`ResourceTransactionRecord`는 다음 필드를 가진 감사 기록이다.
+
+```text
+id: String
+day_index: int
+sequence_index: int
+resource_type_id: String
+source_store_id: String
+destination_store_id: String
+consumer_person_id: String
+quantity: int
+reason_id: String
+```
+
+두 가지 형태만 허용한다.
+
+```text
+TRANSFER
+destination_store_id = 존재
+consumer_person_id = 빈 문자열
+
+CONSUMPTION
+destination_store_id = 빈 문자열
+consumer_person_id = 존재
+```
+
+다음 거래는 validation 단계에서 거부한다.
+
+- 수량이 0 이하임
+- source와 destination이 동일함
+- 존재하지 않는 저장소나 인물을 참조함
+- source 잔량을 초과함
+- 같은 거래 ID를 중복 적용함
+- 같은 인물이 같은 날짜에 두 번 소비함
+- destination과 consumer가 동시에 존재함
+- destination과 consumer가 모두 존재하지 않음
+
+거래 ID는 기존 종류별 counter 규칙을 사용한다.
+
+```text
+resource_transaction:000001
+```
+
+#### Schema 2 저장 envelope
+
+Schema 1 envelope는 M1 frozen 형식을 그대로 유지한다. Schema 2는 다음 필드를 사용한다.
+
+```text
+schema_version
+ruleset_id
+ruleset_hash
+state
+audit
+resource_audit
+state_hash
+```
+
+`resource_audit`에는 `ResourceTransactionRecord` 배열을 둔다. 이 기록은 미래 simulation의 입력이 아니므로 상태 해시에서 제외한다.
+
+Schema 2 상태 해시에 포함하는 M2 요소는 다음과 같다.
+
+```text
+day_index
+day_phase
+인물별 daily_food_need_units
+need_scores["hunger"]
+health
+severe_hunger_days
+가구별 resource_store_id
+ResourceStoreState 전체
+M2 ruleset 식별자와 hash
+기존 M1 mutable state
+```
+
+다음은 상태 해시에서 제외한다.
+
+```text
+DecisionRecord
+ResourceTransactionRecord
+저장 시각과 경로
+UI와 editor 상태
+개발 로그
+```
+
+#### M2 ruleset 상수
+
+M2 수치를 처리 코드에 직접 흩어 쓰지 않는다. 다음 파일의 정적 타입 상수로 모은다.
+
+```text
+src/simulation/time/m2_resource_rules.gd
+```
+
+승인된 잠정 상수는 다음과 같다.
+
+```text
+FULL_MEAL_HUNGER_RECOVERY = 6
+SHORTFALL_HUNGER_SCALE = 24
+SEVERE_HUNGER_THRESHOLD = 80
+HEALTH_DAMAGE_DELAY_DAYS = 2
+DAILY_HEALTH_DAMAGE = 5
+```
+
+상수 묶음을 primitive data로 변환하여 `ruleset_hash`에 포함한다.
+
+```text
+ruleset_id = drought-prototype-rules-v2
+```
+
+상수를 변경하면 schema 2 상태 해시와 frozen fixture 결과도 달라져야 한다. 변경 이유와 전후 시험을 별도 PR에 기록하지 않은 수치 변경은 금지한다.
+
+#### 굶주림 계산
+
+각 인물의 하루 필요량, 섭취량 및 부족량을 다음으로 정의한다.
+
+```text
+N = daily_food_need_units
+E = 실제 섭취량
+S = max(0, N - E)
+```
+
+필요량을 모두 섭취했다면 다음을 적용한다.
+
+```text
+H_next = max(0, H - 6)
+```
+
+부족하다면 다음을 적용한다.
+
+```text
+delta_hunger = ceil(24 × S / N)
+H_next = min(100, H + delta_hunger)
+```
+
+실수 계산은 사용하지 않는다. 올림은 다음 정수식으로 구현한다.
+
+```text
+delta_hunger = (24 × S + N - 1) / N
+```
+
+예시는 다음과 같다.
+
+| 필요량 | 섭취량 | 굶주림 변화 |
+|---:|---:|---:|
+| 2 | 2 | -6 |
+| 2 | 1 | +12 |
+| 2 | 0 | +24 |
+| 1 | 0 | +24 |
+
+`N = 0`인 인물은 식량 거래와 굶주림·건강 갱신 대상에서 제외한다.
+
+#### 건강 계산
+
+건강은 굶주림 갱신 후 계산한다.
+
+```text
+새 굶주림 >= 80
+→ severe_hunger_days += 1
+
+새 굶주림 < 80
+→ severe_hunger_days = 0
+```
+
+건강 변화는 다음과 같다.
+
+```text
+severe_hunger_days < 2
+→ 건강 변화 없음
+
+severe_hunger_days >= 2
+→ health -= 5
+```
+
+건강 감소는 두 번째 연속 심각 굶주림 날부터 매일 적용한다. M2에는 질병, 자연회복, 부상, 연령별 건강 차이 및 사망을 넣지 않는다.
+
+#### 부족 식량 배분 알고리즘
+
+각 가구에서 생존 구성원을 canonical person ID순으로 정렬한다.
+
+```text
+A = 가구 저장소의 사용 가능한 식량
+T = 전체 필요량
+N_i = 인물 i의 필요량
+```
+
+`A >= T`이면 각 인물에게 필요량을 그대로 배정한다. `A < T`이면 1차 배분을 다음으로 계산한다.
+
+```text
+B_i = floor(A × N_i / T)
+```
+
+남은 수량은 다음과 같다.
+
+```text
+R = A - sum(B_i)
+```
+
+나머지 배분 규칙은 다음과 같다.
+
+```text
+시작 위치 = 현재 world.day_index % 생존 구성원 수
+canonical person ID순 목록을 순환
+아직 필요량이 남은 인물에게 1단위씩 배정
+R = 0이면 종료
+```
+
+이 알고리즘은 필요량 비례, 정수 계산, 결정론 및 낮은 ID의 영구 우선권 완화를 목적으로 한다. 인물의 도덕적 선택이나 사회적 배급 정책으로 해석하지 않는다.
+
+#### 원자적 하루 진행
+
+`DayProcessor`는 입력 `WorldState`를 직접 수정하지 않는다.
+
+```text
+advance_day(current_world: WorldState) -> DayAdvanceResult
+```
+
+`DayAdvanceResult`는 다음을 가진다.
+
+```text
+ok: bool
+errors: Array[String]
+next_world: WorldState
+resource_transactions: Array[ResourceTransactionRecord]
+before_total: int
+after_total: int
+consumed_total: int
+```
+
+처리 순서는 다음으로 고정한다.
+
+1. 입력 세계 validation
+2. primitive data를 통한 입력 세계 복제
+3. 복제본을 대상으로 하루 계획 작성
+4. 계획 validation
+5. 거래 적용
+6. 굶주림 갱신
+7. 건강 갱신
+8. 저장소별·전체 자원 보존 검증
+9. 날짜 1 증가
+10. 최종 state hash 생성
+11. 성공한 복제본 반환
+
+어느 단계에서든 실패하면 다음을 보장한다.
+
+```text
+입력 current_world 변경 = 0
+day_index 증가 = 0
+부분 거래 기록 반환 = 0
+next_world = null
+```
+
+#### 단계 순서 보호
+
+내부 `DayPhaseGuard`는 다음 상태 전이만 허용한다.
+
+```text
+DAY_END
+→ NEEDS_FIXED
+→ ALLOCATION_PLANNED
+→ CONSUMPTION_APPLIED
+→ HUNGER_UPDATED
+→ HEALTH_UPDATED
+→ CONSERVATION_VERIFIED
+→ DAY_END
+```
+
+단계를 생략, 중복 또는 역순 호출하면 즉시 실패한다. 저장 가능한 `WorldState.day_phase`는 `DAY_END`뿐이다. 중간 단계 상태는 serialization validation을 통과하지 못한다.
+
+#### M2 기준 fixture
+
+M2 fixture는 세 가구, 여덟 명 및 공동창고 하나로 고정한다. 모든 인물은 초기 `health = 100`, `hunger = 0`, `severe_hunger_days = 0`이다.
+
+##### 가구 1 — 플레이어 가족
+
+```text
+person:000001 = 플레이어 / 필요량 2
+person:000002 = 배우자 / 필요량 2
+person:000004 = 자녀 / 필요량 1
+
+총 필요량 = 5
+초기 식량 = 22
+```
+
+4일간 전원 필요량을 충족하고 5일째 부분 배분이 발생한다.
+
+##### 가구 2 — 촌장 가족
+
+```text
+person:000003 = 촌장 / 필요량 2
+person:000005 = 촌장 배우자 / 필요량 2
+person:000006 = 노인 부양가족 / 필요량 1
+
+총 필요량 = 5
+초기 식량 = 46
+```
+
+9일간 전원 필요량을 충족하고 10일째 부분 배분이 발생한다.
+
+##### 가구 3 — 노동자 형제
+
+```text
+person:000007 = 노동자 / 필요량 2
+person:000008 = 노동자 / 필요량 2
+
+총 필요량 = 4
+초기 식량 = 13
+```
+
+3일간 전원 필요량을 충족하고 4일째 부분 배분이 발생한다.
+
+##### 공동창고
+
+```text
+초기 식량 = 100
+자동 배급 = 없음
+```
+
+공동창고는 M2의 10일 실행에서 자동으로 가구를 돕지 않는다. 촌장의 배급 판단을 M2에 몰래 구현하지 않기 위한 경계다.
+
+초기 총식량과 10일 뒤 기대값은 다음과 같다.
+
+```text
+초기 총식량 = 22 + 46 + 13 + 100 = 181
+10일 뒤 가구 저장소 합계 = 0
+10일 뒤 공동창고 = 100
+10일간 실제 소비 = 81
+```
+
+따라서 다음 보존식이 성립해야 한다.
+
+```text
+181 = 100 + 81
+```
+
+M2 fixture의 day-10 canonical JSON과 SHA-256은 구현 후 최초 green 결과에서 동결한다. 원하는 hash를 사전에 정하거나 실패 후 조정하지 않는다.
+
+#### 구현 파일 구조
+
+새 파일은 다음으로 제한한다.
+
+```text
+src/simulation/model/
+  resource_store_state.gd
+  resource_transaction_record.gd
+
+src/simulation/time/
+  m2_resource_rules.gd
+  day_phase_guard.gd
+  consumption_allocation.gd
+  person_day_update.gd
+  day_plan.gd
+  day_advance_result.gd
+  resource_service.gd
+  day_processor.gd
+
+tests/
+  m2_test_runner.gd
+  unit/m2_time_resource_test.gd
+  fixtures/m2_fixture_factory.gd
+  fixtures/m2_day10_canonical.json
+  fixtures/m2_day10_canonical.sha256
+```
+
+수정 대상은 다음으로 제한한다.
+
+```text
+WorldState
+PersonState
+HouseholdState
+StateValidator
+StateCodec
+StateHasher
+StateCanonicalizer
+GitHub Actions
+README
+설계 문서
+```
+
+UI, application bootstrap 및 M3 이후 디렉터리는 수정하지 않는다.
+
+#### 구현 순서와 단계별 중단 조건
+
+##### M2-A — schema와 모델
+
+- schema 1 frozen 직렬화와 hash 보존
+- schema 2 모델과 validation 추가
+- ResourceStore와 거래 기록 직렬화
+- schema 2 round trip
+
+중단 조건:
+
+```text
+M1 frozen JSON 또는 SHA-256 변경
+→ 즉시 중단
+```
+
+##### M2-B — 자원 처리
+
+- 저장소 간 명시적 transfer
+- 저장소에서 인물로 consumption
+- 잔량·참조·중복 검증
+- 저장소별·전체 보존식
+
+중단 조건:
+
+```text
+설명 없는 수량 변화
+음수 저장소
+부분 적용
+→ 즉시 중단
+```
+
+##### M2-C — 하루 진행
+
+- 비례 배분 계획
+- 정수 나머지 순환 배분
+- 굶주림 갱신
+- 건강 갱신
+- 단계 guard
+- 원자적 `next_world` 반환
+
+##### M2-D — 10일 fixture
+
+- 3가구·8명 fixture
+- 날짜별 state hash
+- 10일 연속 실행
+- 5일 `DAY_END` 저장 후 재개
+- Linux·Windows frozen SHA-256 대조
+
+#### 추가 M2 회귀시험
+
+결정 19의 M2-T01~T12에 다음 시험을 추가한다.
+
+| ID | 시험 | 합격 기준 |
+|---|---|---|
+| M2-R01 | M1 frozen 회귀 | schema 1 canonical JSON과 SHA-256 불변 |
+| M2-R02 | RNG 비사용 | M2 처리 전후 seed와 RNG state 완전 동일 |
+| M2-R03 | 실패 원자성 | 실패한 하루가 입력 `WorldState`를 전혀 변경하지 않음 |
+| M2-R04 | schema 경계 | schema 1·2 각각의 필수·금지 필드가 분리됨 |
+| M2-R05 | 명시적 transfer | 공동창고에서 가구로 이동해도 전체 식량 보존 |
+| M2-R06 | 감사 로그 배제 | 거래 기록 내용 변경이 future state hash에 영향 없음 |
+| M2-R07 | 원장 대조 | 저장소 수량 직접 조작을 설명 없는 변화로 검출 |
+| M2-R08 | 사망 경계 | 건강 0 이하 예상 시 `M2_DEATH_NOT_IMPLEMENTED`로 원자적 실패 |
+
+#### CI와 병합 조건
+
+Workflow 표시 이름은 다음으로 변경한다.
+
+```text
+M0-M2 verification
+```
+
+Linux와 Windows에서 각각 다음을 실행한다.
+
+```text
+M0 smoke
+프로젝트 boot
+M1-T01~T10
+M2-T01~T12
+M2-R01~R08
+M2 day-10 frozen SHA-256
+```
+
+두 운영체제의 모든 검사가 성공해야 M2 PR을 병합할 수 있다.
+
+#### M2 구현 완료 주장 경계
+
+```text
+M2 PASS
+= 하루 진행·식량 보존·굶주림·건강의
+  최소 기계 규칙이 결정론적으로 작동함
+
+M2 PASS
+≠ NPC 판단이 작동함
+≠ 가뭄이 구현됨
+≠ 게임의 재미가 검증됨
+```
+
+결정 20의 승인은 M2 세부 구현 명세만 확정한다. 실제 코드 작성 권한은 별도의 `M2 구현 승인` 전까지 부여되지 않는다.
