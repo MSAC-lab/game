@@ -2,7 +2,7 @@
 
 가상의 중세~르네상스 난세에서 한 개인의 선택과 변화가 주변 인물과 역사에 영향을 주는 개인 중심 시뮬레이션 게임 프로젝트다.
 
-현재는 구현 전 설계 검증 단계다. 이 저장소의 첫 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
+M0 기반 구축을 완료했다. 이 저장소의 다음 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
 
 > 인물의 성향·상태·관계·기억 → 판단과 선택 → 사건의 결과 → 인물과 세계의 변화 → 이후의 다른 판단
 
@@ -29,8 +29,63 @@
 ## 현재 상태
 
 ```text
-STATUS = DESIGN_ONLY
-IMPLEMENTATION = NOT_STARTED
+STATUS = M0 PASS
+IMPLEMENTATION = PROJECT SKELETON / SMOKE TEST ONLY
 FIRST_PROTOTYPE = DROUGHT / PROVISIONAL
+ENGINE = GODOT 4.7.2 STABLE STANDARD
+LANGUAGE = STATICALLY TYPED GDSCRIPT
 ```
 
+NPC, 가뭄, 자원 및 판단 시스템은 아직 구현하지 않았다.
+
+## 요구 환경
+
+- [Godot 4.7.2 stable Standard](https://godotengine.org/download/archive/4.7.2-stable/)
+- 최초 실행 대상: Windows x86_64
+- C#/.NET 빌드가 아닌 Standard 빌드
+
+프로토타입이 끝날 때까지 엔진 버전을 임의로 업그레이드하지 않는다.
+
+## Windows에서 실행
+
+1. Godot 4.7.2 Standard를 내려받아 압축을 푼다.
+2. Godot 편집기에서 이 저장소의 `project.godot`을 연다.
+3. `F6`이 아니라 `F5`로 프로젝트를 실행한다.
+
+현재 화면에는 M0 기반 상태와 엔진 버전만 표시된다.
+
+## Headless smoke test
+
+저장소 루트에서 Godot의 콘솔 실행 파일 경로를 지정한다.
+
+```powershell
+& "C:\path\to\Godot_v4.7.2-stable_win64_console.exe" `
+    --headless --path . --script res://tests/smoke_test.gd
+```
+
+성공하면 다음 형식의 메시지와 종료 코드 `0`을 반환한다.
+
+```text
+M0_SMOKE_PASS engine=4.7.2.stable.official...
+```
+
+메인 프로젝트 부팅도 별도로 확인할 수 있다.
+
+```powershell
+& "C:\path\to\Godot_v4.7.2-stable_win64_console.exe" `
+    --headless --path . --quit-after 1
+```
+
+GitHub Actions는 공식 Godot 4.7.2 Standard 배포물의 SHA-256을 확인한 뒤 Linux와 Windows에서 두 검사를 모두 실행한다.
+
+## M0 범위
+
+M0에는 다음만 포함한다.
+
+- Godot 프로젝트 골격
+- 정적 타입 경고 정책
+- 최소 부팅 화면
+- Headless smoke test
+- Linux·Windows 자동 검증
+
+다음 단계인 M1 상태 모델은 별도의 구현 승인이 있기 전까지 시작하지 않는다.

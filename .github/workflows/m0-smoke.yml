@@ -1,0 +1,81 @@
+name: M0 smoke
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: "4.7.2"
+
+jobs:
+  linux-smoke:
+    name: Linux / Godot 4.7.2
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download and verify Godot Standard
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          url="https://godot-releases.nbg1.your-objectstorage.com/${GODOT_VERSION}-stable/${archive}"
+          curl --fail --location --silent --show-error "$url" --output godot.zip
+          echo "cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4  godot.zip" | sha256sum --check --strict
+          unzip -q godot.zip -d .godot-bin
+          chmod +x ".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+
+      - name: Run smoke test and project boot
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot=".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          "$godot" --version | grep '^4\.7\.2\.stable\.'
+          "$godot" --headless --path . --script res://tests/smoke_test.gd
+          "$godot" --headless --path . --quit-after 1
+
+  windows-smoke:
+    name: Windows / Godot 4.7.2
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download and verify Godot Standard
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $archive = "Godot_v$env:GODOT_VERSION-stable_win64.exe.zip"
+          $url = "https://godot-releases.nbg1.your-objectstorage.com/$env:GODOT_VERSION-stable/$archive"
+          Invoke-WebRequest -Uri $url -OutFile godot.zip
+          $actualHash = (Get-FileHash godot.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expectedHash = "731980f9608d61333e5baf54a2ef17210acc7a538446c0cb9969f002aca1e953"
+          if ($actualHash -ne $expectedHash) {
+            throw "Godot archive hash mismatch: $actualHash"
+          }
+          Expand-Archive -Path godot.zip -DestinationPath .godot-bin
+
+      - name: Run smoke test and project boot
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $godot = ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
+          $version = (& $godot --version).Trim()
+          if (-not $version.StartsWith("4.7.2.stable.")) {
+            throw "Unexpected Godot version: $version"
+          }
+          & $godot --headless --path . --script res://tests/smoke_test.gd
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $godot --headless --path . --quit-after 1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

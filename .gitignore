@@ -1,0 +1,10 @@
+# Godot-generated cache and imported resources.
+.godot/
+
+# Local build outputs are produced only in later milestones.
+builds/
+
+# Editor and operating-system noise.
+.DS_Store
+Thumbs.db
+*.tmp
