@@ -7,16 +7,20 @@ const HASH_PATTERN: String = "^[0-9a-fA-F]{64}$"
 
 static func validate_envelope(envelope: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
+	var schema_version: int = 0
 	if not _is_integer(envelope.get("schema_version")):
 		errors.append("schema_version must be an integer")
-	elif int(envelope.get("schema_version")) != WorldState.SUPPORTED_SCHEMA_VERSION:
-		errors.append("unsupported schema_version: %s" % str(envelope.get("schema_version")))
+	else:
+		schema_version = int(envelope.get("schema_version"))
+		if schema_version not in [WorldState.SCHEMA_VERSION_M1, WorldState.SCHEMA_VERSION_M2]:
+			errors.append("unsupported schema_version: %s" % str(schema_version))
 	_require_nonempty_string(envelope, "ruleset_id", "envelope", errors)
 	_require_pattern(envelope, "ruleset_hash", HASH_PATTERN, "envelope", errors)
 	if typeof(envelope.get("state")) != TYPE_DICTIONARY:
 		errors.append("state must be a dictionary")
 		return errors
-	_validate_state(envelope.get("state"), errors)
+	if schema_version in [WorldState.SCHEMA_VERSION_M1, WorldState.SCHEMA_VERSION_M2]:
+		_validate_state(envelope.get("state"), schema_version, errors)
 	return errors
 
 
@@ -24,12 +28,19 @@ static func validate_world(world: WorldState) -> Array[String]:
 	return validate_envelope(StateHasher.state_payload(world))
 
 
-static func _validate_state(state: Dictionary, errors: Array[String]) -> void:
+static func _validate_state(
+	state: Dictionary, schema_version: int, errors: Array[String]
+) -> void:
 	_require_nonempty_string(state, "scenario_id", "state", errors)
 	_require_nonempty_string(state, "season_id", "state", errors)
 	_require_pattern(state, "rng_seed_hex", HEX_64_PATTERN, "state", errors)
 	_require_pattern(state, "rng_state_hex", HEX_64_PATTERN, "state", errors)
 	_require_integer(state, "day_index", 0, 2147483647, "state", errors)
+	if schema_version == WorldState.SCHEMA_VERSION_M1:
+		_forbid_key(state, "day_phase", "schema 1 state", errors)
+		_forbid_key(state, "resource_stores", "schema 1 state", errors)
+	else:
+		_require_exact_string(state, "day_phase", WorldState.DAY_END_PHASE, "state", errors)
 	if typeof(state.get("next_ids")) != TYPE_DICTIONARY:
 		errors.append("state.next_ids must be a dictionary")
 	else:
@@ -44,17 +55,23 @@ static func _validate_state(state: Dictionary, errors: Array[String]) -> void:
 	var events: Dictionary = _index_collection(state, "events", errors)
 	var information: Dictionary = _index_collection(state, "information", errors)
 	var memories: Dictionary = _index_collection(state, "memories", errors)
+	var resource_stores: Dictionary = {}
+	if schema_version == WorldState.SCHEMA_VERSION_M2:
+		resource_stores = _index_collection(state, "resource_stores", errors)
 
 	var player_id: String = str(state.get("player_person_id", ""))
 	if not persons.has(player_id):
 		errors.append("state.player_person_id references missing person: %s" % player_id)
 
-	_validate_households(households, persons, errors)
+	_validate_resource_stores(resource_stores, households, schema_version, errors)
+	_validate_households(households, persons, resource_stores, schema_version, errors)
 	_validate_relations(relations, persons, errors)
 	_validate_events(events, persons, errors)
 	_validate_information(information, persons, events, errors)
 	_validate_memories(memories, persons, events, information, errors)
-	_validate_persons(persons, households, relations, information, memories, errors)
+	_validate_persons(
+		persons, households, relations, information, memories, schema_version, errors
+	)
 
 
 static func _index_collection(
@@ -88,6 +105,7 @@ static func _validate_persons(
 	relations: Dictionary,
 	information: Dictionary,
 	memories: Dictionary,
+	schema_version: int,
 	errors: Array[String]
 ) -> void:
 	for person_id: Variant in persons.keys():
@@ -98,18 +116,36 @@ static func _validate_persons(
 		_require_string_array(person, "role_ids", "person %s" % person_id, errors)
 		_require_string_array(person, "goal_ids", "person %s" % person_id, errors)
 		_require_reference(person, "household_id", households, "person %s" % person_id, errors)
-		_require_integer(person, "health", 0, 100, "person %s" % person_id, errors)
+		var minimum_health: int = 0 if schema_version == WorldState.SCHEMA_VERSION_M1 else 1
+		_require_integer(person, "health", minimum_health, 100, "person %s" % person_id, errors)
 		_validate_score_dictionary(person, "trait_scores", "person %s" % person_id, errors)
 		_validate_score_dictionary(person, "value_scores", "person %s" % person_id, errors)
 		_validate_score_dictionary(person, "emotion_scores", "person %s" % person_id, errors)
 		_validate_score_dictionary(person, "need_scores", "person %s" % person_id, errors)
+		if schema_version == WorldState.SCHEMA_VERSION_M1:
+			_forbid_key(person, "daily_food_need_units", "schema 1 person %s" % person_id, errors)
+			_forbid_key(person, "severe_hunger_days", "schema 1 person %s" % person_id, errors)
+		else:
+			_require_integer(
+				person, "daily_food_need_units", 0, 10, "person %s" % person_id, errors
+			)
+			_require_integer(
+				person, "severe_hunger_days", 0, 365, "person %s" % person_id, errors
+			)
+			var need_scores: Variant = person.get("need_scores")
+			if typeof(need_scores) != TYPE_DICTIONARY or not need_scores.has("hunger"):
+				errors.append("person %s.need_scores.hunger is required by schema 2" % person_id)
 		_validate_reference_array(person, "relation_ids", relations, "person %s" % person_id, errors)
 		_validate_reference_array(person, "information_ids", information, "person %s" % person_id, errors)
 		_validate_reference_array(person, "memory_ids", memories, "person %s" % person_id, errors)
 
 
 static func _validate_households(
-	households: Dictionary, persons: Dictionary, errors: Array[String]
+	households: Dictionary,
+	persons: Dictionary,
+	resource_stores: Dictionary,
+	schema_version: int,
+	errors: Array[String]
 ) -> void:
 	for household_id: Variant in households.keys():
 		var household: Dictionary = households[household_id]
@@ -118,8 +154,68 @@ static func _validate_households(
 		_validate_reference_array(
 			household, "member_ids", persons, "household %s" % household_id, errors
 		)
-		for key: String in ["food_units", "wealth_units", "daily_food_need_units", "dependency_load"]:
+		for key: String in ["wealth_units", "dependency_load"]:
 			_require_integer(household, key, 0, 2147483647, "household %s" % household_id, errors)
+		if schema_version == WorldState.SCHEMA_VERSION_M1:
+			for key: String in ["food_units", "daily_food_need_units"]:
+				_require_integer(
+					household, key, 0, 2147483647, "household %s" % household_id, errors
+				)
+			_forbid_key(
+				household, "resource_store_id", "schema 1 household %s" % household_id, errors
+			)
+		else:
+			_forbid_key(household, "food_units", "schema 2 household %s" % household_id, errors)
+			_forbid_key(
+				household, "daily_food_need_units", "schema 2 household %s" % household_id, errors
+			)
+			_require_reference(
+				household,
+				"resource_store_id",
+				resource_stores,
+				"household %s" % household_id,
+				errors
+			)
+			var store_id: String = str(household.get("resource_store_id", ""))
+			if resource_stores.has(store_id):
+				var store: Dictionary = resource_stores[store_id]
+				if str(store.get("owner_kind", "")) != "household" or str(
+					store.get("owner_id", "")
+				) != str(household_id):
+					errors.append(
+					"household %s.resource_store_id must reference its own household store"
+					% household_id
+				)
+
+
+static func _validate_resource_stores(
+	stores: Dictionary,
+	households: Dictionary,
+	schema_version: int,
+	errors: Array[String]
+) -> void:
+	if schema_version != WorldState.SCHEMA_VERSION_M2:
+		return
+	for store_id: Variant in stores.keys():
+		var store: Dictionary = stores[store_id]
+		_require_string(store, "owner_kind", "store %s" % store_id, errors)
+		_require_string(store, "owner_id", "store %s" % store_id, errors)
+		_require_exact_string(store, "resource_type_id", "food", "store %s" % store_id, errors)
+		_require_integer(store, "quantity", 0, 2147483647, "store %s" % store_id, errors)
+		var owner_kind: String = str(store.get("owner_kind", ""))
+		var owner_id: String = str(store.get("owner_id", ""))
+		if owner_kind == "household":
+			if not households.has(owner_id):
+				errors.append("store %s.owner_id references missing household: %s" % [store_id, owner_id])
+			if str(store_id) != "resource_store:%s" % owner_id:
+				errors.append("household store has non-canonical ID: %s" % store_id)
+		elif owner_kind == "village":
+			if owner_id != "village:main":
+				errors.append("store %s village owner_id must be village:main" % store_id)
+			if str(store_id) != "resource_store:village_granary":
+				errors.append("village store has non-canonical ID: %s" % store_id)
+		else:
+			errors.append("store %s.owner_kind must be village or household" % store_id)
 
 
 static func _validate_relations(
@@ -268,6 +364,24 @@ static func _require_string(
 ) -> void:
 	if typeof(data.get(key)) != TYPE_STRING:
 		errors.append("%s.%s must be a string" % [context, key])
+
+
+static func _require_exact_string(
+	data: Dictionary,
+	key: String,
+	expected: String,
+	context: String,
+	errors: Array[String]
+) -> void:
+	if typeof(data.get(key)) != TYPE_STRING or str(data.get(key)) != expected:
+		errors.append("%s.%s must be %s" % [context, key, expected])
+
+
+static func _forbid_key(
+	data: Dictionary, key: String, context: String, errors: Array[String]
+) -> void:
+	if data.has(key):
+		errors.append("%s forbids field %s" % [context, key])
 
 
 static func _require_bool(

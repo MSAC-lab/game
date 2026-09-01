@@ -4,6 +4,7 @@ extends RefCounted
 
 static func create() -> Dictionary:
 	var world: WorldState = WorldState.new()
+	world.schema_version = WorldState.SCHEMA_VERSION_M1
 	world.ruleset_id = "drought-prototype-rules-v1"
 	world.scenario_id = "three-person-state-fixture"
 	world.day_index = 7

@@ -8,6 +8,8 @@ var occupation_id: String = ""
 var role_ids: Array[String] = []
 var alive: bool = true
 var health: int = 100
+var daily_food_need_units: int = 0
+var severe_hunger_days: int = 0
 var trait_scores: Dictionary = {}
 var value_scores: Dictionary = {}
 var emotion_scores: Dictionary = {}
@@ -18,8 +20,8 @@ var memory_ids: Array[String] = []
 var relation_ids: Array[String] = []
 
 
-func to_data() -> Dictionary:
-	return {
+func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M1) -> Dictionary:
+	var data: Dictionary = {
 		"id": id,
 		"display_name": display_name,
 		"household_id": household_id,
@@ -36,9 +38,15 @@ func to_data() -> Dictionary:
 		"memory_ids": memory_ids.duplicate(),
 		"relation_ids": relation_ids.duplicate(),
 	}
+	if schema_version == WorldState.SCHEMA_VERSION_M2:
+		data["daily_food_need_units"] = daily_food_need_units
+		data["severe_hunger_days"] = severe_hunger_days
+	return data
 
 
-static func from_data(data: Dictionary) -> PersonState:
+static func from_data(
+	data: Dictionary, schema_version: int = WorldState.SCHEMA_VERSION_M1
+) -> PersonState:
 	var state: PersonState = PersonState.new()
 	state.id = str(data.get("id", ""))
 	state.display_name = str(data.get("display_name", ""))
@@ -47,6 +55,9 @@ static func from_data(data: Dictionary) -> PersonState:
 	state.role_ids = ModelData.copy_string_array(data.get("role_ids", []))
 	state.alive = bool(data.get("alive", false))
 	state.health = int(data.get("health", 0))
+	if schema_version == WorldState.SCHEMA_VERSION_M2:
+		state.daily_food_need_units = int(data.get("daily_food_need_units", 0))
+		state.severe_hunger_days = int(data.get("severe_hunger_days", 0))
 	state.trait_scores = ModelData.copy_string_int_dictionary(data.get("trait_scores", {}))
 	state.value_scores = ModelData.copy_string_int_dictionary(data.get("value_scores", {}))
 	state.emotion_scores = ModelData.copy_string_int_dictionary(data.get("emotion_scores", {}))
