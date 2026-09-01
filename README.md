@@ -37,7 +37,7 @@ FIRST_PROTOTYPE = DROUGHT / PROVISIONAL
 ENGINE = GODOT 4.7.2 STABLE STANDARD
 LANGUAGE = STATICALLY TYPED GDSCRIPT
 M1 = COMPLETE / PASS
-M2 = CONTRACT APPROVED / IMPLEMENTATION NOT AUTHORIZED
+M2 = CONTRACT + IMPLEMENTATION SPEC APPROVED / IMPLEMENTATION NOT AUTHORIZED
 ```
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다. NPC 판단, 시간 진행, 가뭄, 자원 변화 및 행동 시스템은 아직 구현하지 않았다.
@@ -122,4 +122,4 @@ M1에는 다음만 포함한다.
 - JSON 저장 문자열의 검증·복원
 - M1-T01~T10 자동 시험
 
-M2의 하루 진행·자원 보존 계약은 설계 결정 19로 승인되었다. 구현은 별도의 `M2 구현 승인`이 있기 전까지 시작하지 않는다.
+M2의 하루 진행·자원 보존 계약과 세부 구현 명세는 설계 결정 19·20으로 승인되었다. 구현은 별도의 `M2 구현 승인`이 있기 전까지 시작하지 않는다.
