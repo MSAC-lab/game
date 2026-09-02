@@ -3,7 +3,7 @@
 ## 문서 상태
 
 ```text
-STATUS = PROVISIONAL / DESIGN ITEMS 1-22 APPROVED
+STATUS = PROVISIONAL / DESIGN ITEMS 1-23 APPROVED
 IMPLEMENTATION AUTHORIZATION = M0 + M1 + M2 + M3
 M1 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 M2 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
@@ -12,8 +12,8 @@ IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS / M2 COMPLETE / 
 AUTOMATED VERIFICATION = M0 + M1 + M2 + M3 LOCAL / LINUX / WINDOWS PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FULL ACCEPTANCE = M0 + M1 + M2 + M3 MECHANICS PASS / M3 BEHAVIOR OBSERVED
-SCOPE = M0 + M1 + M2 + M3 COMPLETE / M4 NOT SPECIFIED / M4 NOT AUTHORIZED
-PENDING DISCUSSION = DESIGN ITEM 23 / M4 CONTRACT
+SCOPE = M0 + M1 + M2 + M3 COMPLETE / M4 HIGH-LEVEL ARCHITECTURE FROZEN / M4 NOT AUTHORIZED
+PENDING DISCUSSION = DESIGN ITEM 24 / M4 DETAILED IMPLEMENTATION SPECIFICATION
 ```
 
 이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, 구현된 M1~M3 경계는 결정 18~22의 해당 계약과 동결 artifact로 고정했다.
@@ -1915,28 +1915,34 @@ C01~C05는 합격 시험이 아니라 반대 조건 관찰 프로브다. 특정 
 
 구현 내용은 다음과 같다.
 
-- R0 확정 처리
-- R1 상대방 판단
-- R2 불확실 과업
-- R3 대항 행동
-- 실행 직전 재검증
+- M3 판단 artifact의 canonical 재검증
+- 선택을 구체적 시도로 만드는 순수 `IntentParameterizer`
+- R0 확정 처리, R1 상대방 판단 및 R3 대항 행동
+- 행동 실행 가능성의 객관적 재검증
+- 희망량·시도량·제안량·실제량 분리
 - 성공과 발각 분리
-- 독립 결과 난수
-- 즉시 반응 1회 제한
+- 행동 단위의 상태 없는 결과 난수와 안정적 거래 ID
+- 복수 행동의 순서 독립적 자원 충돌 해결
+- clone-world 적용, 전역 invariant 검증 및 batch 원자적 commit
 
 최초 구현 대상은 다음으로 제한한다.
 
-- 식량 요청과 상대의 응답
-- 공동창고 실사
-- 공동창고 절도
+- A00 현재 행동 유지
+- A04 식량 요청과 상대의 전량 제공·일부 제공·거절 응답
+- A11 공동창고 절도
 - 절도의 목격과 흔적
+
+R2 불확실 과업, A02 공동창고 실사, 조건부 역제안과 협상 lifecycle은 후속 단계로 연기한다. 결정 15의 일반 행동 분류는 장기 설계로 유지하되 결정 23이 이번 M4 마일스톤의 구현 범위를 제한한다.
 
 합격 기준은 다음과 같다.
 
-- C06 상대방 자율성 통과
-- C07 성공과 발각 분리 통과
-- I05 실행 조건 통과
-- 처리 순서를 바꿔도 결과가 동일함
+- 특정 행동 결과나 이야기 방향을 합격 조건으로 두지 않음
+- 동일 입력·동일 규칙에서 전체 resolution artifact와 다음 세계가 재현됨
+- 상대방의 응답 판단과 절도의 수행·발각 계산이 감사 가능함
+- 행위자가 몰랐던 객관적 정보가 의도 형성에 역류하지 않음
+- 행동 입력 배열 순서를 바꿔도 의미론적 결과와 다음 세계가 동일함
+- 자원 보존과 참조 무결성이 깨지면 전체 batch가 commit되지 않음
+- 정확한 fixture와 M4-T/R 시험 목록은 결정 24에서 동결함
 
 #### M5 — 사건·정보·기억·변화
 
@@ -3338,4 +3344,188 @@ C01~C05는 3인 가구의 가구주, 배우자·자녀, 촌장과 공동창고�
 2b4a65a99fcf795999ee4a8e34f9ace9a0b791e659a631b8efa1b34da8602357
 ```
 
-결정 22 구현은 M3-T01~T12, M3-R01~R04와 추가 schema·입력 경계 회귀 시험을 통과해야 한다. M4 계약과 구현은 별도 승인 전까지 시작하지 않는다.
+결정 22 구현은 M3-T01~T12, M3-R01~R04와 추가 schema·입력 경계 회귀 시험을 통과해야 한다. M4 구현은 결정 23 승인만으로 시작하지 않으며, 세부 구현 명세와 별도의 구현 승인을 기다린다.
+
+## 25. 승인된 잠정 설계 23
+
+### 결정 23. M4 원자적 행동 결과 처리 계약
+
+M4는 M3가 고른 행동을 현실 세계의 실제 결과로 해소한다. 원하는 행동이나 이야기 결과를 만들기 위한 계층이 아니며, 동일한 입력과 동결 규칙에서 재현 가능하고 감사 가능한 결과를 만드는 계층이다.
+
+고수준 아키텍처는 승인·동결됐지만 M4 구현은 아직 승인되지 않았다. 필드 타입, 정수 계수와 공식, 정확한 RNG 키 직렬화, `action_instance_id` 생성 규칙, fixture 및 M4-T/R 시험은 결정 24에서 별도로 고정한다.
+
+#### 책임 경계
+
+```text
+M3 = 무엇을 할 것인가
+IntentParameterizer = 그 선택을 어떤 구체적 시도로 만들 것인가
+M4 = 실제 세계에서는 무엇이 일어났는가
+M5 = 일어난 일을 사람들이 어떻게 알고 기억하고 받아들이는가
+```
+
+M4는 관계·기억·감정·성향을 직접 바꾸지 않는다. 대신 M5가 객관적 사건과 인물별 인식으로 변환할 수 있는 목격·흔적 등 객관적 evidence seed를 출력한다.
+
+#### 최초 지원 범위
+
+| 행동 | 내용 | 결과 유형 |
+|---|---|---|
+| A00 | 현재 행동 유지 | R0 확정 처리 |
+| A04 | 다른 인물에게 식량 요청 | R1 상대방 판단 |
+| A11 | 공동창고 절도 시도 | R3 대항 행동 |
+
+A04 응답은 `GRANT_FULL`, `GRANT_PARTIAL`, `REJECT`만 허용한다. 이번 단계에서 `COUNTEROFFER`는 지원하지 않는다. 응답자의 식량 출처는 응답자 가구의 `resource_store_id` 하나로 제한한다.
+
+R2 불확실 과업과 A02 공동창고 실사는 이번 M4 범위 밖이다. 장기 설계의 R2 분류 자체를 폐기하는 것이 아니라, A11만으로 수행·실패·노출 분리를 먼저 검증하기 위해 연기한다.
+
+schema 4에는 A11 수행 계산에 필요한 최소 능력·기술 값을 담을 정적 타입 container를 추가할 수 있다. 이번 단계는 container와 직접 참조 규칙만 정의하며 성장, 경험치, 파생 능력치, 광범위한 직업 보정이나 완성된 캐릭터 능력 체계는 구현하지 않는다. 이는 결정 15의 임시 기존 정보 조합을 M4의 감사 가능한 명시 입력으로 좁혀 교체하는 것이며, 정확한 필드와 허용 key는 결정 24에서 동결한다.
+
+#### 처리 pipeline과 원자성
+
+```text
+M3 DecisionResult
+→ canonical provenance 재검증
+→ IntentParameterizer
+→ Fully Parameterized ActionIntent
+→ 객관적 실행 가능성 재검증
+→ A04 responder decision / A11 performance
+→ desired / attempted / proposed result
+→ resource conflict resolution
+→ actual result와 objective attainment
+→ exposure / witness / trace
+→ deterministic resource ledger
+→ clone-world apply
+→ global invariant validation
+→ atomic commit
+```
+
+복수 행동은 입력 배열 순서가 아니라 안정적인 `action_instance_id` 순으로 처리한다. 제안된 모든 자원 변화와 충돌을 확정한 뒤 거래 원장의 순서를 부여한다. 하나라도 전역 invariant를 깨뜨리면 원본 세계를 변경하지 않고 batch 전체를 실패시킨다.
+
+#### ruleset manifest
+
+schema 4의 세계는 단일 ruleset ID·hash 대신 다음 다섯 component를 가진 manifest를 사용한다.
+
+```text
+resource
+decision
+parameterization
+response
+resolution
+```
+
+각 component의 ID와 canonical hash로 `simulation_ruleset_hash`를 만든다. 어느 component의 규칙이 바뀌어도 전체 simulation ruleset hash가 바뀌어야 한다. M1~M3의 동결 artifact와 legacy schema는 재작성하지 않는다.
+
+#### DecisionResult와 intent provenance
+
+`IntentParameterizer`는 임의의 행동 문자열을 받지 않는다. 기존 API인 다음 호출로 입력 세계에서 M3 결과를 다시 계산한다.
+
+```text
+DecisionEngine.evaluate(WorldState, DecisionRequest) -> DecisionResult
+```
+
+재계산 결과의 canonical hash가 제출된 `DecisionResult`와 같아야 하며, actor, decision key, input state hash, decision ruleset hash와 selected candidate가 모두 일치해야 한다. 완전한 intent는 최소한 다음 provenance를 보존한다.
+
+```text
+source_decision_hash
+source_decision_input_state_hash
+source_decision_ruleset_hash
+source_selected_candidate_id
+parameterization_ruleset_hash
+```
+
+`action_instance_id`는 전역 순차 allocator나 입력 배열 위치에서 만들지 않는다. 동일한 행위자가 같은 판단 키·행동·대상을 반복할 때도 충돌하지 않도록 `decision_instance_key` 또는 안정적인 `attempt_ordinal`을 입력 계약에 포함해야 한다. 둘 중 어느 방식을 쓸지와 정확한 canonical 생성식은 결정 24에서 고정한다.
+
+#### IntentParameterizer의 정보 경계
+
+Parameterizer는 의도 형성 계층이므로 행위자가 아는 정보만 사용한다.
+
+허용되는 입력은 다음과 같다.
+
+- 행위자 자신의 건강·욕구와 직접 소속된 가구의 자기 권위 상태
+- 행위자의 구조화된 주관적 사실
+- M3가 선택한 행동과 대상
+- 동결된 parameterization rules
+
+금지되는 입력은 다음과 같다.
+
+- 대상 창고의 비공개 실제 재고와 실제 보안
+- 숨어 있는 목격자와 행위자가 알지 못하는 현장 상태
+- 대상 인물의 비공개 욕구·감정·자원 상태
+
+A11의 `desired_units`는 가구 필요량, 행위자가 믿는 목표 창고 상황과 행동별 상한으로 정한다. 실제 목표 창고 수량은 M4의 현실 해소 단계에서만 사용한다. 따라서 잘못된 정보로 빈 창고를 털려는 시도도 사라지지 않고 실제 실패·목격·흔적으로 이어질 수 있다.
+
+#### 실행 불가와 현실적 실패의 경계
+
+객관적 재검증은 행동을 시작할 수 없는 경우에만 `INVALIDATED`를 반환한다.
+
+```text
+INVALIDATED 예시
+- actor가 사망함
+- 필수 target이 소멸함
+- actor가 실행 현장에 없음
+- 행동에 필수적인 대상 자체가 더 이상 존재하지 않음
+```
+
+다음은 실행 무효가 아니라 가능한 한 `RESOLVED`의 현실 조건으로 처리한다.
+
+```text
+- 실제 창고가 비어 있음
+- 실제 경비가 예상보다 강함
+- 응답자에게 제공할 식량이 없음
+```
+
+즉 `잘못된 정보 → 잘못된 선택 → 현실과 충돌`을 보존한다. `ResolutionContext`는 canonical이어야 하며 날짜·phase 일치, 존재하고 살아 있는 현장 인물, 중복 부재, 행위자의 현장 포함을 검증한다. 아직 위치 scheduler가 없으므로 context 자체의 생성은 외부 execution-context trust boundary이며 M5·M6의 scheduler가 후속 책임을 갖는다.
+
+#### 결과 축과 절도 수량
+
+행동 결과는 한 개의 성공 boolean으로 축약하지 않는다.
+
+```text
+processing_status = RESOLVED / INVALIDATED / REJECTED_AS_MALFORMED
+objective_attainment = FULL / PARTIAL / NONE / NOT_APPLICABLE
+response_decision = GRANT_FULL / GRANT_PARTIAL / REJECT / NOT_APPLICABLE
+```
+
+A11은 최소한 다음 수량을 구분한다.
+
+```text
+desired_units   = 행위자가 바라며 intent에 고정한 양
+attempted_units = 현실에서 실제로 훔치려 한 양
+proposed_units  = 자원 충돌 전 획득 가능 결과
+actual_units    = 충돌 해결과 원장 적용 후 실제 획득량
+```
+
+필요하면 `performance_capacity_units`를 감사용 중간값으로 추가한다. 노출·목격·흔적 계산은 `actual_units`만 보지 않고 시도량, 실제량, 수행 결과, 가시성, 은밀성, 목격자 지각과 실제 보안을 행동별 resolution rules로 사용한다. 그러므로 실제 획득량이 0이어도 목격되거나 흔적을 남길 수 있다.
+
+#### 결정론적 난수와 거래 identity
+
+M4 결과 난수는 세계 전체 hash나 순차 RNG 호출 횟수에 묶지 않는다. 정확한 키는 결정 24에서 정하되 최소한 simulation ruleset, seed, 날짜·phase, 안정적인 action instance, roll purpose와 필요한 participant를 canonical 직렬화한 상태 없는 행동 단위 키를 사용한다.
+
+M4가 새로 만드는 거래 ID는 `action_instance_id + transfer_leg`에서 파생되는 action-scoped deterministic ID를 사용한다. 자원 충돌을 해결하고 행동을 canonical 정렬한 뒤 `sequence_index`를 부여한다. batch 내 전역 sequence나 무관한 앞선 행동 때문에 개별 행동의 의미론적 resolution hash가 바뀌어서는 안 된다. M2의 기존 동결 거래 ID와 artifact는 변경하지 않는다.
+
+#### 출력 계약
+
+M4는 최소한 다음을 반환한다.
+
+```text
+BatchResolutionRecord
+ActionOutcomeRecord[]
+WitnessObservationSeed[]
+ResourceTransactionRecord[]
+next_world
+```
+
+각 결과는 intent provenance, 처리 상태, 목적 달성, 상대 응답, 희망·시도·제안·실제 수량, 수행과 노출의 감사값, 자원 거래 ID 및 객관적 evidence seed를 재구성할 수 있어야 한다.
+
+#### 승인과 다음 게이트
+
+결정 23은 M4의 고수준 아키텍처만 동결한다. 다음 작업은 결정 24 `M4 세부 구현 명세`이며 다음을 반드시 확정해야 한다.
+
+- schema 4의 정확한 필드와 정적 타입
+- parameterization·response·resolution의 모든 정수식과 clamp·반올림 순서
+- exact RNG key serialization과 roll purpose 목록
+- 중복 없는 `action_instance_id`의 유일성 출처와 생성식
+- stable transaction ID와 ledger sequence 규칙
+- 기준 fixture, 관찰 report 및 M4-T/R 시험 목록
+- `INVALIDATED`와 현실적 `RESOLVED/NONE`의 행동별 경계
+
+별도의 `M4 구현 승인` 전에는 schema 4 코드, resolver, fixture 또는 시험을 구현하지 않는다.
