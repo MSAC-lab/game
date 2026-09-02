@@ -3473,7 +3473,9 @@ INVALIDATED 예시
 - 응답자에게 제공할 식량이 없음
 ```
 
-즉 `잘못된 정보 → 잘못된 선택 → 현실과 충돌`을 보존한다. `ResolutionContext`는 canonical이어야 하며 날짜·phase 일치, 존재하고 살아 있는 현장 인물, 중복 부재, 행위자의 현장 포함을 검증한다. 아직 위치 scheduler가 없으므로 context 자체의 생성은 외부 execution-context trust boundary이며 M5·M6의 scheduler가 후속 책임을 갖는다.
+즉 `잘못된 정보 → 잘못된 선택 → 현실과 충돌`을 보존한다. `ResolutionContext`는 임의의 호출자가 조립하는 공개 입력이 아니라 신뢰된 scheduler 또는 execution issuer만 생성한다. canonical context는 최소한 issuer ID, 입력 state hash, 날짜·phase와 해당 `action_instance_id` 묶음에 결합하며, resolver는 현재 세계·batch와 일치하지 않거나 이미 소비된 context의 재사용을 거부한다. 암호학적 서명이나 네트워크 인증은 이 로컬 프로토타입의 범위가 아니다.
+
+context는 존재하고 살아 있는 현장 인물, 중복 부재, 행위자의 현장 포함도 검증한다. 아직 위치 scheduler가 없으므로 실제 위치를 판정해 context를 발행하는 책임은 외부 execution-context trust boundary이며 M5·M6의 scheduler가 후속 책임을 갖는다. M4 시험에서는 production scheduler를 가장하지 않는 명시적 test issuer만 사용하며, 정확한 발행·소비 API와 replay 식별자는 결정 24에서 고정한다.
 
 #### 결과 축과 절도 수량
 
@@ -3508,13 +3510,24 @@ M4는 최소한 다음을 반환한다.
 
 ```text
 BatchResolutionRecord
-ActionOutcomeRecord[]
-WitnessObservationSeed[]
-ResourceTransactionRecord[]
-next_world
+committed_outcomes: ActionOutcomeRecord[]
+committed_witness_seeds: WitnessObservationSeed[]
+committed_transactions: ResourceTransactionRecord[]
+next_world: WorldState or absent
 ```
 
-각 결과는 intent provenance, 처리 상태, 목적 달성, 상대 응답, 희망·시도·제안·실제 수량, 수행과 노출의 감사값, 자원 거래 ID 및 객관적 evidence seed를 재구성할 수 있어야 한다.
+`BatchResolutionRecord`는 개별 행동의 `processing_status`와 별도로 다음 batch 수준 정보를 가진다.
+
+```text
+batch_status = COMMITTED / REJECTED
+input_state_hash
+output_state_hash or absent
+errors[]
+```
+
+`next_world`와 세 `committed_*` 배열은 전역 invariant 검증과 atomic commit이 성공한 경우에만 반환한다. batch가 `REJECTED`이면 `next_world`는 없고 세 배열은 비어 있어야 하며, 적용되지 않은 proposed outcome이나 거래를 committed 결과로 노출해서는 안 된다. 실패 원인 분석이 필요하면 별도의 비세계·비commit `attempt_diagnostics`에 기록하고 committed artifact 및 세계 hash와 구분한다.
+
+각 committed 결과는 intent provenance, 처리 상태, 목적 달성, 상대 응답, 희망·시도·제안·실제 수량, 수행과 노출의 감사값, 자원 거래 ID 및 객관적 evidence seed를 재구성할 수 있어야 한다.
 
 #### 승인과 다음 게이트
 
@@ -3527,5 +3540,7 @@ next_world
 - stable transaction ID와 ledger sequence 규칙
 - 기준 fixture, 관찰 report 및 M4-T/R 시험 목록
 - `INVALIDATED`와 현실적 `RESOLVED/NONE`의 행동별 경계
+- 신뢰된 `ResolutionContext` issuer, state/action binding과 replay 거부 규칙
+- batch commit 상태, 실패 출력 및 `next_world` 부재 계약
 
 별도의 `M4 구현 승인` 전에는 schema 4 코드, resolver, fixture 또는 시험을 구현하지 않는다.
