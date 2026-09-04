@@ -43,12 +43,15 @@ static func _validate_request(world: WorldState, request: DecisionRequest) -> Ar
 		errors.append("actor_person_id references missing person: %s" % request.actor_person_id)
 	if request.decision_key.is_empty():
 		errors.append("decision_key must not be empty")
-	if world.schema_version != WorldState.SCHEMA_VERSION_M3:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M3:
+		if world.ruleset_id != M3DecisionRules.RULESET_ID:
+			errors.append("M3 decision engine requires ruleset %s" % M3DecisionRules.RULESET_ID)
+		if world.ruleset_hash != M3DecisionRules.ruleset_hash():
+			errors.append("M3 decision engine ruleset_hash mismatch")
+	elif world.schema_version == WorldState.SCHEMA_VERSION_M4:
+		errors.append_array(M4Rules.validate_world_manifest(world, ["decision"]))
+	else:
 		errors.append("M3 decision engine requires schema 3")
-	if world.ruleset_id != M3DecisionRules.RULESET_ID:
-		errors.append("M3 decision engine requires ruleset %s" % M3DecisionRules.RULESET_ID)
-	if world.ruleset_hash != M3DecisionRules.ruleset_hash():
-		errors.append("M3 decision engine ruleset_hash mismatch")
 	return errors
 
 

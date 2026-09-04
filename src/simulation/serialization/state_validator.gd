@@ -3,6 +3,63 @@ extends RefCounted
 
 const HEX_64_PATTERN: String = "^[0-9a-fA-F]{16}$"
 const HASH_PATTERN: String = "^[0-9a-fA-F]{64}$"
+const LOWER_HASH_PATTERN: String = "^[0-9a-f]{64}$"
+const SCHEMA4_PAYLOAD_KEYS: Array[String] = [
+	"schema_version",
+	"ruleset_manifest",
+	"simulation_ruleset_hash",
+	"state",
+]
+const SCHEMA4_SAVE_KEYS: Array[String] = [
+	"schema_version",
+	"ruleset_manifest",
+	"simulation_ruleset_hash",
+	"state",
+	"audit",
+	"resource_audit",
+	"state_hash",
+]
+const SCHEMA4_STATE_KEYS: Array[String] = [
+	"scenario_id",
+	"day_index",
+	"day_phase",
+	"season_id",
+	"rng_seed_hex",
+	"rng_state_hex",
+	"next_ids",
+	"player_person_id",
+	"persons",
+	"households",
+	"resource_stores",
+	"relations",
+	"events",
+	"information",
+	"memories",
+	"resolution_epoch",
+	"next_resource_sequence_index",
+	"resolved_decision_slot_ids",
+]
+const SCHEMA4_PERSON_KEYS: Array[String] = [
+	"id",
+	"display_name",
+	"household_id",
+	"occupation_id",
+	"role_ids",
+	"alive",
+	"health",
+	"daily_food_need_units",
+	"severe_hunger_days",
+	"trait_scores",
+	"value_scores",
+	"emotion_scores",
+	"need_scores",
+	"goal_ids",
+	"information_ids",
+	"memory_ids",
+	"relation_ids",
+	"aptitude_scores",
+	"skill_scores",
+]
 
 
 static func validate_envelope(envelope: Dictionary) -> Array[String]:
@@ -16,10 +73,23 @@ static func validate_envelope(envelope: Dictionary) -> Array[String]:
 			WorldState.SCHEMA_VERSION_M1,
 			WorldState.SCHEMA_VERSION_M2,
 			WorldState.SCHEMA_VERSION_M3,
+			WorldState.SCHEMA_VERSION_M4,
 		]:
 			errors.append("unsupported schema_version: %s" % str(schema_version))
-	_require_nonempty_string(envelope, "ruleset_id", "envelope", errors)
-	_require_pattern(envelope, "ruleset_hash", HASH_PATTERN, "envelope", errors)
+	if schema_version == WorldState.SCHEMA_VERSION_M4:
+		var is_save_envelope: bool = (
+			envelope.has("audit") or envelope.has("resource_audit") or envelope.has("state_hash")
+		)
+		_validate_exact_keyset(
+			envelope,
+			SCHEMA4_SAVE_KEYS if is_save_envelope else SCHEMA4_PAYLOAD_KEYS,
+			"schema 4 envelope",
+			errors
+		)
+		_validate_ruleset_manifest(envelope, errors)
+	else:
+		_require_nonempty_string(envelope, "ruleset_id", "envelope", errors)
+		_require_pattern(envelope, "ruleset_hash", HASH_PATTERN, "envelope", errors)
 	if typeof(envelope.get("state")) != TYPE_DICTIONARY:
 		errors.append("state must be a dictionary")
 		return errors
@@ -27,6 +97,7 @@ static func validate_envelope(envelope: Dictionary) -> Array[String]:
 		WorldState.SCHEMA_VERSION_M1,
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
 	]:
 		_validate_state(envelope.get("state"), schema_version, errors)
 	return errors
@@ -36,9 +107,60 @@ static func validate_world(world: WorldState) -> Array[String]:
 	return validate_envelope(StateHasher.state_payload(world))
 
 
+static func _validate_ruleset_manifest(
+	envelope: Dictionary, errors: Array[String]
+) -> void:
+	var manifest_value: Variant = envelope.get("ruleset_manifest")
+	if typeof(manifest_value) != TYPE_DICTIONARY:
+		errors.append("envelope.ruleset_manifest must be a dictionary")
+		return
+	var manifest: Dictionary = manifest_value
+	_validate_exact_keyset(
+		manifest, RulesetManifest.COMPONENT_NAMES, "schema 4 ruleset_manifest", errors
+	)
+	for component_name: String in RulesetManifest.COMPONENT_NAMES:
+		var component_value: Variant = manifest.get(component_name)
+		if typeof(component_value) != TYPE_DICTIONARY:
+			errors.append(
+				"ruleset_manifest.%s must be a dictionary" % component_name
+			)
+			continue
+		var component: Dictionary = component_value
+		_validate_exact_keyset(
+			component,
+			["ruleset_id", "ruleset_hash"],
+			"ruleset_manifest.%s" % component_name,
+			errors
+		)
+		_require_nonempty_string(
+			component, "ruleset_id", "ruleset_manifest.%s" % component_name, errors
+		)
+		_require_pattern(
+			component,
+			"ruleset_hash",
+			LOWER_HASH_PATTERN,
+			"ruleset_manifest.%s" % component_name,
+			errors
+		)
+	_require_pattern(
+		envelope,
+		"simulation_ruleset_hash",
+		LOWER_HASH_PATTERN,
+		"envelope",
+		errors
+	)
+	if (
+		StateHasher.hash_data({"ruleset_manifest": manifest})
+		!= str(envelope.get("simulation_ruleset_hash", ""))
+	):
+		errors.append("simulation_ruleset_hash mismatch")
+
+
 static func _validate_state(
 	state: Dictionary, schema_version: int, errors: Array[String]
 ) -> void:
+	if schema_version == WorldState.SCHEMA_VERSION_M4:
+		_validate_exact_keyset(state, SCHEMA4_STATE_KEYS, "schema 4 state", errors)
 	_require_nonempty_string(state, "scenario_id", "state", errors)
 	_require_nonempty_string(state, "season_id", "state", errors)
 	_require_pattern(state, "rng_seed_hex", HEX_64_PATTERN, "state", errors)
@@ -49,6 +171,14 @@ static func _validate_state(
 		_forbid_key(state, "resource_stores", "schema 1 state", errors)
 	else:
 		_require_exact_string(state, "day_phase", WorldState.DAY_END_PHASE, "state", errors)
+	if schema_version == WorldState.SCHEMA_VERSION_M4:
+		_require_integer(state, "resolution_epoch", 0, 2147483647, "state", errors)
+		_require_integer(
+			state, "next_resource_sequence_index", 0, 2147483647, "state", errors
+		)
+		_require_sorted_unique_hash_array(
+			state, "resolved_decision_slot_ids", "state", errors
+		)
 	if typeof(state.get("next_ids")) != TYPE_DICTIONARY:
 		errors.append("state.next_ids must be a dictionary")
 	else:
@@ -64,7 +194,11 @@ static func _validate_state(
 	var information: Dictionary = _index_collection(state, "information", errors)
 	var memories: Dictionary = _index_collection(state, "memories", errors)
 	var resource_stores: Dictionary = {}
-	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
+	if schema_version in [
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
+	]:
 		resource_stores = _index_collection(state, "resource_stores", errors)
 
 	var player_id: String = str(state.get("player_person_id", ""))
@@ -118,6 +252,10 @@ static func _validate_persons(
 ) -> void:
 	for person_id: Variant in persons.keys():
 		var person: Dictionary = persons[person_id]
+		if schema_version == WorldState.SCHEMA_VERSION_M4:
+			_validate_exact_keyset(
+				person, SCHEMA4_PERSON_KEYS, "schema 4 person %s" % person_id, errors
+			)
 		_require_string(person, "display_name", "person %s" % person_id, errors)
 		_require_string(person, "occupation_id", "person %s" % person_id, errors)
 		_require_bool(person, "alive", "person %s" % person_id, errors)
@@ -143,6 +281,21 @@ static func _validate_persons(
 			var need_scores: Variant = person.get("need_scores")
 			if typeof(need_scores) != TYPE_DICTIONARY or not need_scores.has("hunger"):
 				errors.append("person %s.need_scores.hunger is required by schema 2" % person_id)
+		if schema_version == WorldState.SCHEMA_VERSION_M4:
+			_validate_exact_score_dictionary(
+				person,
+				"aptitude_scores",
+				["dexterity", "perception"],
+				"person %s" % person_id,
+				errors
+			)
+			_validate_exact_score_dictionary(
+				person,
+				"skill_scores",
+				["intrigue.stealth", "intrigue.theft"],
+				"person %s" % person_id,
+				errors
+			)
 		_validate_reference_array(person, "relation_ids", relations, "person %s" % person_id, errors)
 		_validate_reference_array(person, "information_ids", information, "person %s" % person_id, errors)
 		_validate_reference_array(person, "memory_ids", memories, "person %s" % person_id, errors)
@@ -197,7 +350,7 @@ static func _validate_households(
 					"household %s.resource_store_id must reference its own household store"
 					% household_id
 					)
-			if schema_version == WorldState.SCHEMA_VERSION_M3:
+			if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 				_validate_reference_array(
 					household,
 					"dependent_person_ids",
@@ -228,7 +381,11 @@ static func _validate_resource_stores(
 	schema_version: int,
 	errors: Array[String]
 ) -> void:
-	if schema_version not in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
+	if schema_version not in [
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
+	]:
 		return
 	for store_id: Variant in stores.keys():
 		var store: Dictionary = stores[store_id]
@@ -236,7 +393,7 @@ static func _validate_resource_stores(
 		_require_string(store, "owner_id", "store %s" % store_id, errors)
 		_require_exact_string(store, "resource_type_id", "food", "store %s" % store_id, errors)
 		_require_integer(store, "quantity", 0, 2147483647, "store %s" % store_id, errors)
-		if schema_version == WorldState.SCHEMA_VERSION_M3:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 			_require_integer(store, "security_level", 0, 100, "store %s" % store_id, errors)
 		else:
 			_forbid_key(store, "security_level", "schema 2 store %s" % store_id, errors)
@@ -306,7 +463,7 @@ static func _validate_information(
 		_require_integer(
 			info, "learned_day_index", 0, 2147483647, "information %s" % info_id, errors
 		)
-		if schema_version == WorldState.SCHEMA_VERSION_M3:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 			_validate_structured_information(
 				str(info_id), info, persons, resource_stores, structured_keys, errors
 			)
@@ -455,6 +612,60 @@ static func _validate_score_dictionary(
 	for score_key: Variant in scores.keys():
 		if not _is_integer(scores[score_key]) or int(scores[score_key]) < 0 or int(scores[score_key]) > 100:
 			errors.append("%s.%s.%s must be an integer from 0 to 100" % [context, key, score_key])
+
+
+static func _validate_exact_score_dictionary(
+	data: Dictionary,
+	key: String,
+	expected_keys: Array[String],
+	context: String,
+	errors: Array[String]
+) -> void:
+	var value: Variant = data.get(key)
+	if typeof(value) != TYPE_DICTIONARY:
+		errors.append("%s.%s must be a dictionary" % [context, key])
+		return
+	var scores: Dictionary = value
+	_validate_exact_keyset(scores, expected_keys, "%s.%s" % [context, key], errors)
+	for score_key: String in expected_keys:
+		_require_integer(scores, score_key, 0, 100, "%s.%s" % [context, key], errors)
+
+
+static func _require_sorted_unique_hash_array(
+	data: Dictionary, key: String, context: String, errors: Array[String]
+) -> void:
+	var value: Variant = data.get(key)
+	if typeof(value) != TYPE_ARRAY:
+		errors.append("%s.%s must be an array" % [context, key])
+		return
+	var values: Array = value
+	var previous: String = ""
+	for index: int in values.size():
+		var item: Variant = values[index]
+		if typeof(item) != TYPE_STRING:
+			errors.append("%s.%s contains a non-string value" % [context, key])
+			continue
+		var item_string: String = str(item)
+		var wrapper: Dictionary = {"value": item_string}
+		_require_pattern(wrapper, "value", LOWER_HASH_PATTERN, "%s.%s" % [context, key], errors)
+		if index > 0 and item_string <= previous:
+			errors.append("%s.%s must be sorted unique" % [context, key])
+		previous = item_string
+
+
+static func _validate_exact_keyset(
+	data: Dictionary, expected_keys: Array[String], context: String, errors: Array[String]
+) -> void:
+	var expected: Dictionary = {}
+	for key: String in expected_keys:
+		expected[key] = true
+	for key: String in expected_keys:
+		if not data.has(key):
+			errors.append("%s exact keyset is missing %s" % [context, key])
+	for key_value: Variant in data.keys():
+		var key: String = str(key_value)
+		if not expected.has(key):
+			errors.append("%s exact keyset has unexpected %s" % [context, key])
 
 
 static func _require_nonempty_string(

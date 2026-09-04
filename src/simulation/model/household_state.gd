@@ -25,9 +25,13 @@ func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M1) -> Dictionary:
 	if schema_version == WorldState.SCHEMA_VERSION_M1:
 		data["food_units"] = food_units
 		data["daily_food_need_units"] = daily_food_need_units
-	elif schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
+	elif schema_version in [
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
+	]:
 		data["resource_store_id"] = resource_store_id
-		if schema_version == WorldState.SCHEMA_VERSION_M3:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 			data["dependent_person_ids"] = dependent_person_ids.duplicate()
 	return data
 
@@ -42,9 +46,13 @@ static func from_data(
 	if schema_version == WorldState.SCHEMA_VERSION_M1:
 		state.food_units = int(data.get("food_units", 0))
 		state.daily_food_need_units = int(data.get("daily_food_need_units", 0))
-	elif schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
+	elif schema_version in [
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
+	]:
 		state.resource_store_id = str(data.get("resource_store_id", ""))
-		if schema_version == WorldState.SCHEMA_VERSION_M3:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 			state.dependent_person_ids = ModelData.copy_string_array(
 				data.get("dependent_person_ids", [])
 			)

@@ -13,6 +13,8 @@ static func validate_transactions(
 	world: WorldState, transactions: Array[ResourceTransactionRecord]
 ) -> Array[String]:
 	var errors: Array[String] = []
+	if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+		errors.append_array(M4Rules.validate_world_manifest(world, ["resource"]))
 	var simulated_quantities: Dictionary = {}
 	for store: ResourceStoreState in world.resource_stores:
 		simulated_quantities[store.id] = store.quantity
@@ -31,9 +33,25 @@ static func validate_transactions(
 			errors.append("resource transaction %s quantity must be positive" % record.id)
 		if record.day_index < 0 or record.sequence_index < 0:
 			errors.append("resource transaction %s day and sequence must be non-negative" % record.id)
-		var sequence_key: String = "%d:%d" % [record.day_index, record.sequence_index]
+		elif (
+			world.schema_version == WorldState.SCHEMA_VERSION_M4
+			and (record.day_index > 2147483647 or record.sequence_index > 2147483647)
+		):
+			errors.append("resource transaction %s day or sequence overflows schema 4" % record.id)
+		var sequence_key: String = (
+			str(record.sequence_index)
+			if world.schema_version == WorldState.SCHEMA_VERSION_M4
+			else "%d:%d" % [record.day_index, record.sequence_index]
+		)
 		if sequence_keys.has(sequence_key):
-			errors.append("duplicate resource transaction day and sequence: %s" % sequence_key)
+			if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+				errors.append(
+					"duplicate resource transaction sequence identity: %s" % sequence_key
+				)
+			else:
+				errors.append(
+					"duplicate resource transaction day and sequence: %s" % sequence_key
+				)
 		else:
 			sequence_keys[sequence_key] = true
 		if record.resource_type_id != "food":

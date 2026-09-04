@@ -1,0 +1,74 @@
+{
+  "action_instance": {
+    "algorithm_id": "m4-action-instance-v1",
+    "hash_fields": [
+      "decision_slot_id",
+      "parameterization_ruleset_hash",
+      "selected_candidate_id"
+    ],
+    "input_state_hash_in_identity": false,
+    "resolution_epoch_in_identity": false,
+    "source_decision_hash_in_identity": false
+  },
+  "algorithm_id": "m4-intent-parameterization-v1",
+  "allowed_action_ids": [
+    "A00",
+    "A04",
+    "A11"
+  ],
+  "allowed_decision_key": "daily_food_strategy",
+  "attempt_ordinal": 0,
+  "decision_slot": {
+    "algorithm_id": "m4-decision-slot-v1",
+    "hash_fields": [
+      "actor_person_id",
+      "day_index",
+      "decision_key",
+      "phase_id"
+    ],
+    "input_state_hash_in_identity": false,
+    "resolution_epoch_in_identity": false
+  },
+  "failure": {
+    "error_precedence": {
+      "decision_provenance_mismatch": 1,
+      "request_source_equals_recipient": 3,
+      "selected_positive_action_has_zero_need_basis": 2,
+      "theft_target_equals_recipient": 4,
+      "unsupported_decision_key": 0
+    },
+    "errors_encoding": "single_reason_id_array",
+    "intent_on_failure": "null",
+    "strategy": "first_applicable_reason_by_precedence"
+  },
+  "need_basis": {
+    "empty_alive_household_daily_need_units": 0,
+    "empty_alive_household_max_hunger": 0,
+    "food_horizon_days": 10,
+    "hunger_positive_floor_units": 1,
+    "request_cap_units": 10,
+    "theft_belief_scale_units": 10,
+    "theft_desired_cap_units": 10,
+    "zero_need_positive_action_error": "selected_positive_action_has_zero_need_basis"
+  },
+  "phase_id": "DAY_ACTION_RESOLUTION",
+  "recipient_policy": {
+    "recipient_store": "actor_household_resource_store",
+    "request_same_store_condition": "derived_request_source_store_equals_recipient_store",
+    "request_same_store_error": "request_source_equals_recipient",
+    "request_source_store_derivation": "selected_target_person_household_resource_store",
+    "same_store_validation_stage": "parameterization",
+    "theft_same_store_condition": "selected_target_store_equals_recipient_store",
+    "theft_same_store_error": "theft_target_equals_recipient"
+  },
+  "rounding": {
+    "ceil_div_nonnegative": "ceil_div_nonnegative_v1",
+    "round_div": "half_away_from_zero_v1"
+  },
+  "subjective_information": {
+    "effective_value": "confidence_weighted_effective_value_v1",
+    "fact_type_id": "food_stock_level",
+    "target_actual_quantity_forbidden": true,
+    "target_actual_security_forbidden": true
+  }
+}

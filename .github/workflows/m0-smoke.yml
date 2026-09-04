@@ -1,4 +1,4 @@
-name: M0-M3 verification
+name: M0-M4 verification
 
 on:
   pull_request:
@@ -67,6 +67,13 @@ jobs:
           godot=".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           "$godot" --headless --path . --script res://tests/m3_test_runner.gd
 
+      - name: Run M4 atomic action-resolution tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot=".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          "$godot" --headless --path . --script res://tests/m4_test_runner.gd
+
   windows-smoke:
     name: Windows / Godot 4.7.2
     runs-on: windows-latest
@@ -130,4 +137,12 @@ jobs:
           $ErrorActionPreference = "Stop"
           $godot = ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
           & $godot --headless --path . --script res://tests/m3_test_runner.gd
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run M4 atomic action-resolution tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $godot = ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
+          & $godot --headless --path . --script res://tests/m4_test_runner.gd
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

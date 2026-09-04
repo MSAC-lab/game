@@ -2,7 +2,7 @@
 
 가상의 중세~르네상스 난세에서 한 개인의 선택과 변화가 주변 인물과 역사에 영향을 주는 개인 중심 시뮬레이션 게임 프로젝트다.
 
-M0 기반, M1 상태 모델, M2 하루·식량 진행기와 M3 최초 판단 엔진을 완료했다. M3는 결과를 유도하지 않고 세 행동의 후보·효용·선택을 관찰한다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
+M0 기반, M1 상태 모델, M2 하루·식량 진행기, M3 최초 판단 엔진과 M4 원자적 행동 결과 처리기를 완료했다. M3는 결과를 유도하지 않고 세 행동의 후보·효용·선택을 관찰하며, M4는 선택된 행동을 동결 규칙에 따라 객관적 세계에서 해소한다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
 
 > 인물의 성향·상태·관계·기억 → 판단과 선택 → 사건의 결과 → 인물과 세계의 변화 → 이후의 다른 판단
 
@@ -29,9 +29,9 @@ M0 기반, M1 상태 모델, M2 하루·식량 진행기와 M3 최초 판단 엔
 ## 현재 상태
 
 ```text
-STATUS = M0 PASS / M1 PASS / M2 PASS / M3 PASS
-IMPLEMENTATION = FOUNDATION + STATE / TIME / FOOD + PURE DECISION EVALUATION
-AUTOMATED_VERIFICATION = M0-M3 LOCAL + LINUX + WINDOWS PASS
+STATUS = M0 PASS / M1 PASS / M2 PASS / M3 PASS / M4 PASS
+IMPLEMENTATION = FOUNDATION + STATE / TIME / FOOD + PURE DECISION EVALUATION + ATOMIC ACTION RESOLUTION
+AUTOMATED_VERIFICATION = M0-M4 LOCAL + LINUX + WINDOWS PASS
 GUI_VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FIRST_PROTOTYPE = DROUGHT / PROVISIONAL
 ENGINE = GODOT 4.7.2 STABLE STANDARD
@@ -39,7 +39,8 @@ LANGUAGE = STATICALLY TYPED GDSCRIPT
 M1 = COMPLETE / PASS
 M2 = COMPLETE / PASS
 M3 = COMPLETE / MECHANICS PASS / BEHAVIOR OBSERVED
-M4 DESIGN = DECISIONS 23-24 APPROVED / IMPLEMENTATION NOT AUTHORIZED
+M4 = COMPLETE / MECHANICS PASS / BEHAVIOR OBSERVED
+M4 DESIGN = DECISIONS 23-24 APPROVED / FROZEN
 ```
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다.
@@ -48,7 +49,7 @@ M2는 schema 2의 자원 저장소와 거래 원장, 원자적 하루 진행, �
 
 M3는 schema 3의 구조화된 주관적 사실만 이용해 `A00 현재 행동 유지`, `A04 도움 요청`, `A11 절도`를 평가한다. 외부 창고의 실제 수량·보안, 자연어 `claim`, 사건·기억과 플레이어 여부는 판단 입력이 아니다. 계산 정확성, 결정론, 정보 경계, 입력 상태 불변성과 감사 가능성만 기계적으로 판정한다. C01~C05에서 모두 A04가 선택됐지만 이는 성공 조건이 아니라 최초 동결 규칙에서 나온 관찰값이다.
 
-M4의 고수준 계약인 결정 23과 세부 구현 명세인 결정 24는 승인됐다. M4는 M3의 선택을 주관적 정보로 구체화한 뒤 객관적 현실에서 원자적으로 해소하며, 최초 범위는 `A00 현재 행동 유지`, `A04 도움 요청`, `A11 절도`로 제한한다. 설계 승인은 코드 작성 권한이 아니며, 문서 병합 후 정확한 `main` SHA를 기준으로 별도의 `M4 구현 승인`을 받아야 한다.
+M4는 승인된 결정 23·24에 따라 M3의 선택을 주관적 정보로 구체화한 뒤 객관적 현실에서 원자적으로 해소한다. 최초 범위는 `A00 현재 행동 유지`, `A04 도움 요청`, `A11 절도`로 제한한다. 공개 실행 진입점은 `M4Facade.execute_decisions_v1()`이며, Schema 4 ruleset manifest, stateless RNG, 동시 자원 충돌, replay 방지, 목격 evidence seed와 원자적 실패를 검증한다.
 
 Windows 편집기 실행 증거는 [M0 Windows GUI 검증 기록](docs/evidence/m0-windows-gui-2026-09-01.md)에 보존한다.
 
@@ -189,3 +190,37 @@ M1·M2 시험과 같은 editor scan 후 M3 시험을 실행한다.
 - M3-T01~T12 및 M3-R01~R04 자동 시험
 
 M3는 상대의 응답, 절도의 성공·발각, 자원 이전, 날짜 pipeline 통합, 사건·기억·관계·성향 변화, 다수 NPC scheduler 또는 플레이 UI를 포함하지 않는다.
+
+## M4 원자적 행동 결과 시험
+
+M1~M3 시험과 같은 editor scan 후 M4 시험을 실행한다.
+
+```powershell
+& "C:\path\to\Godot_v4.7.2-stable_win64_console.exe" `
+    --headless --editor --path . --quit
+& "C:\path\to\Godot_v4.7.2-stable_win64_console.exe" `
+    --headless --path . --script res://tests/m4_test_runner.gd
+```
+
+성공하면 `M4 PASS`와 종료 코드 `0`을 반환한다. 저장소의 exact-artifact annex와 동결 ruleset hash는 다음과 같다.
+
+```text
+annex           = 63a154f947ccbe6309d3d89690dbb7b3d6b1f5bf695356a89dd5ff45028e6819
+parameterization = 2b3b28f3ad886962e462eaedbd7dfd5321b519329af25f2f2d9664c666c46ae3
+response         = 6599cea3c34469b9051a6a6ecc8eebc89d4291620a792388a7a5b8aa9b5dae4d
+resolution       = 5ac0e95d42761ba1037480a28edb996d73e318ab04dae44ee5ef587eb537a3fe
+simulation       = 2ba7245d5b5481398f3d6d3d7e21f597a2f23a240b82a22e0dde8eca188aa3e4
+```
+
+## M4 범위
+
+- Schema 4 exact state/save 계약과 component ruleset manifest
+- M3 `DecisionResult` provenance 재검증과 안정적인 decision slot·action ID
+- A00·A04·A11의 정수 parameterization, 응답 및 현실 해소
+- action-scoped stateless RNG, 목격 판정과 evidence seed
+- batch 동시 충돌 배분, 자원 보존, 전역 transaction sequence
+- zero-change commit을 포함한 epoch·slot replay 방지
+- Schema 4 `DayProcessor`와 연속 M4 batch의 원장 연결
+- 정상 fixture 13개, 경계 fixture 6개 및 M4-T01~T22 자동 시험
+
+M4는 사건·정보·기억·관계·감정·성향을 직접 변경하지 않는다. 이 변화와 production 위치 scheduler는 후속 단계의 책임이다.

@@ -3,6 +3,13 @@ extends RefCounted
 
 
 static func state_payload(world: WorldState) -> Dictionary:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+		return {
+			"schema_version": world.schema_version,
+			"ruleset_manifest": world.ruleset_manifest.duplicate(true),
+			"simulation_ruleset_hash": world.simulation_ruleset_hash,
+			"state": world.to_state_data(),
+		}
 	return {
 		"schema_version": world.schema_version,
 		"ruleset_id": world.ruleset_id,
