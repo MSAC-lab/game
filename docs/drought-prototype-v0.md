@@ -3,17 +3,18 @@
 ## 문서 상태
 
 ```text
-STATUS = PROVISIONAL / DESIGN ITEMS 1-23 APPROVED
+STATUS = PROVISIONAL / DESIGN ITEMS 1-24 APPROVED
 IMPLEMENTATION AUTHORIZATION = M0 + M1 + M2 + M3
 M1 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 M2 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 M3 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
+M4 DETAILED DESIGN AUTHORIZATION = GRANTED / 2026-09-04
 IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS / M2 COMPLETE / PASS / M3 COMPLETE / MECHANICS PASS
 AUTOMATED VERIFICATION = M0 + M1 + M2 + M3 LOCAL / LINUX / WINDOWS PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FULL ACCEPTANCE = M0 + M1 + M2 + M3 MECHANICS PASS / M3 BEHAVIOR OBSERVED
-SCOPE = M0 + M1 + M2 + M3 COMPLETE / M4 HIGH-LEVEL ARCHITECTURE FROZEN / M4 NOT AUTHORIZED
-PENDING DISCUSSION = DESIGN ITEM 24 / M4 DETAILED IMPLEMENTATION SPECIFICATION
+SCOPE = M0 + M1 + M2 + M3 COMPLETE / M4 HIGH-LEVEL + DETAILED DESIGN FROZEN / M4 IMPLEMENTATION NOT AUTHORIZED
+NEXT GATE = DOCUMENT MERGE VERIFICATION / SEPARATE M4 IMPLEMENTATION AUTHORIZATION
 ```
 
 이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, 구현된 M1~M3 경계는 결정 18~22의 해당 계약과 동결 artifact로 고정했다.
@@ -3544,3 +3545,2163 @@ errors[]
 - batch commit 상태, 실패 출력 및 `next_world` 부재 계약
 
 별도의 `M4 구현 승인` 전에는 schema 4 코드, resolver, fixture 또는 시험을 구현하지 않는다.
+
+## 26. 승인된 잠정 설계 24
+
+### 결정 24. M4 세부 구현 명세
+
+결정 24는 기준 `main@434cf7f92dffc5bf9cd94bc17f9a5e228600e445`에서 독립 레드팀 검산을 통과했고 2026-09-04 사용자가 최종 승인했다. 이 결정은 앞서 작성된 모든 Decision 24 후보·수정안·요약본을 대체한다.
+
+```text
+DECISION 23 = APPROVED
+DECISION 24 = APPROVED
+M4 DETAILED DESIGN = FROZEN
+M4 IMPLEMENTATION = NOT AUTHORIZED
+SCHEMA 3→4 AUTOMATIC MIGRATION = OUT OF SCOPE
+SCHEMA 1–3 FROZEN SUPPORT = PRESERVED
+SCHEMA 4 READ / WRITE / VALIDATION CONTRACT = IN SCOPE
+```
+
+독립 검산 기준 exact-artifact annex는 `Decision24_F01-F10_exact_artifacts.json`, SHA-256 `63a154f947ccbe6309d3d89690dbb7b3d6b1f5bf695356a89dd5ff45028e6819`다. 이 annex는 설계 승인 증거지만 아직 구현 승인이 없으므로 repository fixture로 추가하지 않는다. 구현 승인 후 이 SHA와 일치하는 원상으로만 저장소 fixture를 생성한다.
+
+특정 NPC가 도움을 주거나 절도에 성공해야 PASS인 것이 아니다. 승인 대상은 타입, 인과 경계, 정수 계산, 직렬화, 결정론, 원자성 및 fixture 재현 가능성이다.
+
+#### 1. M4 범위와 책임 경계
+
+M4는 M3가 선택한 행동을 객관적 세계에서 원자적으로 처리한다.
+
+```text
+M3 = 행위자가 자기 정보로 무엇을 할지 선택
+Parameterizer = 선택을 수량과 대상으로 구체화
+M4 = 실제 세계에서 무엇이 발생했는지 확정
+M5 = 발생 사실을 누가 알고 기억하며 어떻게 변하는지 처리
+```
+
+최초 지원 행동은 다음 세 개뿐이다.
+
+| Action | 의미 | M4 처리 |
+|---|---|---|
+| `A00` | 기다림/행동 유지 | 수행 기록, 자원 변화 없음 |
+| `A04` | 식량 요청 | 상대의 독립 응답과 실제 이전량 확정 |
+| `A11` | 절도 | 수행량, 실제 획득량, 흔적과 목격 확정 |
+
+`A02`, 협상 counteroffer, 기억·소문·관계 변화, 하루 전체 scheduler, 위치 이동 및 권한 시스템은 범위 밖이다.
+
+#### 2. 공통 수치·정규화 계약
+
+모든 수치는 별도 명시가 없으면 signed 64-bit 계산 중간값을 사용하고, 저장되는 게임 점수와 수량은 `0..2147483647` 범위의 정수다. overflow 가능성은 mutation 전에 거부한다.
+
+```text
+round_div(n, d), d > 0
+
+n == 0 → 0
+n > 0  → floor((2*n + d) / (2*d))
+n < 0  → -floor((2*abs(n) + d) / (2*d))
+```
+
+정확히 half-away-from-zero다.
+
+```text
+ceil_div_nonnegative(n, d)
+= floor((n + d - 1) / d)
+
+precondition: n >= 0, d > 0
+```
+
+모든 곱셈, 나눗셈, clamp는 이 문서에 쓰인 순서대로 적용한다. 부동소수점 계산을 금지한다.
+
+`StateCanonicalizer`의 현재 계약을 그대로 사용한다.
+
+- dictionary key: 사전식
+- 문자열 배열: 사전식
+- 모든 원소가 `id`를 가진 dictionary 배열: `id` 사전식
+- 그 외 배열: 생산자가 명시적으로 정렬한 순서 보존
+
+#### 3. Schema 4 저장·검증 계약
+
+##### 3.1 StateHasher payload와 save envelope
+
+Schema 4의 `StateHasher.state_payload(world)` exact keyset:
+
+```json
+{
+  "schema_version": 4,
+  "ruleset_manifest": {},
+  "simulation_ruleset_hash": "",
+  "state": {}
+}
+```
+
+`StateCodec.encode()`가 만드는 save envelope exact keyset:
+
+```text
+schema_version
+ruleset_manifest
+simulation_ruleset_hash
+state
+audit
+resource_audit
+state_hash
+```
+
+Schema 4에서 최상위 `ruleset_id`, `ruleset_hash`는 금지한다. Schema 1–3의 기존 payload, JSON, hash 및 검증 분기는 변경하지 않는다.
+
+Schema 4 `state` exact keyset:
+
+```text
+scenario_id
+day_index
+day_phase
+season_id
+rng_seed_hex
+rng_state_hex
+next_ids
+player_person_id
+persons
+households
+resource_stores
+relations
+events
+information
+memories
+resolution_epoch
+next_resource_sequence_index
+resolved_decision_slot_ids
+```
+
+추가 invariant:
+
+```text
+resolution_epoch: integer, 0..2147483647
+next_resource_sequence_index: integer, 0..2147483647
+resolved_decision_slot_ids: Array[String], sorted unique, 각 값 SHA-256 lowercase 64자리
+```
+
+외부 save decode:
+
+```text
+resource_audit가 비어 있음
+→ next_resource_sequence_index == 0
+
+resource_audit가 존재함
+→ next_resource_sequence_index > max(resource_audit.sequence_index)
+```
+
+엔진이 정상 생성한 Schema 4 save에는 다음 강한 invariant가 적용된다.
+
+```text
+next_resource_sequence_index
+== max(resource_audit.sequence_index) + 1
+```
+
+##### 3.2 Schema 4 PersonState
+
+Schema 1–3 PersonState는 변경하지 않는다. Schema 4 `PersonState.to_data(4)`는 기존 Schema 3 key에 다음 두 dictionary를 추가한다.
+
+```text
+aptitude_scores
+skill_scores
+```
+
+exact keyset:
+
+```json
+{
+  "aptitude_scores": {
+    "dexterity": 0,
+    "perception": 0
+  },
+  "skill_scores": {
+    "intrigue.stealth": 0,
+    "intrigue.theft": 0
+  }
+}
+```
+
+네 값 모두 integer `0..100`이다. Schema 4에서는 누락 키와 추가 키를 모두 validation error로 처리한다. 누락값을 0으로 대체하지 않는다. 현재 health와 hunger는 기존 필드를 사용한다.
+
+#### 4. Ruleset manifest와 exact 원상
+
+##### 4.1 Manifest
+
+`RulesetComponentRef.to_data()` exact keyset:
+
+```text
+ruleset_id
+ruleset_hash
+```
+
+`ruleset_id`는 비어 있지 않은 문자열, `ruleset_hash`는 lowercase SHA-256 64자리다.
+
+`RulesetManifest.to_data()` exact JSON:
+
+```json
+{
+  "decision": {
+    "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
+    "ruleset_id": "drought-prototype-rules-v3"
+  },
+  "parameterization": {
+    "ruleset_hash": "2b3b28f3ad886962e462eaedbd7dfd5321b519329af25f2f2d9664c666c46ae3",
+    "ruleset_id": "drought-prototype-parameterization-v1"
+  },
+  "resolution": {
+    "ruleset_hash": "5ac0e95d42761ba1037480a28edb996d73e318ab04dae44ee5ef587eb537a3fe",
+    "ruleset_id": "drought-prototype-resolution-v1"
+  },
+  "resource": {
+    "ruleset_hash": "3c5da58d0e0168c9427b827c0e37c4b9dd1e4582834b8c33efc5a6e6c9015f03",
+    "ruleset_id": "drought-prototype-rules-v2"
+  },
+  "response": {
+    "ruleset_hash": "6599cea3c34469b9051a6a6ecc8eebc89d4291620a792388a7a5b8aa9b5dae4d",
+    "ruleset_id": "drought-prototype-response-v1"
+  }
+}
+```
+
+```text
+simulation_ruleset_hash =
+StateHasher.hash_data({
+  "ruleset_manifest": ruleset_manifest.to_data()
+})
+
+expected =
+2ba7245d5b5481398f3d6d3d7e21f597a2f23a240b82a22e0dde8eca188aa3e4
+```
+
+##### 4.2 Parameterization rules exact `to_data()`
+
+Hash domain:
+
+```text
+StateHasher.hash_data({
+  "m4_parameterization_rules": parameterization_rules.to_data()
+})
+```
+
+Exact JSON:
+
+```json
+{
+  "action_instance": {
+    "algorithm_id": "m4-action-instance-v1",
+    "hash_fields": [
+      "decision_slot_id",
+      "parameterization_ruleset_hash",
+      "selected_candidate_id"
+    ],
+    "input_state_hash_in_identity": false,
+    "resolution_epoch_in_identity": false,
+    "source_decision_hash_in_identity": false
+  },
+  "algorithm_id": "m4-intent-parameterization-v1",
+  "allowed_action_ids": [
+    "A00",
+    "A04",
+    "A11"
+  ],
+  "allowed_decision_key": "daily_food_strategy",
+  "attempt_ordinal": 0,
+  "decision_slot": {
+    "algorithm_id": "m4-decision-slot-v1",
+    "hash_fields": [
+      "actor_person_id",
+      "day_index",
+      "decision_key",
+      "phase_id"
+    ],
+    "input_state_hash_in_identity": false,
+    "resolution_epoch_in_identity": false
+  },
+  "failure": {
+    "error_precedence": {
+      "decision_provenance_mismatch": 1,
+      "request_source_equals_recipient": 3,
+      "selected_positive_action_has_zero_need_basis": 2,
+      "theft_target_equals_recipient": 4,
+      "unsupported_decision_key": 0
+    },
+    "errors_encoding": "single_reason_id_array",
+    "intent_on_failure": "null",
+    "strategy": "first_applicable_reason_by_precedence"
+  },
+  "need_basis": {
+    "empty_alive_household_daily_need_units": 0,
+    "empty_alive_household_max_hunger": 0,
+    "food_horizon_days": 10,
+    "hunger_positive_floor_units": 1,
+    "request_cap_units": 10,
+    "theft_belief_scale_units": 10,
+    "theft_desired_cap_units": 10,
+    "zero_need_positive_action_error": "selected_positive_action_has_zero_need_basis"
+  },
+  "phase_id": "DAY_ACTION_RESOLUTION",
+  "recipient_policy": {
+    "recipient_store": "actor_household_resource_store",
+    "request_same_store_condition": "derived_request_source_store_equals_recipient_store",
+    "request_same_store_error": "request_source_equals_recipient",
+    "request_source_store_derivation": "selected_target_person_household_resource_store",
+    "same_store_validation_stage": "parameterization",
+    "theft_same_store_condition": "selected_target_store_equals_recipient_store",
+    "theft_same_store_error": "theft_target_equals_recipient"
+  },
+  "rounding": {
+    "ceil_div_nonnegative": "ceil_div_nonnegative_v1",
+    "round_div": "half_away_from_zero_v1"
+  },
+  "subjective_information": {
+    "effective_value": "confidence_weighted_effective_value_v1",
+    "fact_type_id": "food_stock_level",
+    "target_actual_quantity_forbidden": true,
+    "target_actual_security_forbidden": true
+  }
+}
+```
+
+Expected hash:
+
+```text
+2b3b28f3ad886962e462eaedbd7dfd5321b519329af25f2f2d9664c666c46ae3
+```
+
+##### 4.3 Response rules exact `to_data()`
+
+Hash domain:
+
+```text
+StateHasher.hash_data({
+  "m4_response_rules": response_rules.to_data()
+})
+```
+
+Exact JSON:
+
+```json
+{
+  "algorithm_id": "m4-food-response-v1",
+  "candidate_rank": {
+    "GRANT": 0,
+    "REJECT": 1
+  },
+  "care": {
+    "divisor": 4,
+    "fields": [
+      "trait_scores.empathy",
+      "value_scores.community_survival",
+      "value_scores.fairness_reciprocity",
+      "value_scores.life_protection"
+    ]
+  },
+  "defaulted_input_paths": {
+    "missing_person_value": "persons[{person_id}].{domain}.{key}",
+    "missing_relation_component": "relations[{source_person_id}->{target_person_id}].{component}",
+    "order": "lexicographic_unique"
+  },
+  "grant_candidate": {
+    "full_id": "GRANT_FULL",
+    "partial_id": "GRANT_PARTIAL",
+    "reject_id": "REJECT",
+    "source_store": "responder_household_resource_store"
+  },
+  "grant_utility": {
+    "care_coefficient": 20,
+    "relation_coefficient": 10,
+    "reserve_cost_coefficient": -20
+  },
+  "missing_input_policy": "zero_and_record_defaulted_inputs",
+  "reject_utility": 0,
+  "relation": {
+    "clamp_max": 100,
+    "clamp_min": -100,
+    "direction": "responder_to_requester",
+    "divisor": 3,
+    "negative_fields": [
+      "fear",
+      "resentment"
+    ],
+    "positive_fields": [
+      "affection",
+      "obligation",
+      "trust"
+    ]
+  },
+  "reserve": {
+    "food_horizon_days": 10,
+    "reserve_cost_scale": 100
+  },
+  "round_div": "half_away_from_zero_v1",
+  "tie_roll_purpose": "A04_RESPONSE_TIE"
+}
+```
+
+Expected hash:
+
+```text
+6599cea3c34469b9051a6a6ecc8eebc89d4291620a792388a7a5b8aa9b5dae4d
+```
+
+##### 4.4 Resolution rules exact `to_data()`
+
+Hash domain:
+
+```text
+StateHasher.hash_data({
+  "m4_resolution_rules": resolution_rules.to_data()
+})
+```
+
+Exact JSON:
+
+```json
+{
+  "algorithm_id": "m4-atomic-resolution-v1",
+  "artifact_order": {
+    "batch_contexts": "action_instance_id",
+    "batch_intents": "action_instance_id",
+    "diagnostics": "id",
+    "errors": "lexicographic",
+    "outcomes": "action_instance_id",
+    "random_draws": "roll_purpose_then_participant_id",
+    "transactions": "state_canonicalizer_id",
+    "witness_seeds": "id"
+  },
+  "batch_order": {
+    "context_input_order": "resolver_sorts_by_action_instance_id",
+    "input_order_mismatch_is_error": false,
+    "intent_input_order": "resolver_sorts_by_action_instance_id"
+  },
+  "conflict": {
+    "a04_reserve_priority": true,
+    "allocation": "proportional_floor_then_remainder_v1",
+    "capacity_basis": "input_world_stock_only",
+    "inbound_reuse_same_batch": false,
+    "pool_key": "source_store_id",
+    "remainder_order": "action_instance_id_ascending"
+  },
+  "context": {
+    "algorithm_id": "m4-resolution-context-v1",
+    "array_policy": "issuer_sorted_unique",
+    "batch_binding": "exact_action_id_set",
+    "issuer_policy": "trusted_in_process_v1",
+    "one_context_per_action": true
+  },
+  "exposure": {
+    "actual_zero_adjustment": 15,
+    "attempted_unit_coefficient": 2,
+    "partial_adjustment": 5,
+    "stealth_dexterity_weight": 3,
+    "stealth_skill_weight": 7,
+    "trace_threshold": 50,
+    "weight_divisor": 10
+  },
+  "hash_domains": {
+    "batch": "m4-batch-artifact-v1",
+    "context": "m4-resolution-context-v1",
+    "diagnostic": "m4-attempt-diagnostic-v1",
+    "intent": "m4-action-intent-v1",
+    "semantic_resolution": "m4-semantic-resolution-v1",
+    "transaction": "m4-resource-transaction-id-v1",
+    "witness_seed": "m4-witness-seed-id-v1"
+  },
+  "intent_trust_boundary": {
+    "external_serialized_intent_input": false,
+    "facade_api": "M4Facade.execute_decisions_v1",
+    "producer": "IntentParameterizer",
+    "resolver_api": "AtomicActionResolver.resolve_trusted_v1",
+    "resolver_guarantee": "structural_hash_and_binding_validation_only",
+    "scope": "trusted_in_process_only",
+    "self_consistent_forgery_detection": false,
+    "trusted_context_source": "trusted_context_issuer"
+  },
+  "invalidation_reason_ids": [
+    "actor_not_alive",
+    "actor_not_present",
+    "target_person_missing",
+    "target_person_not_alive",
+    "target_person_not_present",
+    "target_store_missing",
+    "target_store_not_present"
+  ],
+  "invalidation_result": {
+    "details": "empty_object",
+    "invalidation_reason_order": "lexicographic_unique",
+    "objective_outcome": "NOT_APPLICABLE",
+    "random_draws": "empty_array",
+    "resource_transaction_ids": "empty_array",
+    "witness_evidence_seed_ids": "empty_array"
+  },
+  "objective_outcome_ids": [
+    "FULL",
+    "NONE",
+    "NOT_APPLICABLE",
+    "PARTIAL"
+  ],
+  "performance": {
+    "action_cap_units": 6,
+    "base_scale": 50,
+    "dexterity_weight": 4,
+    "health_penalty_max": 20,
+    "hunger_penalty_max": 20,
+    "offset_max": 10,
+    "offset_min": -10,
+    "stealth_skill_weight": 2,
+    "theft_skill_weight": 4,
+    "weight_divisor": 10
+  },
+  "phase_id": "DAY_ACTION_RESOLUTION",
+  "processing_status_ids": [
+    "INVALIDATED",
+    "RESOLVED"
+  ],
+  "rejection": {
+    "action_instance_id_policy": "readable_attributed_action_id_else_empty",
+    "attempt_diagnostic_count": 1,
+    "batch_status": "REJECTED",
+    "committed_arrays": "empty",
+    "diagnostic_processing_status": "REJECTED_AS_MALFORMED",
+    "equal_reason_tie_break": {
+      "action_instance_id_order": "lexicographic_ascending_empty_first",
+      "algorithm_id": "m4-rejection-tie-break-v1",
+      "comparison_fields": [
+        "action_instance_id",
+        "reason_precedence"
+      ],
+      "identical_tuple_policy": "collapse_to_single_output",
+      "input_array_order_influence": false
+    },
+    "errors_encoding": "single_reason_id_array",
+    "input_resolution_epoch_if_unreadable": -1,
+    "input_state_hash_if_unreadable": "",
+    "output_resolution_epoch": -1,
+    "output_state_hash": "",
+    "reason_stage": {
+      "action_context_set_mismatch": "BATCH_BINDING",
+      "action_instance_id_mismatch": "INTENT_VALIDATION",
+      "arithmetic_overflow": "SEQUENCE_PREFLIGHT",
+      "component_ruleset_mismatch": "RULESET_VALIDATION",
+      "context_id_mismatch": "CONTEXT_VALIDATION",
+      "context_missing_person_id": "CONTEXT_VALIDATION",
+      "context_missing_store_id": "CONTEXT_VALIDATION",
+      "context_person_ids_not_sorted_unique": "CONTEXT_VALIDATION",
+      "context_store_ids_not_sorted_unique": "CONTEXT_VALIDATION",
+      "decision_provenance_mismatch": "INTENT_VALIDATION",
+      "decision_slot_already_resolved": "SLOT_VALIDATION",
+      "duplicate_action_instance_id": "INTENT_VALIDATION",
+      "duplicate_context": "CONTEXT_VALIDATION",
+      "duplicate_decision_slot_id": "SLOT_VALIDATION",
+      "field_contract_violation": "WORLD_VALIDATION",
+      "intent_hash_mismatch": "INTENT_VALIDATION",
+      "invalid_phase": "CONTEXT_VALIDATION",
+      "invalid_world": "WORLD_VALIDATION",
+      "post_apply_invariant_failure": "ATOMIC_COMMIT",
+      "request_source_equals_recipient": "INTENT_VALIDATION",
+      "resource_sequence_overflow": "SEQUENCE_PREFLIGHT",
+      "selected_positive_action_has_zero_need_basis": "INTENT_VALIDATION",
+      "simulation_ruleset_hash_mismatch": "RULESET_VALIDATION",
+      "stale_day_index": "CONTEXT_VALIDATION",
+      "stale_input_state_hash": "INTENT_VALIDATION",
+      "stale_resolution_epoch": "CONTEXT_VALIDATION",
+      "theft_target_equals_recipient": "INTENT_VALIDATION",
+      "unsupported_action_id": "INTENT_VALIDATION",
+      "unsupported_decision_key": "SLOT_VALIDATION",
+      "untrusted_context_issuer": "CONTEXT_VALIDATION"
+    },
+    "strategy": "first_applicable_reason_by_precedence",
+    "validation_precedence": {
+      "action_context_set_mismatch": 26,
+      "action_instance_id_mismatch": 14,
+      "arithmetic_overflow": 27,
+      "component_ruleset_mismatch": 3,
+      "context_id_mismatch": 20,
+      "context_missing_person_id": 24,
+      "context_missing_store_id": 25,
+      "context_person_ids_not_sorted_unique": 22,
+      "context_store_ids_not_sorted_unique": 23,
+      "decision_provenance_mismatch": 8,
+      "decision_slot_already_resolved": 5,
+      "duplicate_action_instance_id": 12,
+      "duplicate_context": 19,
+      "duplicate_decision_slot_id": 6,
+      "field_contract_violation": 1,
+      "intent_hash_mismatch": 13,
+      "invalid_phase": 18,
+      "invalid_world": 0,
+      "post_apply_invariant_failure": 29,
+      "request_source_equals_recipient": 10,
+      "resource_sequence_overflow": 28,
+      "selected_positive_action_has_zero_need_basis": 9,
+      "simulation_ruleset_hash_mismatch": 2,
+      "stale_day_index": 17,
+      "stale_input_state_hash": 7,
+      "stale_resolution_epoch": 16,
+      "theft_target_equals_recipient": 11,
+      "unsupported_action_id": 15,
+      "unsupported_decision_key": 4,
+      "untrusted_context_issuer": 21
+    }
+  },
+  "result_amount_basis": {
+    "A00": "NOT_APPLICABLE",
+    "A04": "requested_units",
+    "A11": "desired_units"
+  },
+  "round_div": "half_away_from_zero_v1",
+  "schema4_day_processor": {
+    "clone_metadata_fields": [
+      "ruleset_manifest",
+      "schema_version",
+      "simulation_ruleset_hash"
+    ],
+    "commit_order": "day_counter_then_slot_clear_then_final_validation_then_state_hash_then_commit",
+    "consumption_order": [
+      "household_id",
+      "person_id"
+    ],
+    "consumption_transaction_id_policy": "legacy_id_allocator_next_id_v1",
+    "legacy_next_id_key": "resource_transaction",
+    "manifest_components_validated": [
+      "resolution",
+      "resource"
+    ],
+    "next_resource_sequence_start": "world.next_resource_sequence_index",
+    "resolution_epoch_policy": "preserve",
+    "schema2_branch_policy": "bit_for_bit_preserved",
+    "slot_clear_policy": "clear_only_on_successful_day_commit",
+    "transaction_day_offset": 1
+  },
+  "stateless_rng": {
+    "algorithm_id": "m4-stateless-roll-v1",
+    "digest_hex_digits": 15,
+    "hash_algorithm": "SHA-256",
+    "purposes": {
+      "A04_RESPONSE_TIE": "mod_candidate_count",
+      "A11_EXPOSURE": "mod21_minus10",
+      "A11_PERFORMANCE": "mod21_minus10",
+      "A11_WITNESS": "mod21_minus10"
+    },
+    "source_record_encoding": "15_lowercase_hex_chars"
+  },
+  "supported_action_ids": [
+    "A00",
+    "A04",
+    "A11"
+  ],
+  "transaction": {
+    "action_transaction_algorithm_id": "m4-resource-transaction-id-v1",
+    "day_offset": 1,
+    "legs": {
+      "A04": "A04_FOOD_GRANT",
+      "A11": "A11_FOOD_THEFT"
+    },
+    "reason_ids": {
+      "A04": "food_request_grant",
+      "A11": "food_theft",
+      "DAY_CONSUMPTION": "daily_food_consumption"
+    },
+    "sequence_counter_max": 2147483647,
+    "sequence_policy": "world_global_monotonic"
+  },
+  "witness": {
+    "exposure_divisor": 2,
+    "notice_threshold": 75,
+    "offset_max": 10,
+    "offset_min": -10
+  }
+}
+```
+
+Expected hash:
+
+```text
+5ac0e95d42761ba1037480a28edb996d73e318ab04dae44ee5ef587eb537a3fe
+```
+
+#### 5. Service별 ruleset authority
+
+| Service | Schema 4에서 검증할 component |
+|---|---|
+| `DecisionEngine` | `manifest.decision` |
+| `IntentParameterizer` | `manifest.parameterization`, `manifest.decision` |
+| `ResponseEvaluator` | `manifest.response` |
+| `AtomicActionResolver` | `manifest.resolution`, `manifest.resource` |
+| `ResourceService` | `manifest.resource` |
+| `DayProcessor` | `manifest.resource`, `manifest.resolution` |
+
+모든 Schema 4 service는 manifest 전체 형식과 재계산한 `simulation_ruleset_hash`도 검증한다.
+
+#### 6. 행동 슬롯, provenance 및 replay
+
+##### 6.1 DecisionInstanceKey와 slot
+
+`DecisionInstanceKey.to_data()` exact keyset:
+
+```text
+day_index
+phase_id
+actor_person_id
+decision_key
+attempt_ordinal
+```
+
+최초 M4:
+
+```text
+phase_id = DAY_ACTION_RESOLUTION
+decision_key = daily_food_strategy
+attempt_ordinal = 0
+```
+
+caller는 위 값을 지정할 수 없다.
+
+```text
+decision_slot_id =
+StateHasher.hash_data({
+  "algorithm_id": "m4-decision-slot-v1",
+  "actor_person_id": actor_person_id,
+  "day_index": day_index,
+  "decision_key": decision_key,
+  "phase_id": phase_id
+})
+```
+
+`resolution_epoch`, `input_state_hash`, `attempt_ordinal`은 최초 slot identity에 들어가지 않는다. `attempt_ordinal`은 반드시 0이므로 identity 충돌이 없다.
+
+같은 `decision_slot_id`가 `resolved_decision_slot_ids`에 있으면 재실행을 batch-level `REJECTED`로 거부한다. 성공한 M4 batch는 자원 변화가 0이어도 slot을 소비하고 epoch를 1 증가시킨다.
+
+##### 6.2 M3 provenance
+
+M3 판단 hash의 유일한 계산 경로:
+
+```text
+source_decision_hash =
+DecisionArtifactCodec.hash_result(submitted_decision_result)
+```
+
+다른 wrapper/hash 방언을 금지한다.
+
+Parameterizer는 기존 API를 사용한다.
+
+```text
+expected = DecisionEngine.evaluate(world, decision_request)
+```
+
+다음을 전부 검증한다.
+
+```text
+submitted.ok == true
+submitted.actor_person_id == request.actor_person_id
+submitted.decision_key == request.decision_key
+submitted.day_index == world.day_index
+submitted.input_state_hash == StateHasher.hash_world(world)
+submitted.ruleset_hash == manifest.decision.ruleset_hash
+DecisionArtifactCodec.hash_result(expected)
+  == DecisionArtifactCodec.hash_result(submitted)
+selected_candidate_id가 candidate_evaluations에 정확히 1개 존재
+```
+
+##### 6.3 Action instance
+
+```text
+action_instance_id =
+StateHasher.hash_data({
+  "algorithm_id": "m4-action-instance-v1",
+  "decision_slot_id": decision_slot_id,
+  "parameterization_ruleset_hash": parameterization_ruleset_hash,
+  "selected_candidate_id": selected_candidate_id
+})
+```
+
+`source_decision_hash`, world hash와 epoch는 action/RNG identity에서 제외하고 provenance에만 남긴다.
+
+#### 7. IntentParameterizer
+
+##### 7.1 API와 정보 경계
+
+```text
+parameterize(
+  world,
+  decision_request,
+  submitted_decision_result
+) -> ParameterizationResult
+```
+
+Parameterization 실패는 다음 rank의 첫 오류 하나만 반환하고 `intent=null`로 둔다.
+
+```text
+0 unsupported_decision_key
+1 decision_provenance_mismatch
+2 selected_positive_action_has_zero_need_basis
+3 request_source_equals_recipient
+4 theft_target_equals_recipient
+```
+
+`unsupported_decision_key`는 request의 key가 `daily_food_strategy`가 아닐 때 발생한다. §6.2의 provenance 조건 중 하나라도 실패하면 세부 내부 원인을 외부 artifact에 분산하지 않고 `decision_provenance_mismatch` 하나로 정규화한다. 이 두 오류는 intent가 만들어지기 전 발생하므로 `action_instance_id=""`를 사용한다.
+
+Parameterizer는 의도 형성 계층이다.
+
+허용 입력:
+
+- 행위자 자신과 자기 가구의 self-authoritative 상태
+- 행위자가 소유한 주관적 InformationState
+- 검증된 M3 selected candidate
+- parameterization rules
+
+금지 입력:
+
+- 대상 창고의 actual quantity
+- 대상의 actual security
+- 대상의 hidden state
+
+##### 7.2 필요량
+
+```text
+household_need_10d =
+sum(alive household member.daily_food_need_units) * 10
+
+own_food =
+actor household resource store의 actual food quantity
+
+food_shortfall =
+max(0, household_need_10d - own_food)
+
+max_household_hunger =
+max(alive household member.need_scores.hunger)
+
+hunger_relief_floor =
+1 if max_household_hunger > 0 else 0
+
+need_basis_units =
+max(food_shortfall, hunger_relief_floor)
+```
+
+살아 있는 가구원이 한 명도 없으면 합계와 최댓값은 다음으로 고정한다.
+
+```text
+household_need_10d = 0
+max_household_hunger = 0
+food_shortfall = 0
+hunger_relief_floor = 0
+need_basis_units = 0
+```
+
+A04/A11이 선택됐는데 `need_basis_units == 0`이면 `selected_positive_action_has_zero_need_basis`로 parameterization을 실패시킨다. `clamp(0,1,...)` 같은 숨은 최소 요청을 금지한다.
+
+##### 7.3 A04
+
+```text
+requested_units = min(need_basis_units, 10)
+recipient_store_id = actor household.resource_store_id
+requested_resource_type_id = food
+```
+
+Parameterizer는 selected target person의 현재 household에서 request source store를 구조적으로 도출한다. 그 store가 recipient store와 같으면 `request_source_equals_recipient`로 실패한다. 수량·security 같은 대상의 숨은 상태는 읽지 않는다.
+
+##### 7.4 A11
+
+선택 target의 `food_stock_level` 주관 fact를 사용한다.
+
+```text
+effective_food_stock_level =
+round_div(belief_value * confidence, 100)
+
+belief_cap_units =
+max(1, ceil_div_nonnegative(effective_food_stock_level * 10, 100))
+
+desired_units =
+min(need_basis_units, 10, belief_cap_units)
+
+recipient_store_id = actor household.resource_store_id
+```
+
+selected target store가 recipient store와 같으면 `theft_target_equals_recipient`로 실패한다. 두 same-store 검사는 모두 intent 생성 전 Parameterizer 단계에서 수행한다.
+
+사용한 `food_stock_level` fact ID를 `parameterization_input_fact_ids`에 남긴다.
+
+#### 8. Typed intent와 hash
+
+`ParameterizationResult.to_data()`:
+
+```text
+ok: bool
+errors: Array[String], sorted unique
+intent: ActionIntent | null
+```
+
+모든 ActionIntent 공통 exact keyset:
+
+```text
+action_instance_id
+decision_instance_key
+decision_slot_id
+input_resolution_epoch
+actor_person_id
+action_id
+source_decision_hash
+source_decision_input_state_hash
+source_decision_ruleset_hash
+source_selected_candidate_id
+parameterization_ruleset_hash
+parameterization_input_fact_ids
+intent_hash
+```
+
+행동별 추가 key:
+
+```text
+A00: 추가 key 없음
+
+A04:
+target_person_id
+requested_resource_type_id
+requested_units
+recipient_store_id
+
+A11:
+target_store_id
+desired_units
+recipient_store_id
+```
+
+```text
+intent_hash =
+StateHasher.hash_data({
+  "algorithm_id": "m4-action-intent-v1",
+  "action_intent": intent.to_data_without_intent_hash()
+})
+```
+
+#### 9. ResolutionContext
+
+하나의 context는 하나의 action에만 대응한다.
+
+`ResolutionContext.to_data()` exact keyset:
+
+```text
+context_id
+issuer_id
+action_instance_id
+input_state_hash
+resolution_epoch
+day_index
+phase_id
+present_person_ids
+present_store_ids
+```
+
+```text
+context_id =
+StateHasher.hash_data({
+  "algorithm_id": "m4-resolution-context-v1",
+  "issuer_id": issuer_id,
+  "action_instance_id": action_instance_id,
+  "input_state_hash": input_state_hash,
+  "resolution_epoch": resolution_epoch,
+  "day_index": day_index,
+  "phase_id": phase_id,
+  "present_person_ids": present_person_ids,
+  "present_store_ids": present_store_ids
+})
+```
+
+`context_id` 자신은 입력에서 제외한다. 두 present 배열은 issuer가 sorted unique로 발행한다.
+
+외부에 공개되는 유일한 실행 진입점은 다음 facade다.
+
+```text
+M4Facade.execute_decisions_v1(
+  world,
+  decision_submissions,
+  trusted_context_issuer
+) -> BatchResolutionRecord
+
+decision_submission exact in-process fields:
+- decision_request
+- submitted_decision_result
+```
+
+Facade는 각 submission을 `IntentParameterizer`로 검증·구체화한다. 하나라도 실패하면 첫 parameterization 오류를 batch `REJECTED`로 변환하고 context 발행 및 Resolver 호출을 하지 않는다. 모두 성공하면 trusted issuer가 생성된 action ID별 context를 발행하고 facade가 내부 `ResolutionBatchRequest`를 구성한다.
+
+내부 호출은 다음으로 고정한다.
+
+```text
+AtomicActionResolver.resolve_trusted_v1(
+  world,
+  batch_request,
+  trusted_context_issuer
+) -> BatchResolutionRecord
+```
+
+최초 구현은 프로세스 내부 trust boundary다. 암호학적 서명과 일반 권한 시스템은 도입하지 않는다. 시험은 `TestResolutionContextIssuer`를 사용한다.
+
+`ActionIntent`, `ResolutionContext`, `ResolutionBatchRequest`는 모두 같은 프로세스 내부 신뢰 경계에 속한다. 외부 save, UI, network 또는 임의 JSON에서 decode한 이 객체들을 Resolver에 직접 제출하는 API는 제공하지 않는다. M4 facade만 `IntentParameterizer`와 trusted issuer의 성공 결과를 Resolver로 전달한다.
+
+Resolver는 intent의 exact keyset, `intent_hash`, action/context binding과 stale 상태는 검증하지만, 공격자가 전체 intent와 hash를 함께 다시 만든 **자기 일관적인 위조 provenance**를 탐지한다고 주장하지 않는다. T04는 Parameterizer의 DecisionResult 재검증과 신뢰 경계 이후의 accidental mutation 탐지만 보장한다.
+
+`ResolutionBatchRequest.to_data()` exact keyset:
+
+```text
+intents
+execution_contexts
+```
+
+두 배열은 caller 순서와 무관하게 resolver가 `action_instance_id`순으로 정렬한다. 다음 집합은 정확히 같아야 한다.
+
+```text
+set(intents.action_instance_id)
+== set(contexts.action_instance_id)
+```
+
+#### 10. Batch rejection, INVALIDATED, RESOLVED
+
+##### 10.1 Batch `REJECTED`
+
+다음 구조·위조·stale 오류는 world를 변경하지 않는다. Facade와 Resolver는 함께 §16.7의 reason precedence를 공유하며 **처음 성립하는 오류 하나에서 종료**한다. Parameterization 단계에서 먼저 거부되면 Resolver는 호출되지 않는다. 다중 오류 수집은 최초 M4 범위 밖이다.
+
+복수 submission에서 실패 후보가 동시에 나오면 먼저 전역 `reason precedence`를 비교하고, 같은 rank에서는 diagnostic에 기록할 `action_instance_id`를 소문자 문자열 사전식 오름차순으로 비교한다. action ID를 만들 수 없는 오류는 빈 문자열을 사용하므로 가장 먼저 온다. 두 비교값이 모두 같으면 동일한 rejection 출력 하나로 축약한다. caller의 submission 배열 순서는 선택에 영향을 주지 않는다.
+
+- 잘못된 schema/world/envelope
+- manifest 또는 component hash 불일치
+- stale input state hash/epoch/day/phase
+- facade의 unsupported decision key 또는 잘못된 DecisionResult provenance
+- 이미 소비한 decision slot
+- 중복 slot/action/context
+- intent hash/action ID 불일치
+- context hash/issuer 불일치
+- intent/context action ID 집합 불일치
+- present 배열의 중복·비정규 순서·존재하지 않는 ID
+- 지원하지 않는 action
+- 필드 타입·범위·exact keyset 위반
+- resource sequence 또는 정수 계산 overflow
+- clone 적용 후 invariant/conservation/hash 실패
+
+`REJECTED` 결과:
+
+```text
+next_world = null
+output_state_hash = ""
+output_resolution_epoch = -1
+committed_outcomes = []
+resource_transactions = []
+witness_evidence_seeds = []
+attempt_diagnostics = rejection diagnostics
+```
+
+정확한 rejection 출력:
+
+```text
+errors = [first_reason_id]
+attempt_diagnostics = [exactly one AttemptDiagnostic]
+
+world를 정상적으로 hash/decode할 수 없음:
+input_state_hash = ""
+input_resolution_epoch = -1
+
+world를 읽을 수 있음:
+input_state_hash = StateHasher.hash_world(world)
+input_resolution_epoch = world.resolution_epoch
+```
+
+Action에 귀속할 수 없는 오류의 diagnostic `action_instance_id=""`다. 귀속 가능한 오류는 제출물에서 정상적으로 읽힌 action ID를 사용한다. Batch hash는 이 sentinel을 포함한 rejection record에서 정상적으로 생성한다.
+
+##### 10.2 개별 `INVALIDATED`
+
+구조적으로 정상적인 제출이지만 행동 자체를 시작할 수 없는 현실 조건이다.
+
+```text
+actor_not_alive
+actor_not_present
+target_person_missing
+target_person_not_alive
+target_person_not_present
+target_store_missing
+target_store_not_present
+```
+
+해당 action만 무효화하며 다른 action은 계속 처리한다. `INVALIDATED`도 성공한 batch의 slot을 소비하고 epoch를 증가시킨다.
+
+여러 무효 조건이 동시에 성립하면 적용 가능한 reason을 모두 모아 중복을 제거하고 사전식 정렬한다. 결과는 다음으로 고정한다.
+
+```text
+processing_status = INVALIDATED
+objective_outcome = NOT_APPLICABLE
+details = {}
+random_draws = []
+resource_transaction_ids = []
+witness_evidence_seed_ids = []
+```
+
+##### 10.3 `RESOLVED/NONE`
+
+다음은 행동을 실제로 시도했으므로 invalidation이 아니다.
+
+- 대상 창고 재고 0
+- responder surplus 0
+- 높은 실제 security
+- 낮은 performance
+- 동시 충돌로 actual 0
+- 요청 거절
+
+A11은 actual 0이어도 흔적과 목격을 독립 계산한다.
+
+#### 11. A04 응답 공식
+
+Source store는 responder의 현재 household `resource_store_id`로 제한한다.
+
+```text
+reserve_need =
+sum(alive responder household member.daily_food_need_units) * 10
+
+surplus =
+max(0, source_store.food_quantity - reserve_need)
+```
+
+항상 `REJECT` 후보가 있다.
+
+```text
+REJECT:
+authorized_units = 0
+utility = 0
+```
+
+Grant 후보:
+
+```text
+surplus >= requested_units
+→ GRANT_FULL, authorized_units = requested_units
+
+0 < surplus < requested_units
+→ GRANT_PARTIAL, authorized_units = surplus
+
+surplus == 0
+→ grant 후보 없음
+```
+
+누락된 trait/value/relation 성분은 0으로 계산하고 exact 경로를 `defaulted_inputs`에 기록한다.
+
+Exact path 문법:
+
+```text
+persons[<person_id>].<domain>.<key>
+relations[<source_person_id>-><target_person_id>].<component>
+```
+
+예:
+
+```text
+persons[person:000004].trait_scores.empathy
+relations[person:000004->person:000001].trust
+```
+
+관계 record 자체가 없으면 `trust`, `affection`, `obligation`, `fear`, `resentment` 다섯 경로를 각각 기록한다. 배열은 중복 없이 사전식 정렬한다.
+
+```text
+care_score =
+round_div(
+  empathy
+  + community_survival
+  + fairness_reciprocity
+  + life_protection,
+  4
+)
+
+relation_score =
+clamp(
+  round_div(
+    trust + affection + obligation - fear - resentment,
+    3
+  ),
+  -100,
+  100
+)
+
+reserve_cost =
+round_div(authorized_units * 100, surplus)
+
+grant_utility =
+20 * care_score
++ 10 * relation_score
+- 20 * reserve_cost
+```
+
+동률 후보 순서는 `[grant, REJECT]`다. `A04_RESPONSE_TIE` draw의 `mapped_value`를 index로 사용한다.
+
+후속 자원 충돌로 actual이 줄어도 `response_decision`과 `response_authorized_units`는 변경하지 않는다.
+
+#### 12. A11 수행·노출·목격 공식
+
+##### 12.1 수행
+
+```text
+base_capability =
+round_div(
+  4*dexterity
+  + 4*intrigue.theft
+  + 2*intrigue.stealth,
+  10
+)
+
+hunger_penalty = round_div(actor_hunger * 20, 100)
+health_penalty = round_div((100 - actor_health) * 20, 100)
+
+performance_score =
+clamp(base_capability - hunger_penalty - health_penalty, 0, 100)
+
+attempted_units = min(desired_units, 6)
+
+performance_margin =
+performance_score - actual_security + performance_offset
+
+performance_scale = clamp(50 + performance_margin, 0, 100)
+
+proposed_units =
+round_div(attempted_units * performance_scale, 100)
+```
+
+##### 12.2 노출과 흔적
+
+자원 충돌 후 확정된 `actual_units`를 사용한다.
+
+```text
+stealth_capability =
+round_div(3*dexterity + 7*intrigue.stealth, 10)
+
+attempt_adjustment = 2 * attempted_units
+
+outcome_adjustment =
+15 if actual_units == 0
+5  if 0 < actual_units < attempted_units
+0  otherwise
+
+exposure_pressure =
+clamp(
+  actual_security
+  + attempt_adjustment
+  + outcome_adjustment
+  - stealth_capability
+  + exposure_offset,
+  0,
+  100
+)
+
+trace_created = exposure_pressure >= 50
+```
+
+##### 12.3 목격
+
+Context에 있는 살아 있는 person 중 actor를 제외한 전원을 평가한다.
+
+```text
+exposure_half = round_div(exposure_pressure, 2)
+
+notice_score =
+clamp(
+  witness.perception
+  + exposure_half
+  + witness_offset,
+  0,
+  100
+)
+
+witnessed = notice_score >= 75
+```
+
+`witnessed == true`인 경우에만 `WitnessEvidenceSeed`를 출력한다.
+
+#### 13. Stateless RNG exact 계약
+
+Canonical payload exact keyset:
+
+```json
+{
+  "algorithm_id": "m4-stateless-roll-v1",
+  "simulation_ruleset_hash": "",
+  "rng_seed_hex": "",
+  "day_index": 0,
+  "phase_id": "DAY_ACTION_RESOLUTION",
+  "action_instance_id": "",
+  "roll_purpose": "",
+  "participant_id": ""
+}
+```
+
+```text
+digest_hex = SHA256(StateCanonicalizer.canonical_json(payload))
+source_hex = digest_hex의 첫 15개 문자
+source_integer = unsigned hexadecimal interpretation(source_hex)
+```
+
+`source_integer`는 계산 중에만 존재하며 JSON에 저장하지 않는다.
+
+```text
+A04_RESPONSE_TIE:
+mapped_value = source_integer % candidate_count
+
+A11_PERFORMANCE:
+A11_EXPOSURE:
+A11_WITNESS:
+mapped_value = source_integer % 21 - 10
+```
+
+Participant:
+
+```text
+A04_RESPONSE_TIE → responder
+A11_PERFORMANCE  → actor
+A11_EXPOSURE     → actor
+A11_WITNESS      → witness candidate
+```
+
+#### 14. 동시 자원 충돌
+
+모든 action의 `proposed_units`를 먼저 계산한다. 같은 source store의 A04와 A11을 하나의 outgoing pool에서 처리하며, 같은 batch의 inbound 자원은 재사용하지 않는다.
+
+용량 `capacity`와 양수 claim `p[i]`:
+
+```text
+sum(p) <= capacity
+→ actual[i] = p[i]
+
+sum(p) > capacity
+→ base[i] = floor(capacity * p[i] / sum(p))
+→ remainder = capacity - sum(base)
+→ action_instance_id 오름차순으로
+  proposed에 아직 도달하지 않은 claim에 1씩 배정
+```
+
+그 결과 A04 actual 합이 responder surplus를 넘으면:
+
+1. A04 claim만 surplus 한도로 다시 비례 배분한다.
+2. `remaining_for_theft = actual_stock - final_grant_total`을 계산한다.
+3. A11 claim을 remaining capacity에서 다시 비례 배분한다.
+
+보장:
+
+```text
+0 <= actual_units <= proposed_units
+source별 total actual <= input actual stock
+source별 A04 actual 합 <= responder surplus
+```
+
+Objective:
+
+```text
+A04 FULL    ↔ actual == requested
+A04 PARTIAL ↔ 0 < actual < requested
+A04 NONE    ↔ actual == 0
+
+A11 FULL    ↔ actual == desired
+A11 PARTIAL ↔ 0 < actual < desired
+A11 NONE    ↔ actual == 0
+
+A00 NOT_APPLICABLE
+```
+
+#### 15. Resource transaction
+
+```text
+transaction_id =
+"resource_transaction:m4:" +
+StateHasher.hash_data({
+  "algorithm_id": "m4-resource-transaction-id-v1",
+  "action_instance_id": action_instance_id,
+  "transfer_leg": transfer_leg
+})
+```
+
+```text
+A04 transfer_leg = A04_FOOD_GRANT
+A11 transfer_leg = A11_FOOD_THEFT
+
+A04 reason_id = food_request_grant
+A11 reason_id = food_theft
+DayProcessor reason_id = daily_food_consumption
+```
+
+`actual_units > 0`일 때만 transaction을 만든다. Action을 `action_instance_id`순으로 정렬한 뒤 `world.next_resource_sequence_index`부터 sequence를 부여한다.
+
+`ResourceTransactionRecord.to_data()`의 exact keyset:
+
+```text
+id
+day_index
+sequence_index
+resource_type_id
+source_store_id
+destination_store_id
+consumer_person_id
+quantity
+reason_id
+```
+
+M4 이전은 `consumer_person_id=""`, `resource_type_id="food"`다. Schema 4 DayProcessor 소비는 `source_store_id`와 `consumer_person_id`를 채우고 `destination_store_id=""`로 둔다.
+
+```text
+transaction.day_index = input_world.day_index + 1
+```
+
+Transaction artifact 배열은 현재 canonicalizer에 따라 `id`순이다. 실제 원장 실행 순서는 각 record의 `(day_index, sequence_index)`로 결정한다. `semantic_resolution_hash`에는 stable transaction ID만 포함하고 sequence는 넣지 않는다. Batch hash에는 전체 transaction record와 sequence를 포함한다.
+
+#### 16. Artifact exact keyset과 hash domain
+
+모든 `to_data()`는 아래 key를 항상 출력한다. 빈 문자열, 빈 배열, false, 0, null을 생략하지 않는다.
+
+##### 16.1 RandomDrawRecord
+
+```text
+roll_purpose
+participant_id
+digest_hex
+source_hex
+modulus
+mapped_value
+```
+
+##### 16.2 ResponseEvaluation
+
+```text
+responder_person_id
+source_store_id
+source_stock_units
+reserve_need_units
+surplus_units
+care_score
+relation_score
+reserve_cost
+grant_candidate_present
+grant_candidate_decision
+grant_authorized_units
+grant_utility
+reject_utility
+tie_break_used
+selected_decision
+selected_authorized_units
+defaulted_inputs
+```
+
+Grant 후보가 없으면:
+
+```text
+grant_candidate_present = false
+grant_candidate_decision = ""
+grant_authorized_units = 0
+reserve_cost = 0
+grant_utility = 0
+```
+
+##### 16.3 WitnessEvaluation
+
+```text
+witness_person_id
+perception_score
+exposure_pressure
+exposure_half
+notice_offset
+notice_score
+notice_threshold
+witnessed
+```
+
+##### 16.4 Outcome details
+
+```text
+A00OutcomeDetails = {}
+```
+
+A04:
+
+```text
+target_person_id
+source_store_id
+recipient_store_id
+requested_units
+response_decision
+response_authorized_units
+proposed_units
+actual_units
+response_evaluation
+```
+
+A11:
+
+```text
+target_store_id
+recipient_store_id
+desired_units
+attempted_units
+performance_score
+performance_offset
+actual_security
+performance_margin
+performance_scale
+proposed_units
+actual_units
+stealth_capability
+exposure_offset
+exposure_pressure
+trace_created
+witness_evaluations
+```
+
+##### 16.5 ActionOutcomeRecord
+
+```text
+id
+action_instance_id
+action_id
+actor_person_id
+intent_hash
+context_id
+source_decision_hash
+processing_status
+objective_outcome
+invalidation_reason_ids
+resource_transaction_ids
+witness_evidence_seed_ids
+random_draws
+details
+semantic_resolution_hash
+```
+
+```text
+semantic_resolution_hash =
+StateHasher.hash_data({
+  "algorithm_id": "m4-semantic-resolution-v1",
+  "action_outcome": outcome.to_data_without_semantic_resolution_hash()
+})
+```
+
+##### 16.6 WitnessEvidenceSeed
+
+```text
+id
+action_instance_id
+context_id
+witness_person_id
+actor_person_id
+action_id
+notice_score
+notice_threshold
+actual_units
+trace_created
+day_index
+phase_id
+```
+
+```text
+id = StateHasher.hash_data({
+  "algorithm_id": "m4-witness-seed-id-v1",
+  "action_instance_id": action_instance_id,
+  "context_id": context_id,
+  "witness_person_id": witness_person_id
+})
+```
+
+##### 16.7 AttemptDiagnostic
+
+```text
+id
+processing_status
+stage_id
+action_instance_id
+reason_id
+```
+
+```text
+processing_status = REJECTED_AS_MALFORMED
+
+id = StateHasher.hash_data({
+  "algorithm_id": "m4-attempt-diagnostic-v1",
+  "action_instance_id": action_instance_id,
+  "reason_id": reason_id,
+  "stage_id": stage_id
+})
+```
+
+특정 action에 귀속되지 않는 batch 전체 오류의 `action_instance_id`는 빈 문자열이다. 정상적으로 읽힌 action에 귀속 가능한 오류는 해당 ID를 사용한다.
+
+허용 stage:
+
+```text
+WORLD_VALIDATION
+RULESET_VALIDATION
+SLOT_VALIDATION
+INTENT_VALIDATION
+CONTEXT_VALIDATION
+BATCH_BINDING
+SEQUENCE_PREFLIGHT
+ATOMIC_COMMIT
+```
+
+`reason_id` 허용 목록:
+
+```text
+invalid_world
+field_contract_violation
+simulation_ruleset_hash_mismatch
+component_ruleset_mismatch
+unsupported_decision_key
+decision_slot_already_resolved
+duplicate_decision_slot_id
+stale_input_state_hash
+decision_provenance_mismatch
+selected_positive_action_has_zero_need_basis
+request_source_equals_recipient
+theft_target_equals_recipient
+duplicate_action_instance_id
+intent_hash_mismatch
+action_instance_id_mismatch
+unsupported_action_id
+stale_resolution_epoch
+stale_day_index
+invalid_phase
+duplicate_context
+context_id_mismatch
+untrusted_context_issuer
+context_person_ids_not_sorted_unique
+context_store_ids_not_sorted_unique
+context_missing_person_id
+context_missing_store_id
+action_context_set_mismatch
+arithmetic_overflow
+resource_sequence_overflow
+post_apply_invariant_failure
+```
+
+위 목록 순서가 곧 first-failure precedence다. Reason별 stage는 다음으로 고정한다.
+
+| stage_id | reason_id |
+|---|---|
+| `WORLD_VALIDATION` | `invalid_world`, `field_contract_violation` |
+| `RULESET_VALIDATION` | `simulation_ruleset_hash_mismatch`, `component_ruleset_mismatch` |
+| `SLOT_VALIDATION` | `unsupported_decision_key`, `decision_slot_already_resolved`, `duplicate_decision_slot_id` |
+| `INTENT_VALIDATION` | `stale_input_state_hash`, `decision_provenance_mismatch`, `selected_positive_action_has_zero_need_basis`, `request_source_equals_recipient`, `theft_target_equals_recipient`, `duplicate_action_instance_id`, `intent_hash_mismatch`, `action_instance_id_mismatch`, `unsupported_action_id` |
+| `CONTEXT_VALIDATION` | `stale_resolution_epoch`, `stale_day_index`, `invalid_phase`, `duplicate_context`, `context_id_mismatch`, `untrusted_context_issuer`, `context_person_ids_not_sorted_unique`, `context_store_ids_not_sorted_unique`, `context_missing_person_id`, `context_missing_store_id` |
+| `BATCH_BINDING` | `action_context_set_mismatch` |
+| `SEQUENCE_PREFLIGHT` | `arithmetic_overflow`, `resource_sequence_overflow` |
+| `ATOMIC_COMMIT` | `post_apply_invariant_failure` |
+
+`errors`는 첫 reason 하나를 담은 배열이고, `attempt_diagnostics`도 같은 reason을 가진 정확히 한 개의 record다.
+
+결과 enum은 다음 exact 값만 허용한다.
+
+```text
+processing_status = RESOLVED | INVALIDATED
+objective_outcome = FULL | PARTIAL | NONE | NOT_APPLICABLE
+batch_status = COMMITTED | REJECTED
+```
+
+##### 16.8 BatchResolutionRecord
+
+```text
+batch_status
+input_state_hash
+output_state_hash
+input_resolution_epoch
+output_resolution_epoch
+errors
+committed_outcomes
+resource_transactions
+witness_evidence_seeds
+attempt_diagnostics
+next_world
+batch_artifact_hash
+```
+
+```text
+batch_artifact_hash =
+StateHasher.hash_data({
+  "algorithm_id": "m4-batch-artifact-v1",
+  "batch_resolution":
+    record.to_data_without_batch_artifact_hash_and_next_world()
+})
+```
+
+#### 17. Canonical artifact ordering
+
+| Artifact | 정렬 |
+|---|---|
+| batch input intents | resolver가 `action_instance_id` |
+| batch input contexts | resolver가 `action_instance_id` |
+| context person/store IDs | issuer가 sorted unique |
+| committed outcomes | `action_instance_id` |
+| transactions | artifact는 `id`; 실행은 `sequence_index` |
+| witness seeds | `id` |
+| random draws | `roll_purpose`, `participant_id` |
+| errors | 사전식, 중복 금지 |
+| diagnostics | `id` |
+
+Batch 입력 배열 순서만 바뀐 것은 rejection 사유가 아니다.
+
+#### 18. Schema 4 DayProcessor
+
+Schema 2 분기는 현재 동작과 fixture/hash를 그대로 보존한다.
+
+Schema 4 분기 순서:
+
+1. 입력 WorldState와 exact keyset을 검증한다.
+2. manifest와 `simulation_ruleset_hash`를 재계산한다.
+3. `manifest.resource`, `manifest.resolution`을 현재 구현과 대조한다.
+4. `day_phase == DAY_END`를 검증한다.
+5. metadata `schema_version/ruleset_manifest/simulation_ruleset_hash`와 state를 깊은 복제한다.
+6. 소비 계획을 `(household_id, person_id)`순으로 만든다.
+7. 시작 sequence를 `next_resource_sequence_index`로 사용한다.
+8. 필요한 transaction 수와 counter overflow를 mutation 전에 검사한다.
+9. 소비 ID는 기존 `IdAllocator.next_id(world,"resource_transaction")`를 clone에서 사용한다.
+10. ResourceService 적용, hunger, health, reconciliation, conservation을 수행한다.
+11. `day_index += 1`과 counter 갱신을 완료한다.
+12. `resolved_decision_slot_ids=[]`로 초기화한다.
+13. 이 최종 상태를 validation하고 state hash를 계산한다.
+14. 모든 검증과 hash가 성공한 경우에만 commit한다.
+
+`resolution_epoch`은 보존한다. 실패하면 원본 world, counter, slot 및 `next_ids`를 변경하지 않는다.
+
+#### 19. 기준 fixture F_BASE exact 원상
+
+Fixture는 자동 Schema migration을 사용하지 않고 Schema 4로 직접 생성한다. 전체 canonical input/output artifact는 동봉된 `Decision24_F01-F10_exact_artifacts.json`에 포함한다.
+
+공통 metadata/state:
+
+```text
+schema_version = 4
+day_index = 7
+day_phase = DAY_END
+season_id = late_summer_drought
+rng_seed_hex = 0123456789abcdef
+rng_state_hex = fedcba9876543210
+resolution_epoch = 0
+next_resource_sequence_index = 0
+resolved_decision_slot_ids = []
+player_person_id = person:000001
+next_ids = {
+  decision:1, event:2, household:3, information:16,
+  memory:1, person:5, resource_transaction:1
+}
+```
+
+인물:
+
+| ID | 이름 | 가구 | 직업 | 일일식량 | hunger | health | DEX | PER | theft | stealth |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `person:000001` | 한결 | HH1 | field_worker | 2 | 35 | 100 | 70 | 60 | 57 | 56 |
+| `person:000002` | 미라 | HH1 | weaver | 2 | 30 | 100 | 60 | 60 | 55 | 60 |
+| `person:000003` | 나리 | HH1 | child | 1 | 40 | 100 | 40 | 40 | 0 | 0 |
+| `person:000004` | 도윤 | HH2 | village_head | 2 | 5 | 100 | 50 | 65 | 0 | 0 |
+
+한결 성향·가치·감정:
+
+```json
+{
+  "trait_scores": {
+    "risk_taking": 54,
+    "empathy": 67,
+    "self_control": 56,
+    "norm_adherence": 69
+  },
+  "value_scores": {
+    "family_protection": 94,
+    "community_survival": 50,
+    "legitimate_order": 50,
+    "fairness_reciprocity": 74,
+    "property_autonomy": 50,
+    "life_protection": 50
+  },
+  "emotion_scores": {
+    "fear": 70,
+    "anger": 20
+  }
+}
+```
+
+도윤 기본 응답 입력:
+
+```text
+empathy = 80
+community_survival = 80
+fairness_reciprocity = 80
+life_protection = 80
+
+도윤→한결:
+trust=50, affection=50, obligation=50,
+fear=0, resentment=0
+```
+
+F_BASE 관계의 exact 원상:
+
+| source → target | trust | affection | fear | resentment | obligation |
+|---|---:|---:|---:|---:|---:|
+| 한결 → 미라 | 85 | 90 | 0 | 0 | 85 |
+| 한결 → 나리 | 92 | 96 | 0 | 0 | 98 |
+| 한결 → 도윤 | 43 | 5 | 22 | 8 | 15 |
+| 도윤 → 한결 | 50 | 50 | 0 | 0 | 50 |
+
+표에 없는 관계는 존재하지 않는다. 각 인물은 `alive=true`, `severe_hunger_days=0`, `memory_ids=[]`이며, 표 또는 annex에서 값이 없는 typed dictionary/array는 비어 있다.
+
+가구와 저장소:
+
+| ID | 구성 | 필요량/일 | store | food | security |
+|---|---|---:|---|---:|---:|
+| HH1 | 한결·미라·나리 | 5 | `resource_store:household:000001` | 15 | 10 |
+| HH2 | 도윤 | 2 | `resource_store:household:000002` | 60 | 30 |
+| village | — | — | `resource_store:village_granary` | 80 | 45 |
+
+한결의 InformationState exact 원상:
+
+| ID | fact_type | subject kind | subject | belief | confidence |
+|---|---|---|---|---:|---:|
+| 000001 | request_food_access | person | 도윤 | 100 | 100 |
+| 000002 | request_food_capacity | person | 도윤 | 60 | 80 |
+| 000003 | request_success_expectation | person | 도윤 | 50 | 80 |
+| 000004 | request_social_risk | person | 도윤 | 25 | 80 |
+| 000005 | village_authority | person | 도윤 | 100 | 100 |
+| 000006 | food_stock_level | resource_store | granary | 80 | 80 |
+| 000007 | theft_access | resource_store | granary | 70 | 90 |
+| 000008 | theft_opportunity | resource_store | granary | 70 | 80 |
+| 000009 | detection_risk | resource_store | granary | 45 | 80 |
+| 000010 | sanction_severity | resource_store | granary | 70 | 90 |
+
+소유자는 모두 한결이며 `information_ids`에 위 ID가 정렬되어 연결된다. 미라 정보는 다음과 같다.
+
+| ID | owner | fact_type | subject | belief | confidence |
+|---|---|---|---|---:|---:|
+| 000011 | 미라 | food_stock_level | 도윤 store | 100 | 100 |
+| 000012 | 미라 | theft_access | 도윤 store | 100 | 100 |
+| 000013 | 미라 | theft_opportunity | 도윤 store | 100 | 100 |
+| 000014 | 미라 | detection_risk | 도윤 store | 20 | 100 |
+| 000015 | 미라 | sanction_severity | 도윤 store | 20 | 100 |
+
+모든 fact의 나머지 exact 필드는 다음과 같다. 미라 fact의 owner는 미라, 한결 fact의 owner는 한결이다.
+
+```text
+linked_event_id = event:000001
+acquisition_type = observation_fixture
+original_source_person_id = ""
+current_source_person_id = ""
+is_secret = false
+learned_day_index = 6
+subject_kind = 각 정보 표의 값
+claim = presentation-only:<fact_type_id>
+```
+
+`subject_id`, `subject_kind`, `fact_type_id`, `belief_value`, `confidence`는 각 표의 값을 사용한다. 각 owner의 `information_ids`와 전역 `information`은 ID 사전식 순서다. 이 절의 요약보다 동봉된 exact annex의 전체 F_BASE 객체가 우선하는 규범 원상이며, Base+delta 외 암묵 기본값은 없다.
+
+#### 20. F01–F10 exact delta
+
+표에 없는 값은 F_BASE와 정확히 같다. `scenario_id`는 `m4-fixture-<fixture id lowercase>`다.
+
+| Fixture | F_BASE 대비 exact delta |
+|---|---|
+| F01 | HH1 food `50`; 한결·미라·나리 hunger 모두 `0` |
+| F02 | 없음 |
+| F03 | 도윤 store food `25` |
+| F04 | 도윤 empathy와 세 value `0`; 도윤→한결 관계 다섯 성분 `0` |
+| F05 | 도윤 empathy와 세 value `25`; 도윤→한결 관계 다섯 성분 `0` |
+| F06A | 한결 request fact `000001..000004` 제거; 한결 hunger `20`; food belief `75`, confidence `80`; granary security `0` |
+| F06B | 한결 request fact `000001..000004` 제거; 한결 hunger `20`; food belief `80`, confidence `80`; granary security `45` |
+| F06C | 한결 request fact `000001..000004` 제거; 한결 hunger `20`; food belief `75`, confidence `80`; granary security `100` |
+| F07 | F06C와 같은 belief/hunger/fact 제거; granary food `0`, security `45`; 도윤 PER `100` |
+| F08L | F06C와 같은 belief/hunger/fact 제거; granary security `20` |
+| F08H | F06C와 같은 belief/hunger/fact 제거; granary security `80` |
+| F09 | 도윤 store food `10`; 도윤 daily food need `0`; 한결 A04와 미라 A11을 같은 batch |
+| F10 | F_BASE에서 한결 A04 commit → 갱신 세계에서 미라 A11 commit → Schema 4 DayProcessor |
+
+F06C 교정:
+
+```text
+effective = round_div(75*80,100) = 60
+belief_cap = ceil_div_nonnegative(60*10,100) = 6
+need_basis = 35
+desired = min(35,10,6) = 6
+```
+
+##### Context exact delta
+
+| Fixture/action | present_person_ids | present_store_ids |
+|---|---|---|
+| F01 A00 | 한결 | `[]` |
+| F02–F05 A04 | 한결, 도윤 | HH1 store, 도윤 store |
+| F06A–F08H A11 | 한결, 도윤 | HH1 store, granary |
+| F09 한결 A04 | 한결, 도윤 | HH1 store, 도윤 store |
+| F09 미라 A11 | 미라, 도윤 | HH1 store, 도윤 store |
+| F10 batch1 | 한결, 도윤 | HH1 store, 도윤 store |
+| F10 batch2 | 미라, 도윤 | HH1 store, 도윤 store |
+
+F10 batch2 context는 batch1 이후 state hash와 epoch 1에 결속한다.
+
+#### 21. 수작업 기대 계산
+
+##### 21.1 A04
+
+| Fixture | stock | reserve | surplus | care | relation | reserve cost | grant utility | response/actual |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| F02 | 60 | 20 | 40 | 80 | 50 | 25 | 1600 | GRANT_FULL/10 |
+| F03 | 25 | 20 | 5 | 80 | 50 | 100 | 100 | GRANT_PARTIAL/5 |
+| F04 | 60 | 20 | 40 | 0 | 0 | 25 | -500 | REJECT/0 |
+| F05 | 60 | 20 | 40 | 25 | 0 | 25 | 0 | tie 0 → GRANT_FULL/10 |
+| F09 | 10 | 0 | 10 | 80 | 50 | 100 | 100 | GRANT_FULL/7 |
+| F10 B1 | 60 | 20 | 40 | 80 | 50 | 25 | 1600 | GRANT_FULL/10 |
+
+##### 21.2 한결 A11
+
+```text
+base capability = round_div(4*70 + 4*57 + 2*56,10) = 62
+hunger penalty = round_div(20*20,100) = 4
+performance score = 58
+stealth capability = round_div(3*70 + 7*56,10) = 60
+performance offset = -5
+exposure offset = -1
+witness offset = -10
+```
+
+| Fixture | desired | security | margin | scale | proposed/actual | exposure | notice | 결과 |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| F06A | 6 | 0 | 53 | 100 | 6/6 | 0 | 55 | FULL, no trace, unseen |
+| F06B | 7 | 45 | 8 | 58 | 3/3 | 1 | 56 | PARTIAL, no trace, unseen |
+| F06C | 6 | 100 | -47 | 3 | 0/0 | 66 | 88 | NONE, trace, witnessed |
+| F07 | 6 | 45 | 8 | 58 | 3/0 | 11 | 96 | NONE, no trace, witnessed |
+| F08L | 6 | 20 | 33 | 83 | 5/5 | 0 | 55 | PARTIAL, no trace, unseen |
+| F08H | 6 | 80 | -27 | 23 | 1/1 | 36 | 73 | PARTIAL, no trace, unseen |
+
+##### 21.3 미라 A11
+
+```text
+base capability = round_div(4*60 + 4*55 + 2*60,10) = 58
+hunger penalty = round_div(30*20,100) = 6
+performance score = 52
+stealth capability = 60
+performance offset = -1
+exposure offset = -2
+witness offset = -4
+security = 30
+margin = 21
+scale = 71
+attempted = 6
+proposed = 4
+```
+
+F09 conflict:
+
+```text
+claims = A04 10 + A11 4
+capacity = 10
+grant base = floor(10*10/14) = 7
+theft base = floor(10*4/14) = 2
+remainder = 1
+미라 A11 action ID가 한결 A04보다 작음
+→ theft 3, grant 7
+```
+
+F10:
+
+```text
+initial stores: HH1 15, HH2 60
+batch1 grant 10
+batch2 theft 4
+day consumption: HH1 -5, HH2 -2, sequence 2..5
+final stores: HH1 24, HH2 44
+day = 8
+resolution_epoch = 2
+next_resource_sequence_index = 6
+resolved_decision_slot_ids = []
+next_ids.resource_transaction = 5
+hunger = 한결29, 미라24, 나리34, 도윤0
+```
+
+
+#### 22. 재계산된 기준 벡터
+
+##### 22.1 Ruleset
+
+| 항목 | Hash |
+|---|---|
+| parameterization | `2b3b28f3ad886962e462eaedbd7dfd5321b519329af25f2f2d9664c666c46ae3` |
+| response | `6599cea3c34469b9051a6a6ecc8eebc89d4291620a792388a7a5b8aa9b5dae4d` |
+| resolution | `5ac0e95d42761ba1037480a28edb996d73e318ab04dae44ee5ef587eb537a3fe` |
+| simulation | `2ba7245d5b5481398f3d6d3d7e21f597a2f23a240b82a22e0dde8eca188aa3e4` |
+
+##### 22.2 Slot/action
+
+| 대상 | ID |
+|---|---|
+| 한결 slot | `862f3158b3dff56ff0b6965a833cd53b0f8f39ae85d60af0775354e71de7600f` |
+| 미라 slot | `4c06558d28aa0807fb4500dac5ff71f689226149ff51457134e51342caa56c84` |
+| 한결 A00 | `012ade241680d2bcee9dc5ebe01f79cf3a8f0b49ae84ecd4bc5fa8e75c09975c` |
+| 한결 A04 | `c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414` |
+| 한결 A11 | `5812262bfebd19b26c50e2e00438d9e3cc9b090e572a5c6ae62c870560c64a90` |
+| 미라 A11 | `2494728b695e329c71f49eef0030d2127ec4d927dd2da3938049e6316060a7c6` |
+
+##### 22.3 RNG
+
+| Purpose | Participant | digest | source_hex | mapped |
+|---|---|---|---|---:|
+| A04 tie | 도윤 | `430cd1e9437e35af205bfdd3de4a0deb2915903f2a6bcd204fe305be7beb6b15` | `430cd1e9437e35a` | +0 |
+| 한결 performance | 한결 | `4398e3693818412fe091672f4557b77bb41fae2682dcfa02f19bdce2066fcca7` | `4398e3693818412` | -5 |
+| 한결 exposure | 한결 | `4ea4aeddac0ba3d11321fb76c34e8561e2a52df5bf86796c9bd96ecbdf12956f` | `4ea4aeddac0ba3d` | -1 |
+| 한결 witness | 도윤 | `23363224090b2a032066217df8a420fbe4ce9f9321e199714b33b707809a4c48` | `23363224090b2a0` | -10 |
+| 미라 performance | 미라 | `f239e848453a5b14a0552dc7b5370f97b33515be404838b541502c847a148f6f` | `f239e848453a5b1` | -1 |
+| 미라 exposure | 미라 | `e06ef464bd0aa361071d26150862279b3f3eed5e3a3f8a1ad3d378b38c493d4c` | `e06ef464bd0aa36` | -2 |
+| 미라 witness | 도윤 | `ce6213794f1e0419d784a4111195c7f68c920b6528be7f26d305f98bff73848e` | `ce6213794f1e041` | -4 |
+
+##### 22.4 Fixture hash 표
+
+각 fixture의 input/output state hash는 annex의 `batch.input_state_hash`와 `batch.output_state_hash`가 규범값이다.
+
+| Fixture/action | source decision | action instance | intent | context | semantic | batch |
+|---|---|---|---|---|---|---|
+| `F01` | `2971481eaf67cea41f5596173cc530d818041df25e518f0eaf6eadb752e7699a` | `012ade241680d2bcee9dc5ebe01f79cf3a8f0b49ae84ecd4bc5fa8e75c09975c` | `31d9c29c73d117f6bbc7d4e913664213f7561e1e4fb7a2ceef23c3f745f8b7cf` | `e74a0b0995b20058d0a8c3eeab235b7c755f0e3b033fe95d3b554589970aac63` | `57901b86e14e5139827554dbc0d4e5fc1195c5e1d7304f4b6da6b572ce5f29a1` | `bfe1d9f5ee5c801056bf7ef614760adbdca8885abffd3e3f4d0e4966444881a9` |
+| `F02` | `61902b4ced920c8c528ea5ab4fe93f8a2ba9ac0f7dd5e72236fd56af36a5960e` | `c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414` | `57ccaf8bce082ace70c4b86d62923da6251dcc1022a00a612bbabef47144d4f8` | `744160823e515b0bf49528588ce3ea9535233aeb0e6e5ac4a8fffe64c2f4079e` | `09108d9a48fdf0325f75a3d5495c683e9d28e8ab0a3dbab2cbb3b992366bd81c` | `fb23219ac664aad47542ec194be56aab385399a93662887f6656e0fcaa636c76` |
+| `F03` | `28412aaa0361c4ba2ad4597526827f77107132210a7248d72ac5a8072278df30` | `c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414` | `a42d33ee1c36611e8545d8aa22f1c2336f86a871489759bab871d31f4910b45d` | `e605a55a99e585138bbd4cbdc08e047150e5a485614e953b2d58dc558224564c` | `ad4c41ededc91b2c5fdba7d6d80ec79e743b46211c268d35e02a6ff11393032f` | `5cb449d3870f042c579af699c0c0be8323417fb1ec693afdd7ce4bc0813d66f6` |
+| `F04` | `36352d3b43fabd866b4c8952e5f0fd897636468c500cded201219846a6cf4793` | `c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414` | `90befbca591e2be76ad21d4744a2d199a9c3c4b2529012865d1b20631fb99b2e` | `ba1a5a965d38be0c236ef2ec46e971b767776cb2b74508646d81e49b7d95b615` | `27eab2be43846c74894d4e7d35db55876c196eebc983a2edf7e95097e94b6781` | `0ad79eb72585fe2cd49f752c7542d4647594b7bfd5dc7098bf1bd8963c8faa2f` |
+| `F05` | `9f642f30a153662321bff951d6a27bad4c2d08d234320d5e8a3493485cb898d1` | `c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414` | `7457ea77d29f62d25cfcaf795c8710fcbeb8bcd29937edbe83c4a30e34b57798` | `fee8f9aa9f45e46c314bd577c990970c91b747bf42163f9fd8b7ca82cf249b64` | `37eb3c71d18662b045993710af68feae1fa90498370c8aaabc6f51c45a6d207b` | `0fd33b59593dd90899c579aecabfa89d5ee2286064aa514edbbd092f1f85e91c` |
+| `F06A` | `a532399716602dab77fe90ccb0814f659b73e16667dff66e479e2710e0c9f978` | `5812262bfebd19b26c50e2e00438d9e3cc9b090e572a5c6ae62c870560c64a90` | `b24dd9686286b313d03b6ed35386706f6bf625aad57849183bf8c20953244881` | `4e87a103344be5a9ce8faea6f8e29ea10a8cd1a8f26c120e3d18de6e98bedfb9` | `50f53c8216e50a04599810443265edb96bd5d38078557f1b3ed8ed0d431a4ac4` | `5a377489185ab8961d130a105b9618d4edad7644897cfc997687705950dd51ec` |
+| `F06B` | `dceacd52c5a941075757d81e3145da4bb2d35aa601b064f3592afc18632bf72a` | `5812262bfebd19b26c50e2e00438d9e3cc9b090e572a5c6ae62c870560c64a90` | `4d8c787d9f8f29ba3f8a5dc483f7918f766a547891246f32249dbd2bb5e417db` | `7a179720d83ca5c0dfbf7713254341ce138730883063343562cb849d6a6a41ee` | `df89a9cd941112e1f71678a530331611035288e65eaa82e5a584d531ac0e493c` | `1be0f60f05c76ede867994d8388084497ec5b8db022e7ce90d948d2537167e18` |
+| `F06C` | `086c79a7dee9983cb96849c45a9e3fe098ea32fbbb3621fcaa650ec2b6d4b9b9` | `5812262bfebd19b26c50e2e00438d9e3cc9b090e572a5c6ae62c870560c64a90` | `531a866da4015ff2a2e188eeb8a6ba37c87dcd0ca5cdf085f5c675038bdd8b99` | `d230a80a3bbc38b15f5c2f74a05b4b986c238718b9ae0ba74a4409db1a8bd8af` | `af0cc41ee072bbc4c1a1a3a7a922f244a8f07fc32355f9c6fb09463d9d82bf03` | `1d7117d27837b15b764b6d812464fb599e37ae31392ca4a545a562723db4e162` |
+| `F07` | `ba59ccf231859b7ab1edf84466d993ff5befd4f8d4c142918833cc9c93138cfc` | `5812262bfebd19b26c50e2e00438d9e3cc9b090e572a5c6ae62c870560c64a90` | `9efe60bc0e09304b37a7751a48499a2868a3127926640f7e610946856f01ef9b` | `065116d273ce0cd02775acd5e86c0efbb2d4fdbe0bf7ee1109b49fb5bf3046cf` | `8027e71c2cde952fb2994ded1b03307681f210ca1d84b5d9f714563e9cb6a6cf` | `7fef38a459f5a7bc2ecbd772a2f9760f04d915803146bc332b802ddb3dc02515` |
+| `F08L` | `359f72901977bd843262368eed88e94cd7a03f45c8f8e04df1619d2d00c7464d` | `5812262bfebd19b26c50e2e00438d9e3cc9b090e572a5c6ae62c870560c64a90` | `0c8d8912b0aac7f6bf59144f4d1dbdd82e716bdf8bc7a3cdc1a14fbdc64bfed3` | `44189230a8d8e0e2ac4282120da91bf3d1723c5d6b426e6d8a3ac2f18543223a` | `39a2375dc5aa543c0bfe5948614c446db594dd0f434ed5b0511542eea11b6e58` | `498d92c4c8297de0c00e5adaba752e022357d53cd3a782516e3e4ee34a037f5e` |
+| `F08H` | `8b2ec10634c52e4e33447b22831665e576c91b88ad65ebef1d00029f2c00dbed` | `5812262bfebd19b26c50e2e00438d9e3cc9b090e572a5c6ae62c870560c64a90` | `5913489d703ba7445620d355bb5573e598e3287ce1d43800ba534afded01ec6b` | `0d7aa6dcc8ff54a3745476a03bf618835716d9dc674f35611863c706f73fe01e` | `4186cb2bdd379a42f88930670f9b2bee60d3a6242ff6e695694b21c819a97c77` | `40414f85e3f945439f99ec84cc59dea1da37c5136358e01b52106231e2f01e44` |
+| `F09 person:000002 A11` | `73a099c0e7e3a56e34f55b094044c869e072bd903dcff888312fc7939d1f79e2` | `2494728b695e329c71f49eef0030d2127ec4d927dd2da3938049e6316060a7c6` | `45ee5f0eac24f2a12dd8de88a30c3005a7524026dfc4aa478a658c53b0ed2b19` | `86fa5e4d415a914aebee911a682c6eca206d932f806523755f1b6b0793029318` | `0e710e24d2625e0af71ea474f41f4df0ee944653c64e9472f83e1e8d701f312e` | `6a37fa6dbbeea99543d970f4361a9cdb710e4333d37b9a9cfe4124ae5a12b0e3` |
+| `F09 person:000001 A04` | `663024870604b84be31888f7b27b8ce730a06e3b3f1f1731e565692efd4c6429` | `c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414` | `38d825b4c3d8ea6a72e2fb0bf3fe1566b18cf5a022216f30e47060bbd8ac9ca5` | `87e3c21543b8aaebb3d0db4e527eafc705eb161a629ce0e752c1d33af681a5ae` | `9f198d67e776f966c8ce6bd937468889e25c218548b34379f0a7321f1f1e6659` | `6a37fa6dbbeea99543d970f4361a9cdb710e4333d37b9a9cfe4124ae5a12b0e3` |
+
+##### 22.5 F10 sequential hash
+
+| Stage | input state | output state | source decision | action instance | intent | context | semantic | batch |
+|---|---|---|---|---|---|---|---|---|
+| `batch1` | `2a9b1f38321d4a60793e38e8458c08341ae07448ea4104512c26e6d0ddaeaafb` | `a5c374eab134df6f4c175b8bafccfe267c57f21dee12c93308ba709b585fdbf1` | `1fb00612c4932a66a63be79c94bbbd1feae24304b6bbacc21c614ceb572a2c5f` | `c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414` | `565f37f5541387b6272cb02cb01a764aa8a748bcaeaf2eaf41bce5fcb2400bf6` | `9f726d06a5db9a47807a9fbc27646835e2529db21ee5155debd1c2baa3a45cc3` | `4c779edba7608a666c2c12b6f1420e223f6b9c45a4dffacc0ca5835034d22d07` | `bd654cbdae19a5a39d438b3dd53958b7ddfb3b4ff1e5e5cfb6b54477c3fdaa28` |
+| `batch2` | `a5c374eab134df6f4c175b8bafccfe267c57f21dee12c93308ba709b585fdbf1` | `513595b83a35625d3a2059f63ad508ceebc3fc9c68bffe51f53087f122d32310` | `079a79416b38fcc3048d9150713c175ec82027b999a7d96511bcfa23d5029743` | `2494728b695e329c71f49eef0030d2127ec4d927dd2da3938049e6316060a7c6` | `8f9551d84f56b5120879796fba807d514af2ebbc85a19da9396b12a3fbfcd339` | `bf741e5471c897be587138c53cf9766aa5740639e77723a25ca542a12c6e8317` | `1a20bb47feffceb963f4471466be715eb88254291ca0878f271b81f5ae335f69` | `aa779ff25ae84f51923a41ff15b193575aeaa67a60cc0edae3616f693f4c7483` |
+
+DayProcessor output state: `b478bdebe5574494f1d88522835b3bffde2aca93248b62945d623751a498507a`
+
+##### 22.6 Transaction IDs
+
+| Action | Transaction ID |
+|---|---|
+| 한결 A04 | `resource_transaction:m4:ff6e8f95096745094db04d4de0cbd006b822bc113858b513b1ec8a02022b5a90` |
+| 한결 A11 | `resource_transaction:m4:2ad79b5b2481bdcbbab6ee05fa27456a1730107c6c77da71492ea74c105075b6` |
+| 미라 A11 | `resource_transaction:m4:d2416156827bf0500aabd974348db36de140995e308ee6795b959766003e03ef` |
+
+##### 22.7 Witness seed IDs
+
+| Fixture | ID | notice | actual | trace |
+|---|---|---:|---:|---|
+| F06C | `914aa5b3d5045a1d43c3c7b01dd5fefb0c514dc5f48bc34e00ecffec8aca3cc5` | 88 | 0 | true |
+| F07 | `3d1ab2224868919a9c1eff934271af3dd43f3ddc674a466bd3d976779b1e314e` | 96 | 0 | false |
+
+##### 22.8 실패·경계 golden fixture
+
+E01은 정상적으로 commit된 `INVALIDATED`다.
+
+```text
+processing_status = INVALIDATED
+objective_outcome = NOT_APPLICABLE
+invalidation_reason_ids = ["actor_not_present", "target_person_not_present"]
+details = {}
+random_draws/resource_transaction_ids/witness_evidence_seed_ids = []
+input_state_hash = bb8701e169d36af9b67caa7e560f0879363497142d4eee0effa0ef50b7a31cc1
+output_state_hash = 06fb132ce79f161cfcc64825e2508ae9296d76849d7910a406ec48f3670cd319
+semantic_resolution_hash = cd186adefdd5ca05cf7e7cf27ce162044a290a4be2ca60f56b858a8dbfafdb17
+batch_artifact_hash = 75a803a5ae322c0bb5acea297b8532441346b12d02ab58ddacea400eb3b7d3b9
+```
+
+Rejection vectors:
+
+| Fixture | reason | stage | input hash | epoch | diagnostic ID | batch hash |
+|---|---|---|---|---:|---|---|
+| E02 unreadable world | `invalid_world` | `WORLD_VALIDATION` | `""` | -1 | `420912214ddc73ee21f43a6c72078c01ece487c5591addd969d808b274d552e0` | `94ae4dd19d6b81298c09508caf757262c6590a4ee72567dea644d80055648760` |
+| E03 stale context epoch | `stale_resolution_epoch` | `CONTEXT_VALIDATION` | `70f70de64f8d5806f61055cacb0e0318635719d0c3c6c14f449fe44698788848` | 0 | `ccd72359f64609f4ac7ede249ca7c47e4e51cdc8bf4b6f79b463a1536d462b41` | `6f6c9fca73e0e67b20a6cfe357d6bdb0f3912fd8092ba3a936e3e4f8a686c631` |
+
+E04 exact `defaulted_inputs`:
+
+```text
+persons[person:000004].trait_scores.empathy
+persons[person:000004].value_scores.community_survival
+persons[person:000004].value_scores.fairness_reciprocity
+persons[person:000004].value_scores.life_protection
+relations[person:000004->person:000001].affection
+relations[person:000004->person:000001].fear
+relations[person:000004->person:000001].obligation
+relations[person:000004->person:000001].resentment
+relations[person:000004->person:000001].trust
+```
+
+E04 batch hash: `f71380ac4865f64336a9b696597b4a28858554a7aea790df97eb38692e6cfd5a`
+
+E04에서는 관계 record를 제거할 때 responder의 역참조도 함께 제거한다.
+
+```text
+input_world.person:000004.relation_ids = []
+next_world.person:000004.relation_ids = []
+```
+
+E05 Parameterizer boundary vectors:
+
+```text
+vector_hash = StateHasher.hash_data({
+  "algorithm_id": "m4-parameterization-boundary-vector-v1",
+  "vector": vector.to_data_without_vector_hash()
+})
+```
+
+| Vector | error | vector hash |
+|---|---|---|
+| `E05_EMPTY_ALIVE_HOUSEHOLD` | `selected_positive_action_has_zero_need_basis` | `7e19491ea14870c2000a8af260370d341a18afefd3560fd22a17493a98c9edc6` |
+| `E05_REQUEST_SAME_STORE` | `request_source_equals_recipient` | `53c50555186d1564b286e3e43aa16bf0850fe9350df4d060c9d87ce191539c66` |
+| `E05_THEFT_SAME_STORE` | `theft_target_equals_recipient` | `7483e8feba010c879826b3886d5dd9ffdb86ef6f523bea464e00306feb71cff8` |
+
+E06 facade equal-reason permutation:
+
+```text
+selected action_instance_id = c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414
+reason_id = request_source_equals_recipient
+permutation A batch = 49c35fcd88fd370a1e3e6da45c9468007b29e70badd097d6fc9e29591a8eac1f
+permutation B batch = 49c35fcd88fd370a1e3e6da45c9468007b29e70badd097d6fc9e29591a8eac1f
+```
+
+전체 입력, context, outcome, diagnostic와 canonical object는 annex가 규범 원상이다.
+
+#### 23. 필수 기계 시험
+
+```text
+M4-T01 Schema 1–3 canonical JSON/hash 불변
+M4-T02 Schema 4 round-trip, exact envelope, manifest/simulation hash
+M4-T03 Schema 4 service별 component authority와 legacy branch
+M4-T04 Parameterizer의 DecisionResult provenance 조작 거부와 trusted boundary 이후 intent/action accidental mutation 탐지
+M4-T05 Parameterizer 주관/객관 정보 경계
+M4-T06 zero-change commit epoch/slot 소비와 replay 거부
+M4-T07 A04 FULL/PARTIAL/REJECT/tie/default
+M4-T08 A04 source derivation과 pure response evaluator
+M4-T09 A11 필요량, belief cap, 수행, penalty, 반올림
+M4-T10 빈 창고 RESOLVED/NONE, 흔적·목격 독립성
+M4-T11 RNG purpose 독립성과 고정 벡터
+M4-T12 batch 입력 배열 permutation 불변
+M4-T13 A04/A11 공동 충돌, surplus, conservation
+M4-T14 여러 M4 batch와 DayProcessor sequence counter 공유
+M4-T15 malformed atomic rejection과 결과 분류
+M4-T16 1:1 context, issuer, binding, stale 거부
+M4-T17 artifact 정렬과 semantic/batch hash 경계
+M4-T18 Linux/Windows canonical JSON, digest, state/artifact hash 일치
+M4-T19 INVALIDATED multi-reason과 rejection sentinel/first-fail golden vector
+M4-T20 empty household, same-store와 exact default path golden vector
+M4-T21 facade equal-reason submission permutation 불변
+M4-T22 facade cross-rank submission permutation에서 낮은 reason precedence 우선
+```
+
+#### 24. 관찰 시나리오
+
+F01–F10은 특정 결과가 인간적으로 옳거나 재미있다는 PASS oracle이 아니다. 다음을 관찰·보존한다.
+
+- 요청에서 care/relation/reserve 변화가 응답 계산에 미치는 영향
+- 같은 주관 정보에서 실제 security만 달라질 때 실행 결과 변화
+- 빈 창고를 잘못 믿고 시도한 행동의 객관적 실패와 노출
+- 동시 claim의 순서 독립성
+- hunger floor 동작
+- 연속 M4 batch와 다음 날 소비 연결
+
+상수나 fixture 변경이 필요하면 기존 값을 조용히 고치지 않는다. ruleset version과 Decision 기록을 갱신한다.
+
+#### 25. 독립 검증 및 승인 기록
+
+독립 레드팀은 문서의 exact ruleset JSON, annex 원상, 정상 fixture 13개와 경계 fixture 6개를 재계산했다. E04 관계 참조 무결성, facade의 동순위 실패 선택, E05 vector hash domain, E06 submission permutation 독립성과 `AtomicActionResolver` 명칭을 포함해 blocker가 모두 닫혔고 신규 blocker는 발견되지 않았다.
+
+비차단 권고인 서로 다른 reason rank 사이의 submission permutation 검증은 `M4-T22`로 추가했다. 이는 승인된 ruleset과 hash를 변경하지 않는다.
+
+결정 24의 승인은 설계만 동결한다. 별도의 `M4 구현 승인` 전에는 schema 4 코드, resolver, repository fixture 또는 시험을 구현하지 않는다.
