@@ -218,7 +218,9 @@ func _test_t05_information_boundary() -> void:
 	var security_low: ActionIntent = _parameterize_actor(_world("F08L"), "person:000001")
 	var security_high: ActionIntent = _parameterize_actor(_world("F08H"), "person:000001")
 	_expect(
-		security_low.desired_units == security_high.desired_units,
+		security_low != null
+		and security_high != null
+		and security_low.desired_units == security_high.desired_units,
 		"M4-T05 target actual security is outside parameterization inputs"
 	)
 
@@ -342,6 +344,12 @@ func _test_t09_theft_formula() -> void:
 	var fixture: Dictionary = _fixture("F06C")
 	var world: WorldState = M4FixtureFactory.world_from_payload(fixture.get("input_world", {}))
 	var result: BatchResolutionRecord = _execute_fixture_with_order(fixture, world, false)
+	_expect(
+		result.batch_status == "COMMITTED" and not result.committed_outcomes.is_empty(),
+		"M4-T09 theft formula produces a committed outcome"
+	)
+	if result.batch_status != "COMMITTED" or result.committed_outcomes.is_empty():
+		return
 	var details: Dictionary = result.committed_outcomes[0].details
 	_expect(
 		int(details.get("desired_units", -1)) == 6
@@ -358,6 +366,12 @@ func _test_t10_zero_stock_evidence() -> void:
 	var fixture: Dictionary = _fixture("F07")
 	var world: WorldState = M4FixtureFactory.world_from_payload(fixture.get("input_world", {}))
 	var result: BatchResolutionRecord = _execute_fixture_with_order(fixture, world, false)
+	_expect(
+		result.batch_status == "COMMITTED" and not result.committed_outcomes.is_empty(),
+		"M4-T10 zero-stock attempt produces a committed outcome"
+	)
+	if result.batch_status != "COMMITTED" or result.committed_outcomes.is_empty():
+		return
 	var outcome: ActionOutcomeRecord = result.committed_outcomes[0]
 	_expect(
 		outcome.processing_status == "RESOLVED"
@@ -478,6 +492,18 @@ func _test_t14_sequential_day_processing() -> void:
 		and overflow_day.next_world == null
 		and StateHasher.hash_world(overflow_world) == overflow_hash,
 		"M4-T14 DayProcessor day index overflow is atomic"
+	)
+	var missing_counter_world: WorldState = _world("F02")
+	missing_counter_world.next_ids.erase("resource_transaction")
+	var missing_counter_hash: String = StateHasher.hash_world(missing_counter_world)
+	var missing_counter_day: DayAdvanceResult = DayProcessor.advance_day(missing_counter_world)
+	_expect(
+		not missing_counter_day.ok
+		and missing_counter_day.errors == ["state.next_ids.resource_transaction is required"]
+		and missing_counter_day.next_world == null
+		and missing_counter_day.resource_transactions.is_empty()
+		and StateHasher.hash_world(missing_counter_world) == missing_counter_hash,
+		"M4-T14 missing resource transaction counter is rejected as invalid state"
 	)
 
 
@@ -744,6 +770,7 @@ func _test_t21_equal_reason_permutation() -> void:
 	_expect_data_equal(facade_a.to_data(), facade_b.to_data(), "M4-T21 facade permutation exact")
 	_expect(
 		facade_a.errors == ["request_source_equals_recipient"]
+		and not facade_a.attempt_diagnostics.is_empty()
 		and facade_a.attempt_diagnostics[0].action_instance_id
 		== "c4f1fa79c01b386b0bf3f90723ff1f6002afc37a93a8603f70cb72fd37676414",
 		"M4-T21 facade equal rank selects lexicographically lower action ID"
@@ -788,6 +815,7 @@ func _test_t22_cross_rank_permutation() -> void:
 	_expect_data_equal(facade_a.to_data(), facade_b.to_data(), "M4-T22 facade cross-rank permutation")
 	_expect(
 		facade_a.errors == ["unsupported_decision_key"]
+		and not facade_a.attempt_diagnostics.is_empty()
 		and facade_a.attempt_diagnostics[0].action_instance_id.is_empty(),
 		"M4-T22 facade chooses lower reason precedence with empty action sentinel"
 	)

@@ -183,6 +183,11 @@ static func _validate_state(
 		errors.append("state.next_ids must be a dictionary")
 	else:
 		var next_ids: Dictionary = state.get("next_ids")
+		if (
+			schema_version == WorldState.SCHEMA_VERSION_M4
+			and not next_ids.has("resource_transaction")
+		):
+			errors.append("state.next_ids.resource_transaction is required")
 		for key: Variant in next_ids.keys():
 			if not _is_integer(next_ids[key]) or int(next_ids[key]) < 1:
 				errors.append("state.next_ids.%s must be a positive integer" % str(key))

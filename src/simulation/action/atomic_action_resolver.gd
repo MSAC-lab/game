@@ -189,6 +189,7 @@ static func _context_rejection_candidates(
 ) -> Array[Dictionary]:
 	var candidates: Array[Dictionary] = []
 	var context_actions: Dictionary = {}
+	var state_hash: String = StateHasher.hash_world(world)
 	for context: ResolutionContext in contexts:
 		var action_id: String = context.action_instance_id if context != null else ""
 		if not _valid_context_contract(context):
@@ -196,7 +197,7 @@ static func _context_rejection_candidates(
 			continue
 		if context.resolution_epoch != world.resolution_epoch:
 			candidates.append(_candidate("stale_resolution_epoch", action_id))
-		if context.input_state_hash != StateHasher.hash_world(world):
+		if context.input_state_hash != state_hash:
 			candidates.append(_candidate("stale_input_state_hash", action_id))
 		if context.day_index != world.day_index:
 			candidates.append(_candidate("stale_day_index", action_id))

@@ -6,7 +6,7 @@ const M4_ATOMIC_ACTION_TEST: GDScript = preload(
 
 
 func _init() -> void:
-	var suite: RefCounted = M4_ATOMIC_ACTION_TEST.new()
+	var suite: M4AtomicActionTest = M4_ATOMIC_ACTION_TEST.new()
 	var failures: Array[String] = suite.run_all()
 	if failures.is_empty():
 		print("M4 PASS: schema 4 and atomic action-resolution tests passed.")
