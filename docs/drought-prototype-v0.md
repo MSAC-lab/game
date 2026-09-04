@@ -4,20 +4,21 @@
 
 ```text
 STATUS = PROVISIONAL / DESIGN ITEMS 1-24 APPROVED
-IMPLEMENTATION AUTHORIZATION = M0 + M1 + M2 + M3
+IMPLEMENTATION AUTHORIZATION = M0 + M1 + M2 + M3 + M4
 M1 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 M2 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 M3 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-01
 M4 DETAILED DESIGN AUTHORIZATION = GRANTED / 2026-09-04
-IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS / M2 COMPLETE / PASS / M3 COMPLETE / MECHANICS PASS
-AUTOMATED VERIFICATION = M0 + M1 + M2 + M3 LOCAL / LINUX / WINDOWS PASS
+M4 IMPLEMENTATION AUTHORIZATION = GRANTED / 2026-09-04
+IMPLEMENTATION STATUS = M0 COMPLETE / PASS / M1 COMPLETE / PASS / M2 COMPLETE / PASS / M3 COMPLETE / MECHANICS PASS / M4 COMPLETE / MECHANICS PASS
+AUTOMATED VERIFICATION = M0 + M1 + M2 + M3 + M4 LOCAL / LINUX / WINDOWS PASS
 GUI VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
-FULL ACCEPTANCE = M0 + M1 + M2 + M3 MECHANICS PASS / M3 BEHAVIOR OBSERVED
-SCOPE = M0 + M1 + M2 + M3 COMPLETE / M4 HIGH-LEVEL + DETAILED DESIGN FROZEN / M4 IMPLEMENTATION NOT AUTHORIZED
-NEXT GATE = DOCUMENT MERGE VERIFICATION / SEPARATE M4 IMPLEMENTATION AUTHORIZATION
+FULL ACCEPTANCE = M0 + M1 + M2 + M3 + M4 MECHANICS PASS / M3 + M4 BEHAVIOR OBSERVED
+SCOPE = M0 + M1 + M2 + M3 + M4 COMPLETE / DECISIONS 23-24 FROZEN
+NEXT GATE = SEPARATE M5 DESIGN AUTHORIZATION
 ```
 
-이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, 구현된 M1~M3 경계는 결정 18~22의 해당 계약과 동결 artifact로 고정했다.
+이 문서는 첫 프로토타입의 잠정 검증 범위를 기록한다. 게임 엔진과 프로그래밍 언어는 가뭄 프로토타입에 한해 잠정 결정했다. 수치와 UI 상세는 아직 잠정안이며, 구현된 M1~M4 경계는 결정 18~24의 해당 계약과 동결 artifact로 고정했다.
 
 ## 1. 검증 목적
 
@@ -3353,7 +3354,7 @@ C01~C05는 3인 가구의 가구주, 배우자·자녀, 촌장과 공동창고�
 
 M4는 M3가 고른 행동을 현실 세계의 실제 결과로 해소한다. 원하는 행동이나 이야기 결과를 만들기 위한 계층이 아니며, 동일한 입력과 동결 규칙에서 재현 가능하고 감사 가능한 결과를 만드는 계층이다.
 
-고수준 아키텍처는 승인·동결됐지만 M4 구현은 아직 승인되지 않았다. 필드 타입, 정수 계수와 공식, 정확한 RNG 키 직렬화, `action_instance_id` 생성 규칙, fixture 및 M4-T/R 시험은 결정 24에서 별도로 고정한다.
+고수준 아키텍처를 승인·동결한 시점에는 M4 구현이 아직 승인되지 않았다. 필드 타입, 정수 계수와 공식, 정확한 RNG 키 직렬화, `action_instance_id` 생성 규칙, fixture 및 M4-T/R 시험은 결정 24에서 별도로 고정한다.
 
 #### 책임 경계
 
@@ -3556,13 +3557,13 @@ errors[]
 DECISION 23 = APPROVED
 DECISION 24 = APPROVED
 M4 DETAILED DESIGN = FROZEN
-M4 IMPLEMENTATION = NOT AUTHORIZED
+M4 IMPLEMENTATION = AUTHORIZED / COMPLETE / PASS
 SCHEMA 3→4 AUTOMATIC MIGRATION = OUT OF SCOPE
 SCHEMA 1–3 FROZEN SUPPORT = PRESERVED
 SCHEMA 4 READ / WRITE / VALIDATION CONTRACT = IN SCOPE
 ```
 
-독립 검산 기준 exact-artifact annex는 `Decision24_F01-F10_exact_artifacts.json`, SHA-256 `63a154f947ccbe6309d3d89690dbb7b3d6b1f5bf695356a89dd5ff45028e6819`다. 이 annex는 설계 승인 증거지만 아직 구현 승인이 없으므로 repository fixture로 추가하지 않는다. 구현 승인 후 이 SHA와 일치하는 원상으로만 저장소 fixture를 생성한다.
+독립 검산 기준 exact-artifact annex는 `Decision24_F01-F10_exact_artifacts.json`, SHA-256 `63a154f947ccbe6309d3d89690dbb7b3d6b1f5bf695356a89dd5ff45028e6819`다. 구현 승인 후 이 원상을 `tests/fixtures/m4_exact_artifacts.json`에 같은 SHA-256으로 추가했다.
 
 특정 NPC가 도움을 주거나 절도에 성공해야 PASS인 것이 아니다. 승인 대상은 타입, 인과 경계, 정수 계산, 직렬화, 결정론, 원자성 및 fixture 재현 가능성이다.
 
@@ -5675,7 +5676,7 @@ M4-T11 RNG purpose 독립성과 고정 벡터
 M4-T12 batch 입력 배열 permutation 불변
 M4-T13 A04/A11 공동 충돌, surplus, conservation
 M4-T14 여러 M4 batch와 DayProcessor sequence counter 공유
-M4-T15 malformed atomic rejection과 결과 분류
+M4-T15 malformed·overflow atomic rejection과 결과 분류
 M4-T16 1:1 context, issuer, binding, stale 거부
 M4-T17 artifact 정렬과 semantic/batch hash 경계
 M4-T18 Linux/Windows canonical JSON, digest, state/artifact hash 일치
@@ -5704,4 +5705,6 @@ F01–F10은 특정 결과가 인간적으로 옳거나 재미있다는 PASS ora
 
 비차단 권고인 서로 다른 reason rank 사이의 submission permutation 검증은 `M4-T22`로 추가했다. 이는 승인된 ruleset과 hash를 변경하지 않는다.
 
-결정 24의 승인은 설계만 동결한다. 별도의 `M4 구현 승인` 전에는 schema 4 코드, resolver, repository fixture 또는 시험을 구현하지 않는다.
+결정 24 승인 당시에는 설계만 동결했으며, 별도의 `M4 구현 승인` 전에는 schema 4 코드, resolver, repository fixture 또는 시험을 구현하지 않았다. 이후 2026-09-04 사용자가 `main@c49d3bdbd9c6b46dd4e2b7b4c1d6ff5d42d3f78a`를 기준으로 M4 구현을 승인했다.
+
+구현은 승인된 annex 원상, ruleset component hash와 simulation hash를 변경하지 않는다. Schema 1~3 frozen artifact 회귀, 정상 fixture 13개, 경계 fixture 6개, facade의 equal-rank·cross-rank permutation, stale·replay·overflow 원자성 및 Schema 4 DayProcessor를 M4-T01~T22로 검증한다. Linux·Windows Godot 4.7.2 CI를 모두 통과한 최초 green 결과를 M4 구현 기준으로 동결한다.

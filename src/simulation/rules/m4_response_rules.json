@@ -1,0 +1,55 @@
+{
+  "algorithm_id": "m4-food-response-v1",
+  "candidate_rank": {
+    "GRANT": 0,
+    "REJECT": 1
+  },
+  "care": {
+    "divisor": 4,
+    "fields": [
+      "trait_scores.empathy",
+      "value_scores.community_survival",
+      "value_scores.fairness_reciprocity",
+      "value_scores.life_protection"
+    ]
+  },
+  "defaulted_input_paths": {
+    "missing_person_value": "persons[{person_id}].{domain}.{key}",
+    "missing_relation_component": "relations[{source_person_id}->{target_person_id}].{component}",
+    "order": "lexicographic_unique"
+  },
+  "grant_candidate": {
+    "full_id": "GRANT_FULL",
+    "partial_id": "GRANT_PARTIAL",
+    "reject_id": "REJECT",
+    "source_store": "responder_household_resource_store"
+  },
+  "grant_utility": {
+    "care_coefficient": 20,
+    "relation_coefficient": 10,
+    "reserve_cost_coefficient": -20
+  },
+  "missing_input_policy": "zero_and_record_defaulted_inputs",
+  "reject_utility": 0,
+  "relation": {
+    "clamp_max": 100,
+    "clamp_min": -100,
+    "direction": "responder_to_requester",
+    "divisor": 3,
+    "negative_fields": [
+      "fear",
+      "resentment"
+    ],
+    "positive_fields": [
+      "affection",
+      "obligation",
+      "trust"
+    ]
+  },
+  "reserve": {
+    "food_horizon_days": 10,
+    "reserve_cost_scale": 100
+  },
+  "round_div": "half_away_from_zero_v1",
+  "tie_roll_purpose": "A04_RESPONSE_TIE"
+}

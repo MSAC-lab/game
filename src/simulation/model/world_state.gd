@@ -4,13 +4,16 @@ extends RefCounted
 const SCHEMA_VERSION_M1: int = 1
 const SCHEMA_VERSION_M2: int = 2
 const SCHEMA_VERSION_M3: int = 3
-const CURRENT_SCHEMA_VERSION: int = SCHEMA_VERSION_M3
+const SCHEMA_VERSION_M4: int = 4
+const CURRENT_SCHEMA_VERSION: int = SCHEMA_VERSION_M4
 const SUPPORTED_SCHEMA_VERSION: int = CURRENT_SCHEMA_VERSION
 const DAY_END_PHASE: String = "DAY_END"
 
 var schema_version: int = CURRENT_SCHEMA_VERSION
 var ruleset_id: String = ""
 var ruleset_hash: String = ""
+var ruleset_manifest: Dictionary = {}
+var simulation_ruleset_hash: String = ""
 var scenario_id: String = ""
 var day_index: int = 0
 var day_phase: String = DAY_END_PHASE
@@ -26,6 +29,9 @@ var relations: Array[RelationState] = []
 var events: Array[EventRecord] = []
 var information: Array[InformationState] = []
 var memories: Array[MemoryState] = []
+var resolution_epoch: int = 0
+var next_resource_sequence_index: int = 0
+var resolved_decision_slot_ids: Array[String] = []
 
 
 func to_state_data() -> Dictionary:
@@ -53,12 +59,16 @@ func to_state_data() -> Dictionary:
 	for fact: InformationState in information:
 		information_data.append(fact.to_data(schema_version))
 	data["information"] = information_data
-	if schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3]:
+	if schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4]:
 		data["day_phase"] = day_phase
 		var resource_store_data: Array = []
 		for store: ResourceStoreState in resource_stores:
 			resource_store_data.append(store.to_data(schema_version))
 		data["resource_stores"] = resource_store_data
+	if schema_version == SCHEMA_VERSION_M4:
+		data["resolution_epoch"] = resolution_epoch
+		data["next_resource_sequence_index"] = next_resource_sequence_index
+		data["resolved_decision_slot_ids"] = resolved_decision_slot_ids.duplicate()
 	return data
 
 
@@ -67,9 +77,14 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 	world.schema_version = int(metadata.get("schema_version", 0))
 	world.ruleset_id = str(metadata.get("ruleset_id", ""))
 	world.ruleset_hash = str(metadata.get("ruleset_hash", ""))
+	if world.schema_version == SCHEMA_VERSION_M4:
+		var manifest_value: Variant = metadata.get("ruleset_manifest", {})
+		if typeof(manifest_value) == TYPE_DICTIONARY:
+			world.ruleset_manifest = manifest_value.duplicate(true)
+		world.simulation_ruleset_hash = str(metadata.get("simulation_ruleset_hash", ""))
 	world.scenario_id = str(state_data.get("scenario_id", ""))
 	world.day_index = int(state_data.get("day_index", 0))
-	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3]:
+	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4]:
 		world.day_phase = str(state_data.get("day_phase", ""))
 	world.season_id = str(state_data.get("season_id", ""))
 	world.rng_seed_hex = str(state_data.get("rng_seed_hex", ""))
@@ -85,7 +100,7 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 	for item: Variant in household_data:
 		world.households.append(HouseholdState.from_data(item, world.schema_version))
 
-	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3]:
+	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4]:
 		var resource_store_data: Array = state_data.get("resource_stores", [])
 		for item: Variant in resource_store_data:
 			world.resource_stores.append(ResourceStoreState.from_data(item, world.schema_version))
@@ -105,6 +120,15 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 	var memory_data: Array = state_data.get("memories", [])
 	for item: Variant in memory_data:
 		world.memories.append(MemoryState.from_data(item))
+
+	if world.schema_version == SCHEMA_VERSION_M4:
+		world.resolution_epoch = int(state_data.get("resolution_epoch", 0))
+		world.next_resource_sequence_index = int(
+			state_data.get("next_resource_sequence_index", 0)
+		)
+		world.resolved_decision_slot_ids = ModelData.copy_string_array(
+			state_data.get("resolved_decision_slot_ids", [])
+		)
 
 	return world
 

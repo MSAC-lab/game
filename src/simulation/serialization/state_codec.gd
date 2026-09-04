@@ -12,7 +12,11 @@ static func encode(
 		audit_data.append(record.to_data())
 	var envelope: Dictionary = StateHasher.state_payload(world)
 	envelope["audit"] = audit_data
-	if world.schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
+	if world.schema_version in [
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
+	]:
 		var resource_audit_data: Array = []
 		for record: ResourceTransactionRecord in resource_records:
 			resource_audit_data.append(record.to_data())
@@ -34,9 +38,16 @@ static func decode(json_text: String) -> Dictionary:
 	if typeof(envelope.get("audit")) != TYPE_ARRAY:
 		errors.append("audit must be an array")
 	var schema_version: int = int(envelope.get("schema_version", 0))
-	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
+	if schema_version in [
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
+	]:
 		if typeof(envelope.get("resource_audit")) != TYPE_ARRAY:
-			errors.append("resource_audit must be an array for schema 2 or 3")
+			if schema_version == WorldState.SCHEMA_VERSION_M4:
+				errors.append("resource_audit must be an array for schema 4")
+			else:
+				errors.append("resource_audit must be an array for schema 2 or 3")
 	elif schema_version == WorldState.SCHEMA_VERSION_M1 and envelope.has("resource_audit"):
 		errors.append("schema 1 envelope forbids resource_audit")
 	if typeof(envelope.get("state_hash")) != TYPE_STRING or len(str(envelope.get("state_hash"))) != 64:
@@ -62,7 +73,11 @@ static func decode(json_text: String) -> Dictionary:
 		audit_records.append(DecisionRecord.from_data(record_data))
 
 	var resource_records: Array[ResourceTransactionRecord] = []
-	if schema_version in [WorldState.SCHEMA_VERSION_M2, WorldState.SCHEMA_VERSION_M3]:
+	if schema_version in [
+		WorldState.SCHEMA_VERSION_M2,
+		WorldState.SCHEMA_VERSION_M3,
+		WorldState.SCHEMA_VERSION_M4,
+	]:
 		var resource_audit_data: Array = envelope.get("resource_audit")
 		var transaction_ids: Dictionary = {}
 		var consumer_days: Dictionary = {}
@@ -77,6 +92,21 @@ static func decode(json_text: String) -> Dictionary:
 			if not resource_error.is_empty():
 				return _failure([resource_error])
 			resource_records.append(ResourceTransactionRecord.from_data(record_data))
+	if schema_version == WorldState.SCHEMA_VERSION_M4:
+		var next_sequence: int = world.next_resource_sequence_index
+		if resource_records.is_empty():
+			if next_sequence != 0:
+				return _failure([
+					"schema 4 empty resource_audit requires next_resource_sequence_index 0"
+				])
+		else:
+			var maximum_sequence: int = -1
+			for record: ResourceTransactionRecord in resource_records:
+				maximum_sequence = maxi(maximum_sequence, record.sequence_index)
+			if next_sequence <= maximum_sequence:
+				return _failure([
+					"schema 4 next_resource_sequence_index must exceed resource_audit maximum"
+				])
 	return {
 		"ok": true,
 		"errors": [] as Array[String],
@@ -122,6 +152,23 @@ static func _validate_resource_audit_record(
 	consumer_days: Dictionary,
 	sequence_keys: Dictionary
 ) -> String:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+		var expected_keys: Array[String] = [
+			"id",
+			"day_index",
+			"sequence_index",
+			"resource_type_id",
+			"source_store_id",
+			"destination_store_id",
+			"consumer_person_id",
+			"quantity",
+			"reason_id",
+		]
+		if data.size() != expected_keys.size():
+			return "schema 4 resource_audit item violates exact keyset"
+		for expected_key: String in expected_keys:
+			if not data.has(expected_key):
+				return "schema 4 resource_audit item is missing %s" % expected_key
 	for key: String in [
 		"id",
 		"resource_type_id",
@@ -143,14 +190,26 @@ static func _validate_resource_audit_record(
 		return "resource_audit quantity must be from 1 to 2147483647"
 	if int(data.get("day_index")) < 0 or int(data.get("sequence_index")) < 0:
 		return "resource_audit day and sequence must be non-negative"
+	if (
+		world.schema_version == WorldState.SCHEMA_VERSION_M4
+		and (
+			int(data.get("day_index")) > 2147483647
+			or int(data.get("sequence_index")) > 2147483647
+		)
+	):
+		return "schema 4 resource_audit day or sequence overflows"
 	if str(data.get("resource_type_id")) != "food":
 		return "resource_audit resource_type_id must be food"
 	if str(data.get("reason_id")).is_empty():
 		return "resource_audit reason_id must not be empty"
-	var sequence_key: String = "%d:%d" % [
-		int(data.get("day_index")), int(data.get("sequence_index"))
-	]
+	var sequence_key: String = (
+		str(int(data.get("sequence_index")))
+		if world.schema_version == WorldState.SCHEMA_VERSION_M4
+		else "%d:%d" % [int(data.get("day_index")), int(data.get("sequence_index"))]
+	)
 	if sequence_keys.has(sequence_key):
+		if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+			return "resource_audit has duplicate sequence identity: %s" % sequence_key
 		return "resource_audit has duplicate day and sequence index: %s" % sequence_key
 	sequence_keys[sequence_key] = true
 	var source_id: String = str(data.get("source_store_id"))

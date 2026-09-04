@@ -17,7 +17,7 @@ func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M2) -> Dictionary:
 		"resource_type_id": resource_type_id,
 		"quantity": quantity,
 	}
-	if schema_version == WorldState.SCHEMA_VERSION_M3:
+	if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 		data["security_level"] = security_level
 	return data
 
@@ -31,6 +31,6 @@ static func from_data(
 	state.owner_id = str(data.get("owner_id", ""))
 	state.resource_type_id = str(data.get("resource_type_id", ""))
 	state.quantity = int(data.get("quantity", 0))
-	if schema_version == WorldState.SCHEMA_VERSION_M3:
+	if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 		state.security_level = int(data.get("security_level", 0))
 	return state

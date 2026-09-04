@@ -30,7 +30,7 @@ func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M1) -> Dictionary:
 		"is_secret": is_secret,
 		"learned_day_index": learned_day_index,
 	}
-	if schema_version == WorldState.SCHEMA_VERSION_M3:
+	if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 		data["fact_type_id"] = fact_type_id
 		data["subject_kind"] = subject_kind
 		data["subject_id"] = subject_id
@@ -52,7 +52,7 @@ static func from_data(
 	state.confidence = int(data.get("confidence", 0))
 	state.is_secret = bool(data.get("is_secret", false))
 	state.learned_day_index = int(data.get("learned_day_index", 0))
-	if schema_version == WorldState.SCHEMA_VERSION_M3:
+	if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
 		state.fact_type_id = str(data.get("fact_type_id", ""))
 		state.subject_kind = str(data.get("subject_kind", ""))
 		state.subject_id = str(data.get("subject_id", ""))

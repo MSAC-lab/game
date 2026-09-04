@@ -1,0 +1,255 @@
+{
+  "algorithm_id": "m4-atomic-resolution-v1",
+  "artifact_order": {
+    "batch_contexts": "action_instance_id",
+    "batch_intents": "action_instance_id",
+    "diagnostics": "id",
+    "errors": "lexicographic",
+    "outcomes": "action_instance_id",
+    "random_draws": "roll_purpose_then_participant_id",
+    "transactions": "state_canonicalizer_id",
+    "witness_seeds": "id"
+  },
+  "batch_order": {
+    "context_input_order": "resolver_sorts_by_action_instance_id",
+    "input_order_mismatch_is_error": false,
+    "intent_input_order": "resolver_sorts_by_action_instance_id"
+  },
+  "conflict": {
+    "a04_reserve_priority": true,
+    "allocation": "proportional_floor_then_remainder_v1",
+    "capacity_basis": "input_world_stock_only",
+    "inbound_reuse_same_batch": false,
+    "pool_key": "source_store_id",
+    "remainder_order": "action_instance_id_ascending"
+  },
+  "context": {
+    "algorithm_id": "m4-resolution-context-v1",
+    "array_policy": "issuer_sorted_unique",
+    "batch_binding": "exact_action_id_set",
+    "issuer_policy": "trusted_in_process_v1",
+    "one_context_per_action": true
+  },
+  "exposure": {
+    "actual_zero_adjustment": 15,
+    "attempted_unit_coefficient": 2,
+    "partial_adjustment": 5,
+    "stealth_dexterity_weight": 3,
+    "stealth_skill_weight": 7,
+    "trace_threshold": 50,
+    "weight_divisor": 10
+  },
+  "hash_domains": {
+    "batch": "m4-batch-artifact-v1",
+    "context": "m4-resolution-context-v1",
+    "diagnostic": "m4-attempt-diagnostic-v1",
+    "intent": "m4-action-intent-v1",
+    "semantic_resolution": "m4-semantic-resolution-v1",
+    "transaction": "m4-resource-transaction-id-v1",
+    "witness_seed": "m4-witness-seed-id-v1"
+  },
+  "intent_trust_boundary": {
+    "external_serialized_intent_input": false,
+    "facade_api": "M4Facade.execute_decisions_v1",
+    "producer": "IntentParameterizer",
+    "resolver_api": "AtomicActionResolver.resolve_trusted_v1",
+    "resolver_guarantee": "structural_hash_and_binding_validation_only",
+    "scope": "trusted_in_process_only",
+    "self_consistent_forgery_detection": false,
+    "trusted_context_source": "trusted_context_issuer"
+  },
+  "invalidation_reason_ids": [
+    "actor_not_alive",
+    "actor_not_present",
+    "target_person_missing",
+    "target_person_not_alive",
+    "target_person_not_present",
+    "target_store_missing",
+    "target_store_not_present"
+  ],
+  "invalidation_result": {
+    "details": "empty_object",
+    "invalidation_reason_order": "lexicographic_unique",
+    "objective_outcome": "NOT_APPLICABLE",
+    "random_draws": "empty_array",
+    "resource_transaction_ids": "empty_array",
+    "witness_evidence_seed_ids": "empty_array"
+  },
+  "objective_outcome_ids": [
+    "FULL",
+    "NONE",
+    "NOT_APPLICABLE",
+    "PARTIAL"
+  ],
+  "performance": {
+    "action_cap_units": 6,
+    "base_scale": 50,
+    "dexterity_weight": 4,
+    "health_penalty_max": 20,
+    "hunger_penalty_max": 20,
+    "offset_max": 10,
+    "offset_min": -10,
+    "stealth_skill_weight": 2,
+    "theft_skill_weight": 4,
+    "weight_divisor": 10
+  },
+  "phase_id": "DAY_ACTION_RESOLUTION",
+  "processing_status_ids": [
+    "INVALIDATED",
+    "RESOLVED"
+  ],
+  "rejection": {
+    "action_instance_id_policy": "readable_attributed_action_id_else_empty",
+    "attempt_diagnostic_count": 1,
+    "batch_status": "REJECTED",
+    "committed_arrays": "empty",
+    "diagnostic_processing_status": "REJECTED_AS_MALFORMED",
+    "equal_reason_tie_break": {
+      "action_instance_id_order": "lexicographic_ascending_empty_first",
+      "algorithm_id": "m4-rejection-tie-break-v1",
+      "comparison_fields": [
+        "action_instance_id",
+        "reason_precedence"
+      ],
+      "identical_tuple_policy": "collapse_to_single_output",
+      "input_array_order_influence": false
+    },
+    "errors_encoding": "single_reason_id_array",
+    "input_resolution_epoch_if_unreadable": -1,
+    "input_state_hash_if_unreadable": "",
+    "output_resolution_epoch": -1,
+    "output_state_hash": "",
+    "reason_stage": {
+      "action_context_set_mismatch": "BATCH_BINDING",
+      "action_instance_id_mismatch": "INTENT_VALIDATION",
+      "arithmetic_overflow": "SEQUENCE_PREFLIGHT",
+      "component_ruleset_mismatch": "RULESET_VALIDATION",
+      "context_id_mismatch": "CONTEXT_VALIDATION",
+      "context_missing_person_id": "CONTEXT_VALIDATION",
+      "context_missing_store_id": "CONTEXT_VALIDATION",
+      "context_person_ids_not_sorted_unique": "CONTEXT_VALIDATION",
+      "context_store_ids_not_sorted_unique": "CONTEXT_VALIDATION",
+      "decision_provenance_mismatch": "INTENT_VALIDATION",
+      "decision_slot_already_resolved": "SLOT_VALIDATION",
+      "duplicate_action_instance_id": "INTENT_VALIDATION",
+      "duplicate_context": "CONTEXT_VALIDATION",
+      "duplicate_decision_slot_id": "SLOT_VALIDATION",
+      "field_contract_violation": "WORLD_VALIDATION",
+      "intent_hash_mismatch": "INTENT_VALIDATION",
+      "invalid_phase": "CONTEXT_VALIDATION",
+      "invalid_world": "WORLD_VALIDATION",
+      "post_apply_invariant_failure": "ATOMIC_COMMIT",
+      "request_source_equals_recipient": "INTENT_VALIDATION",
+      "resource_sequence_overflow": "SEQUENCE_PREFLIGHT",
+      "selected_positive_action_has_zero_need_basis": "INTENT_VALIDATION",
+      "simulation_ruleset_hash_mismatch": "RULESET_VALIDATION",
+      "stale_day_index": "CONTEXT_VALIDATION",
+      "stale_input_state_hash": "INTENT_VALIDATION",
+      "stale_resolution_epoch": "CONTEXT_VALIDATION",
+      "theft_target_equals_recipient": "INTENT_VALIDATION",
+      "unsupported_action_id": "INTENT_VALIDATION",
+      "unsupported_decision_key": "SLOT_VALIDATION",
+      "untrusted_context_issuer": "CONTEXT_VALIDATION"
+    },
+    "strategy": "first_applicable_reason_by_precedence",
+    "validation_precedence": {
+      "action_context_set_mismatch": 26,
+      "action_instance_id_mismatch": 14,
+      "arithmetic_overflow": 27,
+      "component_ruleset_mismatch": 3,
+      "context_id_mismatch": 20,
+      "context_missing_person_id": 24,
+      "context_missing_store_id": 25,
+      "context_person_ids_not_sorted_unique": 22,
+      "context_store_ids_not_sorted_unique": 23,
+      "decision_provenance_mismatch": 8,
+      "decision_slot_already_resolved": 5,
+      "duplicate_action_instance_id": 12,
+      "duplicate_context": 19,
+      "duplicate_decision_slot_id": 6,
+      "field_contract_violation": 1,
+      "intent_hash_mismatch": 13,
+      "invalid_phase": 18,
+      "invalid_world": 0,
+      "post_apply_invariant_failure": 29,
+      "request_source_equals_recipient": 10,
+      "resource_sequence_overflow": 28,
+      "selected_positive_action_has_zero_need_basis": 9,
+      "simulation_ruleset_hash_mismatch": 2,
+      "stale_day_index": 17,
+      "stale_input_state_hash": 7,
+      "stale_resolution_epoch": 16,
+      "theft_target_equals_recipient": 11,
+      "unsupported_action_id": 15,
+      "unsupported_decision_key": 4,
+      "untrusted_context_issuer": 21
+    }
+  },
+  "result_amount_basis": {
+    "A00": "NOT_APPLICABLE",
+    "A04": "requested_units",
+    "A11": "desired_units"
+  },
+  "round_div": "half_away_from_zero_v1",
+  "schema4_day_processor": {
+    "clone_metadata_fields": [
+      "ruleset_manifest",
+      "schema_version",
+      "simulation_ruleset_hash"
+    ],
+    "commit_order": "day_counter_then_slot_clear_then_final_validation_then_state_hash_then_commit",
+    "consumption_order": [
+      "household_id",
+      "person_id"
+    ],
+    "consumption_transaction_id_policy": "legacy_id_allocator_next_id_v1",
+    "legacy_next_id_key": "resource_transaction",
+    "manifest_components_validated": [
+      "resolution",
+      "resource"
+    ],
+    "next_resource_sequence_start": "world.next_resource_sequence_index",
+    "resolution_epoch_policy": "preserve",
+    "schema2_branch_policy": "bit_for_bit_preserved",
+    "slot_clear_policy": "clear_only_on_successful_day_commit",
+    "transaction_day_offset": 1
+  },
+  "stateless_rng": {
+    "algorithm_id": "m4-stateless-roll-v1",
+    "digest_hex_digits": 15,
+    "hash_algorithm": "SHA-256",
+    "purposes": {
+      "A04_RESPONSE_TIE": "mod_candidate_count",
+      "A11_EXPOSURE": "mod21_minus10",
+      "A11_PERFORMANCE": "mod21_minus10",
+      "A11_WITNESS": "mod21_minus10"
+    },
+    "source_record_encoding": "15_lowercase_hex_chars"
+  },
+  "supported_action_ids": [
+    "A00",
+    "A04",
+    "A11"
+  ],
+  "transaction": {
+    "action_transaction_algorithm_id": "m4-resource-transaction-id-v1",
+    "day_offset": 1,
+    "legs": {
+      "A04": "A04_FOOD_GRANT",
+      "A11": "A11_FOOD_THEFT"
+    },
+    "reason_ids": {
+      "A04": "food_request_grant",
+      "A11": "food_theft",
+      "DAY_CONSUMPTION": "daily_food_consumption"
+    },
+    "sequence_counter_max": 2147483647,
+    "sequence_policy": "world_global_monotonic"
+  },
+  "witness": {
+    "exposure_divisor": 2,
+    "notice_threshold": 75,
+    "offset_max": 10,
+    "offset_min": -10
+  }
+}
