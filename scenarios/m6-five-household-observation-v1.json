@@ -1,0 +1,3833 @@
+{
+  "algorithm_id": "m60-scenario-v1",
+  "config": {
+    "automatic_person_ids": [
+      "person:000001",
+      "person:000002",
+      "person:000004",
+      "person:000005",
+      "person:000006",
+      "person:000007",
+      "person:000010",
+      "person:000011",
+      "person:000013"
+    ],
+    "contacts": [
+      {
+        "id": "contact:person:000001->person:000002",
+        "person_a_id": "person:000001",
+        "person_b_id": "person:000002"
+      },
+      {
+        "id": "contact:person:000001->person:000004",
+        "person_a_id": "person:000001",
+        "person_b_id": "person:000004"
+      },
+      {
+        "id": "contact:person:000001->person:000013",
+        "person_a_id": "person:000001",
+        "person_b_id": "person:000013"
+      },
+      {
+        "id": "contact:person:000002->person:000003",
+        "person_a_id": "person:000002",
+        "person_b_id": "person:000003"
+      },
+      {
+        "id": "contact:person:000004->person:000005",
+        "person_a_id": "person:000004",
+        "person_b_id": "person:000005"
+      },
+      {
+        "id": "contact:person:000004->person:000007",
+        "person_a_id": "person:000004",
+        "person_b_id": "person:000007"
+      },
+      {
+        "id": "contact:person:000005->person:000006",
+        "person_a_id": "person:000005",
+        "person_b_id": "person:000006"
+      },
+      {
+        "id": "contact:person:000007->person:000008",
+        "person_a_id": "person:000007",
+        "person_b_id": "person:000008"
+      },
+      {
+        "id": "contact:person:000007->person:000010",
+        "person_a_id": "person:000007",
+        "person_b_id": "person:000010"
+      },
+      {
+        "id": "contact:person:000008->person:000009",
+        "person_a_id": "person:000008",
+        "person_b_id": "person:000009"
+      },
+      {
+        "id": "contact:person:000010->person:000011",
+        "person_a_id": "person:000010",
+        "person_b_id": "person:000011"
+      },
+      {
+        "id": "contact:person:000010->person:000013",
+        "person_a_id": "person:000010",
+        "person_b_id": "person:000013"
+      },
+      {
+        "id": "contact:person:000011->person:000012",
+        "person_a_id": "person:000011",
+        "person_b_id": "person:000012"
+      },
+      {
+        "id": "contact:person:000013->person:000014",
+        "person_a_id": "person:000013",
+        "person_b_id": "person:000014"
+      },
+      {
+        "id": "contact:person:000014->person:000015",
+        "person_a_id": "person:000014",
+        "person_b_id": "person:000015"
+      }
+    ],
+    "initial_state_hash": "6b7ad73e630af4e47847bab3f69f69f91bc7b9b93aaecde9df8c9ff427889f4e",
+    "person_sites": {
+      "person:000001": "site:five_household_courtyard",
+      "person:000002": "site:five_household_courtyard",
+      "person:000003": "site:five_household_courtyard",
+      "person:000004": "site:five_household_courtyard",
+      "person:000005": "site:five_household_courtyard",
+      "person:000006": "site:five_household_courtyard",
+      "person:000007": "site:five_household_courtyard",
+      "person:000008": "site:five_household_courtyard",
+      "person:000009": "site:five_household_courtyard",
+      "person:000010": "site:five_household_courtyard",
+      "person:000011": "site:five_household_courtyard",
+      "person:000012": "site:five_household_courtyard",
+      "person:000013": "site:five_household_courtyard",
+      "person:000014": "site:five_household_courtyard",
+      "person:000015": "site:five_household_courtyard"
+    },
+    "runner_version": "m6-0-runner-v1",
+    "simulation_ruleset_hash": "9781a62e3f607f9fe861201a905c0fff6b7a12ffc564c660facb8fdddc40e5d4",
+    "store_sites": {
+      "resource_store:household:000001": "site:five_household_courtyard",
+      "resource_store:household:000002": "site:five_household_courtyard",
+      "resource_store:household:000003": "site:five_household_courtyard",
+      "resource_store:household:000004": "site:five_household_courtyard",
+      "resource_store:household:000005": "site:five_household_courtyard",
+      "resource_store:village_granary": "site:five_household_courtyard"
+    }
+  },
+  "initial_payload": {
+    "ruleset_manifest": {
+      "decision": {
+        "ruleset_hash": "bd3a83d9491eb0275605817fc50d9fde4cf444efb7f5d3ed749c3d6d975fddb8",
+        "ruleset_id": "drought-prototype-rules-v3"
+      },
+      "parameterization": {
+        "ruleset_hash": "2b3b28f3ad886962e462eaedbd7dfd5321b519329af25f2f2d9664c666c46ae3",
+        "ruleset_id": "drought-prototype-parameterization-v1"
+      },
+      "resolution": {
+        "ruleset_hash": "5ac0e95d42761ba1037480a28edb996d73e318ab04dae44ee5ef587eb537a3fe",
+        "ruleset_id": "drought-prototype-resolution-v1"
+      },
+      "resource": {
+        "ruleset_hash": "3c5da58d0e0168c9427b827c0e37c4b9dd1e4582834b8c33efc5a6e6c9015f03",
+        "ruleset_id": "drought-prototype-rules-v2"
+      },
+      "response": {
+        "ruleset_hash": "6599cea3c34469b9051a6a6ecc8eebc89d4291620a792388a7a5b8aa9b5dae4d",
+        "ruleset_id": "drought-prototype-response-v1"
+      },
+      "social": {
+        "ruleset_hash": "c295928deb3178c8ab081aa65ae2cd27ff473dac2d048e668ff8bafa9ca21142",
+        "ruleset_id": "drought-prototype-social-v2"
+      }
+    },
+    "schema_version": 5,
+    "simulation_ruleset_hash": "9781a62e3f607f9fe861201a905c0fff6b7a12ffc564c660facb8fdddc40e5d4",
+    "state": {
+      "day_index": 0,
+      "day_phase": "DAY_END",
+      "events": [
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000001"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000001",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004"
+          ],
+          "witness_ids": [
+            "person:000001"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000002"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000002",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004",
+            "person:000007"
+          ],
+          "witness_ids": [
+            "person:000002"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000004"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000003",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000007"
+          ],
+          "witness_ids": [
+            "person:000004"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000005"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000004",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004",
+            "person:000007"
+          ],
+          "witness_ids": [
+            "person:000005"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000006"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000005",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004",
+            "person:000007"
+          ],
+          "witness_ids": [
+            "person:000006"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000007"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000006",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004",
+            "person:000010"
+          ],
+          "witness_ids": [
+            "person:000007"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000010"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000007",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004",
+            "person:000007"
+          ],
+          "witness_ids": [
+            "person:000010"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000011"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000008",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004",
+            "person:000007"
+          ],
+          "witness_ids": [
+            "person:000011"
+          ]
+        },
+        {
+          "action_id": "observe",
+          "actor_ids": [
+            "person:000013"
+          ],
+          "day_index": 0,
+          "event_type": "subjective_observation_basis",
+          "id": "event:000009",
+          "is_public": false,
+          "location_id": "location:village_center",
+          "m5_origin": {},
+          "objective_payload": {},
+          "result_id": "facts_acquired",
+          "target_ids": [
+            "person:000004",
+            "person:000007"
+          ],
+          "witness_ids": [
+            "person:000013"
+          ]
+        }
+      ],
+      "households": [
+        {
+          "dependency_load": 1,
+          "dependent_person_ids": [
+            "person:000003"
+          ],
+          "id": "household:000001",
+          "livelihood_id": "mixed_labor",
+          "member_ids": [
+            "person:000001",
+            "person:000002",
+            "person:000003"
+          ],
+          "residence_id": "residence:household:000001",
+          "resource_store_id": "resource_store:household:000001",
+          "wealth_units": 0
+        },
+        {
+          "dependency_load": 0,
+          "dependent_person_ids": [],
+          "id": "household:000002",
+          "livelihood_id": "mixed_labor",
+          "member_ids": [
+            "person:000004",
+            "person:000005",
+            "person:000006"
+          ],
+          "residence_id": "residence:household:000002",
+          "resource_store_id": "resource_store:household:000002",
+          "wealth_units": 0
+        },
+        {
+          "dependency_load": 2,
+          "dependent_person_ids": [
+            "person:000008",
+            "person:000009"
+          ],
+          "id": "household:000003",
+          "livelihood_id": "mixed_labor",
+          "member_ids": [
+            "person:000007",
+            "person:000008",
+            "person:000009"
+          ],
+          "residence_id": "residence:household:000003",
+          "resource_store_id": "resource_store:household:000003",
+          "wealth_units": 0
+        },
+        {
+          "dependency_load": 1,
+          "dependent_person_ids": [
+            "person:000012"
+          ],
+          "id": "household:000004",
+          "livelihood_id": "mixed_labor",
+          "member_ids": [
+            "person:000010",
+            "person:000011",
+            "person:000012"
+          ],
+          "residence_id": "residence:household:000004",
+          "resource_store_id": "resource_store:household:000004",
+          "wealth_units": 0
+        },
+        {
+          "dependency_load": 2,
+          "dependent_person_ids": [
+            "person:000014",
+            "person:000015"
+          ],
+          "id": "household:000005",
+          "livelihood_id": "mixed_labor",
+          "member_ids": [
+            "person:000013",
+            "person:000014",
+            "person:000015"
+          ],
+          "residence_id": "residence:household:000005",
+          "resource_store_id": "resource_store:household:000005",
+          "wealth_units": 0
+        }
+      ],
+      "information": [
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000001",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000002",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000003",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000004",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000005",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 40,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000006",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000007",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000008",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000009",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000010",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000001",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000001",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000011",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000012",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000013",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000014",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000015",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000016",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000017",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000018",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000019",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 30,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000020",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 70,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000021",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 50,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000022",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000023",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 70,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000024",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000002",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000002",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000025",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000026",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000027",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000028",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 40,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000029",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000030",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000031",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000032",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000033",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000003",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000004",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000034",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000035",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000036",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000037",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000038",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 40,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000039",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000040",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000041",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000042",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000043",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000004",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000005",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000044",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000045",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000046",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000047",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000048",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 40,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000049",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000050",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000051",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000052",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000053",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000005",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000006",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000054",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000055",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000056",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000057",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000058",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000059",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000010",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 30,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000060",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000010",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000061",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000010",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 35,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000062",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "person:000010",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 40,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000063",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000064",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000065",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000066",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000067",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000006",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000007",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000068",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000069",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000070",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000071",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000072",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000073",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000074",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000075",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000076",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 40,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000077",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000078",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000079",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000080",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000081",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000007",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000010",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000082",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000083",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000084",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000085",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000086",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000087",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000088",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000089",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000090",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 30,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000091",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 70,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000092",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 50,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000093",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000094",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 70,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000095",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000008",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000011",
+          "source_observation_id": "",
+          "subject_id": "resource_store:household:000002",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000096",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000097",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000098",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000099",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:village_authority",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "village_authority",
+          "id": "information:000100",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000004",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 100,
+          "claim": "initial-estimate:request_food_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_access",
+          "id": "information:000101",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:request_food_capacity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_food_capacity",
+          "id": "information:000102",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 15,
+          "claim": "initial-estimate:request_social_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_social_risk",
+          "id": "information:000103",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 20,
+          "claim": "initial-estimate:request_success_expectation",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "request_success_expectation",
+          "id": "information:000104",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "person:000007",
+          "subject_kind": "person"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 40,
+          "claim": "initial-estimate:detection_risk",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "detection_risk",
+          "id": "information:000105",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:food_stock_level",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "food_stock_level",
+          "id": "information:000106",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 60,
+          "claim": "initial-estimate:sanction_severity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "sanction_severity",
+          "id": "information:000107",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_access",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_access",
+          "id": "information:000108",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        },
+        {
+          "acquisition_type": "observation_fixture",
+          "belief_value": 80,
+          "claim": "initial-estimate:theft_opportunity",
+          "confidence": 100,
+          "current_source_person_id": "",
+          "fact_type_id": "theft_opportunity",
+          "id": "information:000109",
+          "is_secret": false,
+          "learned_day_index": 0,
+          "linked_event_id": "event:000009",
+          "original_source_person_id": "",
+          "owner_person_id": "person:000013",
+          "source_observation_id": "",
+          "subject_id": "resource_store:village_granary",
+          "subject_kind": "resource_store"
+        }
+      ],
+      "memories": [],
+      "next_ids": {
+        "decision": 1,
+        "event": 10,
+        "household": 6,
+        "information": 110,
+        "memory": 1,
+        "person": 16,
+        "resource_transaction": 1
+      },
+      "next_resource_sequence_index": 0,
+      "persons": [
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "한결",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000001",
+          "id": "person:000001",
+          "information_ids": [
+            "information:000001",
+            "information:000002",
+            "information:000003",
+            "information:000004",
+            "information:000005",
+            "information:000006",
+            "information:000007",
+            "information:000008",
+            "information:000009",
+            "information:000010"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "field_worker",
+          "relation_ids": [
+            "relation:person:000001->person:000002",
+            "relation:person:000001->person:000003",
+            "relation:person:000001->person:000004",
+            "relation:person:000001->person:000013"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 70,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 70,
+            "legitimate_order": 60,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "미라",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000001",
+          "id": "person:000002",
+          "information_ids": [
+            "information:000011",
+            "information:000012",
+            "information:000013",
+            "information:000014",
+            "information:000015",
+            "information:000016",
+            "information:000017",
+            "information:000018",
+            "information:000019",
+            "information:000020",
+            "information:000021",
+            "information:000022",
+            "information:000023",
+            "information:000024"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "weaver",
+          "relation_ids": [
+            "relation:person:000002->person:000001",
+            "relation:person:000002->person:000003",
+            "relation:person:000002->person:000004",
+            "relation:person:000002->person:000007"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 40,
+            "norm_adherence": 40,
+            "risk_taking": 70,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 40,
+            "fairness_reciprocity": 40,
+            "family_protection": 80,
+            "legitimate_order": 30,
+            "life_protection": 50,
+            "property_autonomy": 40
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 1,
+          "display_name": "나리",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [],
+          "health": 100,
+          "household_id": "household:000001",
+          "id": "person:000003",
+          "information_ids": [],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "child",
+          "relation_ids": [
+            "relation:person:000003->person:000001",
+            "relation:person:000003->person:000002"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "도윤",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000002",
+          "id": "person:000004",
+          "information_ids": [
+            "information:000025",
+            "information:000026",
+            "information:000027",
+            "information:000028",
+            "information:000029",
+            "information:000030",
+            "information:000031",
+            "information:000032",
+            "information:000033"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "village_head",
+          "relation_ids": [
+            "relation:person:000004->person:000001",
+            "relation:person:000004->person:000002",
+            "relation:person:000004->person:000005",
+            "relation:person:000004->person:000006",
+            "relation:person:000004->person:000007",
+            "relation:person:000004->person:000010",
+            "relation:person:000004->person:000011",
+            "relation:person:000004->person:000013"
+          ],
+          "role_ids": [
+            "village_head"
+          ],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 70,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 70,
+            "legitimate_order": 70,
+            "life_protection": 50,
+            "property_autonomy": 70
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "유선",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000002",
+          "id": "person:000005",
+          "information_ids": [
+            "information:000034",
+            "information:000035",
+            "information:000036",
+            "information:000037",
+            "information:000038",
+            "information:000039",
+            "information:000040",
+            "information:000041",
+            "information:000042",
+            "information:000043"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "field_worker",
+          "relation_ids": [
+            "relation:person:000005->person:000004",
+            "relation:person:000005->person:000006",
+            "relation:person:000005->person:000007"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "다솔",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000002",
+          "id": "person:000006",
+          "information_ids": [
+            "information:000044",
+            "information:000045",
+            "information:000046",
+            "information:000047",
+            "information:000048",
+            "information:000049",
+            "information:000050",
+            "information:000051",
+            "information:000052",
+            "information:000053"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "granary_staff",
+          "relation_ids": [
+            "relation:person:000006->person:000004",
+            "relation:person:000006->person:000005",
+            "relation:person:000006->person:000007"
+          ],
+          "role_ids": [
+            "granary_staff"
+          ],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 80,
+            "risk_taking": 40,
+            "self_control": 60
+          },
+          "value_scores": {
+            "community_survival": 60,
+            "fairness_reciprocity": 60,
+            "family_protection": 60,
+            "legitimate_order": 80,
+            "life_protection": 50,
+            "property_autonomy": 60
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "서준",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000003",
+          "id": "person:000007",
+          "information_ids": [
+            "information:000054",
+            "information:000055",
+            "information:000056",
+            "information:000057",
+            "information:000058",
+            "information:000059",
+            "information:000060",
+            "information:000061",
+            "information:000062",
+            "information:000063",
+            "information:000064",
+            "information:000065",
+            "information:000066",
+            "information:000067"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "field_worker",
+          "relation_ids": [
+            "relation:person:000007->person:000002",
+            "relation:person:000007->person:000004",
+            "relation:person:000007->person:000005",
+            "relation:person:000007->person:000006",
+            "relation:person:000007->person:000008",
+            "relation:person:000007->person:000009",
+            "relation:person:000007->person:000010",
+            "relation:person:000007->person:000011",
+            "relation:person:000007->person:000013"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 80,
+            "norm_adherence": 60,
+            "risk_taking": 40,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 80,
+            "fairness_reciprocity": 70,
+            "family_protection": 70,
+            "legitimate_order": 50,
+            "life_protection": 80,
+            "property_autonomy": 60
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 1,
+          "display_name": "은서",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [],
+          "health": 100,
+          "household_id": "household:000003",
+          "id": "person:000008",
+          "information_ids": [],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "elder",
+          "relation_ids": [
+            "relation:person:000008->person:000007",
+            "relation:person:000008->person:000009"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 1,
+          "display_name": "연우",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [],
+          "health": 100,
+          "household_id": "household:000003",
+          "id": "person:000009",
+          "information_ids": [],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "child",
+          "relation_ids": [
+            "relation:person:000009->person:000007",
+            "relation:person:000009->person:000008"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "태오",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000004",
+          "id": "person:000010",
+          "information_ids": [
+            "information:000068",
+            "information:000069",
+            "information:000070",
+            "information:000071",
+            "information:000072",
+            "information:000073",
+            "information:000074",
+            "information:000075",
+            "information:000076",
+            "information:000077",
+            "information:000078",
+            "information:000079",
+            "information:000080",
+            "information:000081"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "field_worker",
+          "relation_ids": [
+            "relation:person:000010->person:000004",
+            "relation:person:000010->person:000007",
+            "relation:person:000010->person:000011",
+            "relation:person:000010->person:000012",
+            "relation:person:000010->person:000013"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 70,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 70,
+            "legitimate_order": 60,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "소담",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000004",
+          "id": "person:000011",
+          "information_ids": [
+            "information:000082",
+            "information:000083",
+            "information:000084",
+            "information:000085",
+            "information:000086",
+            "information:000087",
+            "information:000088",
+            "information:000089",
+            "information:000090",
+            "information:000091",
+            "information:000092",
+            "information:000093",
+            "information:000094",
+            "information:000095"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "weaver",
+          "relation_ids": [
+            "relation:person:000011->person:000004",
+            "relation:person:000011->person:000007",
+            "relation:person:000011->person:000010",
+            "relation:person:000011->person:000012"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 40,
+            "norm_adherence": 40,
+            "risk_taking": 70,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 40,
+            "fairness_reciprocity": 40,
+            "family_protection": 80,
+            "legitimate_order": 30,
+            "life_protection": 50,
+            "property_autonomy": 40
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 1,
+          "display_name": "보람",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [],
+          "health": 100,
+          "household_id": "household:000004",
+          "id": "person:000012",
+          "information_ids": [],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "child",
+          "relation_ids": [
+            "relation:person:000012->person:000010",
+            "relation:person:000012->person:000011"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 2,
+          "display_name": "길상",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [
+            "goal:secure_household_food"
+          ],
+          "health": 100,
+          "household_id": "household:000005",
+          "id": "person:000013",
+          "information_ids": [
+            "information:000096",
+            "information:000097",
+            "information:000098",
+            "information:000099",
+            "information:000100",
+            "information:000101",
+            "information:000102",
+            "information:000103",
+            "information:000104",
+            "information:000105",
+            "information:000106",
+            "information:000107",
+            "information:000108",
+            "information:000109"
+          ],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "field_worker",
+          "relation_ids": [
+            "relation:person:000013->person:000001",
+            "relation:person:000013->person:000004",
+            "relation:person:000013->person:000007",
+            "relation:person:000013->person:000010",
+            "relation:person:000013->person:000014",
+            "relation:person:000013->person:000015"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 1,
+          "display_name": "옥분",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [],
+          "health": 100,
+          "household_id": "household:000005",
+          "id": "person:000014",
+          "information_ids": [],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "elder",
+          "relation_ids": [
+            "relation:person:000014->person:000013",
+            "relation:person:000014->person:000015"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        },
+        {
+          "alive": true,
+          "aptitude_scores": {
+            "dexterity": 50,
+            "perception": 50
+          },
+          "daily_food_need_units": 1,
+          "display_name": "찬우",
+          "emotion_scores": {
+            "anger": 0,
+            "fear": 0,
+            "guilt": 0
+          },
+          "goal_ids": [],
+          "health": 100,
+          "household_id": "household:000005",
+          "id": "person:000015",
+          "information_ids": [],
+          "memory_ids": [],
+          "need_scores": {
+            "hunger": 0
+          },
+          "occupation_id": "child",
+          "relation_ids": [
+            "relation:person:000015->person:000013",
+            "relation:person:000015->person:000014"
+          ],
+          "role_ids": [],
+          "severe_hunger_days": 0,
+          "skill_scores": {
+            "intrigue.stealth": 30,
+            "intrigue.theft": 30
+          },
+          "trait_scores": {
+            "empathy": 50,
+            "norm_adherence": 50,
+            "risk_taking": 50,
+            "self_control": 50
+          },
+          "value_scores": {
+            "community_survival": 50,
+            "fairness_reciprocity": 50,
+            "family_protection": 50,
+            "legitimate_order": 50,
+            "life_protection": 50,
+            "property_autonomy": 50
+          }
+        }
+      ],
+      "player_person_id": "person:000001",
+      "relations": [
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000001",
+          "id": "relation:person:000001->person:000002",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000002",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000001",
+          "id": "relation:person:000001->person:000003",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000003",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000001",
+          "id": "relation:person:000001->person:000004",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000001",
+          "id": "relation:person:000001->person:000013",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000013",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000002",
+          "id": "relation:person:000002->person:000001",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000001",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000002",
+          "id": "relation:person:000002->person:000003",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000003",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000002",
+          "id": "relation:person:000002->person:000004",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000002",
+          "id": "relation:person:000002->person:000007",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000003",
+          "id": "relation:person:000003->person:000001",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000001",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000003",
+          "id": "relation:person:000003->person:000002",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000002",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000001",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000001",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000002",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000002",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000005",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000005",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000006",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000006",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000007",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000010",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000010",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000011",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000011",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000004",
+          "id": "relation:person:000004->person:000013",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000013",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000005",
+          "id": "relation:person:000005->person:000004",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000005",
+          "id": "relation:person:000005->person:000006",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000006",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000005",
+          "id": "relation:person:000005->person:000007",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000006",
+          "id": "relation:person:000006->person:000004",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000006",
+          "id": "relation:person:000006->person:000005",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000005",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000006",
+          "id": "relation:person:000006->person:000007",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000002",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000002",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000004",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000005",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000005",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000006",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000006",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000008",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000008",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000009",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000009",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000010",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000010",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000011",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000011",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000007",
+          "id": "relation:person:000007->person:000013",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000013",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000008",
+          "id": "relation:person:000008->person:000007",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000008",
+          "id": "relation:person:000008->person:000009",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000009",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000009",
+          "id": "relation:person:000009->person:000007",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000009",
+          "id": "relation:person:000009->person:000008",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000008",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000010",
+          "id": "relation:person:000010->person:000004",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000010",
+          "id": "relation:person:000010->person:000007",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000010",
+          "id": "relation:person:000010->person:000011",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000011",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000010",
+          "id": "relation:person:000010->person:000012",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000012",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000010",
+          "id": "relation:person:000010->person:000013",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000013",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000011",
+          "id": "relation:person:000011->person:000004",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000011",
+          "id": "relation:person:000011->person:000007",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000011",
+          "id": "relation:person:000011->person:000010",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000010",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000011",
+          "id": "relation:person:000011->person:000012",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000012",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000012",
+          "id": "relation:person:000012->person:000010",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000010",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000012",
+          "id": "relation:person:000012->person:000011",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000011",
+          "trust": 80
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000013",
+          "id": "relation:person:000013->person:000001",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000001",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000013",
+          "id": "relation:person:000013->person:000004",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000004",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000013",
+          "id": "relation:person:000013->person:000007",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000007",
+          "trust": 50
+        },
+        {
+          "affection": 20,
+          "fear": 0,
+          "from_person_id": "person:000013",
+          "id": "relation:person:000013->person:000010",
+          "obligation": 20,
+          "resentment": 0,
+          "to_person_id": "person:000010",
+          "trust": 50
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000013",
+          "id": "relation:person:000013->person:000014",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000014",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000013",
+          "id": "relation:person:000013->person:000015",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000015",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000014",
+          "id": "relation:person:000014->person:000013",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000013",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000014",
+          "id": "relation:person:000014->person:000015",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000015",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000015",
+          "id": "relation:person:000015->person:000013",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000013",
+          "trust": 80
+        },
+        {
+          "affection": 80,
+          "fear": 0,
+          "from_person_id": "person:000015",
+          "id": "relation:person:000015->person:000014",
+          "obligation": 80,
+          "resentment": 0,
+          "to_person_id": "person:000014",
+          "trust": 80
+        }
+      ],
+      "repeat_exposures": [],
+      "resolution_epoch": 0,
+      "resolved_decision_slot_ids": [],
+      "resource_stores": [
+        {
+          "id": "resource_store:household:000001",
+          "owner_id": "household:000001",
+          "owner_kind": "household",
+          "quantity": 15,
+          "resource_type_id": "food",
+          "security_level": 30
+        },
+        {
+          "id": "resource_store:household:000002",
+          "owner_id": "household:000002",
+          "owner_kind": "household",
+          "quantity": 150,
+          "resource_type_id": "food",
+          "security_level": 30
+        },
+        {
+          "id": "resource_store:household:000003",
+          "owner_id": "household:000003",
+          "owner_kind": "household",
+          "quantity": 80,
+          "resource_type_id": "food",
+          "security_level": 30
+        },
+        {
+          "id": "resource_store:household:000004",
+          "owner_id": "household:000004",
+          "owner_kind": "household",
+          "quantity": 25,
+          "resource_type_id": "food",
+          "security_level": 30
+        },
+        {
+          "id": "resource_store:household:000005",
+          "owner_id": "household:000005",
+          "owner_kind": "household",
+          "quantity": 8,
+          "resource_type_id": "food",
+          "security_level": 30
+        },
+        {
+          "id": "resource_store:village_granary",
+          "owner_id": "village:main",
+          "owner_kind": "village",
+          "quantity": 120,
+          "resource_type_id": "food",
+          "security_level": 45
+        }
+      ],
+      "rng_seed_hex": "0123456789abcdef",
+      "rng_state_hex": "fedcba9876543210",
+      "scenario_id": "m6-five-household-observation-v1",
+      "season_id": "late_summer_drought",
+      "social_effect_receipts": [],
+      "social_observations": [],
+      "social_state": {
+        "last_closed_day_index": -1,
+        "last_contact_day_index": -1,
+        "last_integrated_resolution_epoch": 0,
+        "last_settled_week_index": -1,
+        "revision": 0
+      },
+      "traces": [],
+      "trait_pressures": []
+    }
+  }
+}
