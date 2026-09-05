@@ -1,0 +1,40 @@
+{
+  "authorization_basis": "사용자 보정 허용: 이 한 필드 보정은 승인해도 된다. 원래 hunger 40 사례는 건강 경계에서의 거부·원자성 시험으로 보존한다.",
+  "base_annex_sha256": "65914e923ed4786c51dcd45edb293823de9fffff29a9fb900f1a848d56df5d2e",
+  "corrected_initial_state_hash": "4d5b8b6f98be80177caec978fd310e353f518e5a133f7eae2396af7c70ee0d51",
+  "effective_design_content_hash": "9cd7d8629f03e74ed38c9442a0b276ae1051cb43852fa559d31623180e1f96f3",
+  "erratum_id": "D26-FCAL-ERRATUM-01",
+  "new_value": 37,
+  "old_value": 40,
+  "original_design_content_hash": "df529563420b6b744536c60bc2794eafd980132fda3e94cd9d02a29b0cb50d92",
+  "original_initial_state_hash": "6914961c6d6dcaa5ed3f460fd870254a2aa0d851837a6f5545f19005d81886a1",
+  "person_id": "person:000003",
+  "regression": {
+    "closing_day": 27,
+    "entity_id": "person:000003",
+    "error_code": "M5_POST_APPLY_INVARIANT",
+    "expected_close_success": false,
+    "field_path": "state.persons.health",
+    "initial_hunger": 40,
+    "input_state_unchanged": true,
+    "output_world_is_null": true,
+    "partial_change_arrays_empty": true,
+    "person_health_before": 5,
+    "requested_health_after": 0,
+    "resource_transactions_empty": true
+  },
+  "status": "CANONICAL_FCAL_FIXTURE_CORRECTION",
+  "target": "FCAL_initial_payload.state.persons[id=person:000003].need_scores.hunger",
+  "unchanged_contracts": [
+    "FCAL_rows (all 28 scalar rows)",
+    "blocker_vectors.B01",
+    "blocker_vectors.B02",
+    "blocker_vectors.B03",
+    "numeric_vectors",
+    "M4_projection_vectors",
+    "social_ruleset",
+    "schema5_manifest",
+    "schema5_simulation_ruleset_hash",
+    "PersonDayUpdate health and hunger algorithms"
+  ]
+}

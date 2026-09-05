@@ -2,19 +2,53 @@ class_name M5FixtureFactory
 extends RefCounted
 
 static var _annex: Dictionary = {}
+static var _original_annex: Dictionary = {}
+static var _erratum: Dictionary = {}
 
 
 static func annex() -> Dictionary:
 	if _annex.is_empty():
+		var correction: Dictionary = erratum()
+		assert(FileAccess.get_sha256("res://tests/fixtures/m5_design_vectors.json") == correction.base_annex_sha256)
+		_annex = original_annex()
+		var matched: int = 0
+		for person: Dictionary in _annex.FCAL_initial_payload.state.persons:
+			if person.id == correction.person_id:
+				assert(person.need_scores.hunger == correction.old_value)
+				person.need_scores.hunger = correction.new_value
+				matched += 1
+		assert(matched == 1)
+		_annex.FCAL_initial_state_hash = correction.corrected_initial_state_hash
+		_annex.erase("design_content_hash")
+		_annex.design_content_hash = StateHasher.hash_data(_annex)
+		assert(_annex.design_content_hash == correction.effective_design_content_hash)
+	return _annex.duplicate(true)
+
+
+static func original_annex() -> Dictionary:
+	if _original_annex.is_empty():
 		var parsed: Dictionary = M5JsonReader.parse(FileAccess.get_file_as_string("res://tests/fixtures/m5_design_vectors.json"))
 		assert(parsed.ok, parsed.error)
-		_annex = parsed.value
-	return _annex.duplicate(true)
+		_original_annex = parsed.value
+	return _original_annex.duplicate(true)
+
+
+static func erratum() -> Dictionary:
+	if _erratum.is_empty():
+		var parsed: Dictionary = M5JsonReader.parse(FileAccess.get_file_as_string("res://docs/decisions/m5-fcal-erratum-01.json"))
+		assert(parsed.ok, parsed.error)
+		_erratum = parsed.value
+	return _erratum.duplicate(true)
 
 
 static func initial(legacy_memory: bool = false) -> WorldState:
 	var data: Dictionary = annex()
 	var payload: Dictionary = data.blocker_vectors.B01.initial_payload if legacy_memory else data.FCAL_initial_payload
+	return WorldState.from_data(payload, payload.state)
+
+
+static func original_fcal() -> WorldState:
+	var payload: Dictionary = original_annex().FCAL_initial_payload
 	return WorldState.from_data(payload, payload.state)
 
 

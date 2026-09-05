@@ -24,6 +24,16 @@ func run_all() -> Array[String]:
 
 func _test_initial_and_b01() -> void:
 	var annex: Dictionary = M5FixtureFactory.annex()
+	var original: Dictionary = M5FixtureFactory.original_annex()
+	var correction: Dictionary = M5FixtureFactory.erratum()
+	var restored: Dictionary = annex.duplicate(true)
+	for person: Dictionary in restored.FCAL_initial_payload.state.persons:
+		if person.id == correction.person_id:
+			person.need_scores.hunger = correction.old_value
+	restored.FCAL_initial_state_hash = original.FCAL_initial_state_hash
+	restored.design_content_hash = original.design_content_hash
+	_equal(restored, original, "D26 erratum changes only FCAL hunger and its derived hashes")
+	_equal(StateHasher.hash_world(M5FixtureFactory.original_fcal()), correction.original_initial_state_hash, "D26 original hunger 40 fixture preserved")
 	for legacy: bool in [false, true]:
 		var world: WorldState = M5FixtureFactory.initial(legacy)
 		var errors: Array[String] = StateValidator.validate_world(world)
@@ -110,13 +120,12 @@ func _test_failures_and_stage_boundary() -> void:
 	_group_completed = true
 
 
-func _test_fcal(proposed_fixture: bool) -> void:
+func _test_fcal(original_health_boundary: bool) -> void:
 	var annex: Dictionary = M5FixtureFactory.annex()
-	var world: WorldState = M5FixtureFactory.initial()
-	if proposed_fixture:
-		world.find_person("person:000003").need_scores.hunger = 37
-		runtime_evidence["FCAL_proposed_initial_hash"] = StateHasher.hash_world(world)
-		runtime_evidence["FCAL_proposed_initial_decision"] = M5FixtureFactory.submission(world, "person:000001").submitted_decision_result.to_data()
+	var world: WorldState = M5FixtureFactory.original_fcal() if original_health_boundary else M5FixtureFactory.initial()
+	if not original_health_boundary:
+		runtime_evidence["FCAL_initial_state_hash"] = StateHasher.hash_world(world)
+		runtime_evidence["FCAL_initial_decision"] = M5FixtureFactory.submission(world, "person:000001").submitted_decision_result.to_data()
 	var branch: WorldState = null
 	var hashes: Array = []
 	var total_consumed: int = 0
@@ -132,13 +141,29 @@ func _test_fcal(proposed_fixture: bool) -> void:
 		if not contacts.ok:
 			return
 		var close_stamp: M5RequestStamp = M5RequestStamp.for_world(contacts.next_world)
+		var boundary_case: bool = original_health_boundary and row.closing_day == 27
+		var close_input: Dictionary = StateHasher.state_payload(contacts.next_world) if boundary_case else {}
+		var close_save: String = M5SaveCodec.encode_checked(contacts.next_world).json_text if boundary_case else ""
 		var closed: M5OperationResult = M5Facade.close_day_v1(contacts.next_world, close_stamp)
-		if not proposed_fixture and row.closing_day == 27:
-			_expect(not closed.ok and closed.artifact.errors[0].entity_id == "person:000003", "D26-R02 known canonical FCAL health conflict reproduces")
-			_equal(contacts.next_world.find_person("person:000003").health, 5, "D26-R02 death boundary health before close")
-			_expect(closed.next_world == null and closed.resource_transactions.is_empty(), "D26-R02 rejected day leaves resources unpublished")
-			runtime_evidence["FCAL_canonical"] = hashes
-			runtime_evidence["FCAL_canonical_blocker"] = {"id": "M5-RUNTIME-B01", "day": 27, "person_id": "person:000003", "health_before": 5, "health_after_requested": 0, "expected_close_success": true, "actual_close_success": false, "artifact": closed.artifact, "input_payload": StateHasher.state_payload(contacts.next_world)}
+		if boundary_case:
+			var failures_before: int = failures.size()
+			_expect(not closed.ok, "M5-RUNTIME-B01 regression: hunger 40 close is rejected")
+			_equal(closed.artifact.status, "REJECTED", "M5-RUNTIME-B01 rejected artifact status")
+			_expect(closed.artifact.errors.size() == 1, "M5-RUNTIME-B01 one health boundary error")
+			if closed.artifact.errors.size() == 1:
+				_equal(closed.artifact.errors[0].code, "M5_POST_APPLY_INVARIANT", "M5-RUNTIME-B01 health error code")
+				_equal(closed.artifact.errors[0].field_path, "state.persons.health", "M5-RUNTIME-B01 health error field")
+				_equal(closed.artifact.errors[0].entity_id, "person:000003", "M5-RUNTIME-B01 affected person")
+			_equal(contacts.next_world.find_person("person:000003").health, 5, "M5-RUNTIME-B01 health before rejected close")
+			_expect(closed.next_world == null and closed.resource_transactions.is_empty(), "M5-RUNTIME-B01 rejected day leaves resources unpublished")
+			for key: String in ["observation_changes", "effect_applications", "field_changes", "maintenance_changes", "defaulted_inputs"]:
+				_equal(closed.artifact[key], [], "M5-RUNTIME-B01 no partial artifact changes: " + key)
+			_equal(closed.artifact.intermediate_state_hash, "", "M5-RUNTIME-B01 no completed intermediate state")
+			_equal(closed.artifact.output_state_hash, "", "M5-RUNTIME-B01 no output state")
+			_equal(StateHasher.state_payload(contacts.next_world), close_input, "M5-RUNTIME-B01 full input state unchanged")
+			_equal(M5SaveCodec.encode_checked(contacts.next_world).json_text, close_save, "M5-RUNTIME-B01 rejected close preserves exact save")
+			runtime_evidence["FCAL_original_hunger40"] = hashes
+			runtime_evidence["FCAL_health_boundary_regression"] = {"id": "M5-RUNTIME-B01", "passed": failures.size() == failures_before, "day": 27, "person_id": "person:000003", "health_before": 5, "health_after_requested": 0, "expected_close_success": false, "actual_close_success": closed.ok, "artifact": closed.artifact, "input_payload": close_input}
 			_group_completed = true
 			return
 		_expect(closed.ok, row.id + " close " + str(closed.artifact.errors))
@@ -205,7 +230,10 @@ func _test_fcal(proposed_fixture: bool) -> void:
 	_expect(full_save.ok, "M5-T01 full audit encode " + str(full_save.errors))
 	if full_save.ok:
 		_expect(M5SaveCodec.decode_checked(full_save.json_text).ok, "M5-T01 full audit decode")
-	runtime_evidence["FCAL_proposed_noncanonical"] = hashes
+	_expect(not original_health_boundary, "M5-RUNTIME-B01 hunger 40 must reach rejection boundary")
+	_equal(hashes.size(), 28, "D26-R02 corrected canonical FCAL completes all 28 rows")
+	_equal(world.find_person("person:000003").health, 5, "D26-R02 corrected fixture final health")
+	runtime_evidence["FCAL_canonical"] = hashes
 	runtime_evidence["final_state_hash"] = StateHasher.hash_world(world)
 	runtime_evidence["resource_transactions"] = all_resources.size()
 	_group_completed = true

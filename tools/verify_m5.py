@@ -1,4 +1,4 @@
-"""Run the native M5 contract gate; exit 2 preserves a reproduced design HOLD.
+"""Run the native M5 contract gate with the approved FCAL correction.
 
 Godot can return zero after a script method aborts. Reject engine diagnostics as
 well as assertion failures, missing evidence, and incomplete test groups.
@@ -36,13 +36,18 @@ def main() -> int:
         print("M5 FAIL: runner did not produce evidence.", file=sys.stderr)
         return 1
     evidence = json.loads(output.read_text(encoding="utf-8"))
-    if evidence["failures"] or result.returncode not in (0, 2):
+    if evidence["failures"] or result.returncode != 0:
         return 1
-    expected = 2 if evidence["m5_status"] == "HOLD" else 0
-    if result.returncode != expected or evidence["m5_status"] not in ("PASS", "HOLD"):
-        print("M5 FAIL: runner status and exit code disagree.", file=sys.stderr)
+    if evidence["m5_status"] != "PASS":
+        print("M5 FAIL: runner did not pass the canonical contract.", file=sys.stderr)
         return 1
-    return expected
+    if len(evidence.get("FCAL_canonical", [])) != 28:
+        print("M5 FAIL: corrected canonical FCAL did not complete 28 days.", file=sys.stderr)
+        return 1
+    if not evidence.get("FCAL_health_boundary_regression", {}).get("passed", False):
+        print("M5 FAIL: original hunger 40 rejection/atomicity regression did not pass.", file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
