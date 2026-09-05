@@ -46,12 +46,12 @@ M5 IMPLEMENTATION = MERGED / VERIFIED
 M5 FCAL = ERRATUM 01 APPLIED / HUNGER 40 REJECTION REGRESSION PRESERVED
 M5 HEALTH ERROR ORDER = FIXED / FINAL REVIEW PASS / CLOSED
 M6-0 DESIGN = v0.2 + CONTACT WORDING CLARIFICATION / CANONICAL / USER APPROVED
-M6-0 IMPLEMENTATION = NOT AUTHORIZED / NOT STARTED
+M6-0 IMPLEMENTATION = USER AUTHORIZED / IMPLEMENTED / B REVIEW PENDING
 ```
 
 M5는 Schema 5의 인식·전언·기억·관계·성향 환류를 구현했다. 허용된 FCAL 초기 hunger 40→37 보정을 별도 정오표로 적용해 28일 검증을 완료했고, 원래 40 사례는 건강 0 경계에서의 거부·원자성 회귀 시험으로 보존한다. 최종 검토의 M5-IMPL-B01은 Schema 5 건강 검사 순서를 인물 ID로 고정해 수정했다. 정순·역순 및 각각의 저장 재개에서 실패 결과 전체와 입력 불변성을 검사하며, 로컬 M5 1,915개 검사는 모두 통과했다. 세부 결과는 [M5 구현·검증 기록](docs/m5-implementation.md), 현재 HEAD의 Linux·Windows 결과는 [PR #14](https://github.com/MSAC-lab/game/pull/14)에서 확인한다. 최종 구현 재검토와 병합 후 검증은 PASS로 확정됐다. M5 완료 기준선은 `main@6d4aa8ad607b42c1ee6472c1b72b9d85b90ce369`, tree `9ef2415eb25eef9a5b6d5b0b7d17fbd3fe1dd6e1`이며 [병합 후 CI](https://github.com/MSAC-lab/game/actions/runs/33958806277)도 성공했다.
 
-다음 단계인 [M6-0 최소 자동 진행·관찰 계약 v0.2](docs/decisions/m6-0-v0.2.md)는 사용자 설계 정본 승인을 받았다. 기존 작은 인과 루프를 반복 실행·관찰하는 선행 단계이며, 기존 M6의 60명·행동군 확장 완료를 뜻하지 않는다. 자동 판단 대상이 없어도 유효한 접촉쌍은 처리한다. M6-0 구현은 별도 승인 전까지 미착수다.
+다음 단계인 [M6-0 최소 자동 진행·관찰 계약 v0.2](docs/decisions/m6-0-v0.2.md)는 PR #15로 병합·검증됐고, 이후 사용자가 구현을 승인했다. 기존 작은 인과 루프를 반복 실행·관찰하는 선행 단계이며, 기존 M6의 60명·행동군 확장 완료를 뜻하지 않는다. 자동 판단 대상이 없어도 유효한 접촉쌍은 처리한다. 자동 하루 진행, 하루 경계 저장·재개와 실제 M4 행동 원문 관찰 경로를 구현했으며 B의 구현 검토를 기다린다. 실행 방법·계약 대응·최초 관찰은 [M6-0 구현·관찰 기록](docs/m6-0-implementation.md)에 기록한다. 이번 구현 승인은 구현 PR의 병합 승인을 포함하지 않는다.
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다.
 

@@ -2,10 +2,27 @@ class_name M5Facade
 extends RefCounted
 
 var _active_scope: M5OperationScope
+var _capture_m4: bool = false
+var _captured_m4: Variant = null
 
 
 static func execute_decisions_v1(world: Variant, stamp: Variant, submissions: Variant, issuer: ResolutionContextIssuer) -> M5OperationResult:
 	return M5Facade.new()._run("EXECUTE", world, stamp, submissions, issuer)
+
+
+static func execute_decisions_observed_v1(world: Variant, stamp: Variant, submissions: Variant, issuer: ResolutionContextIssuer) -> M5ObservedExecutionResult:
+	return M5Facade.new()._run_observed(world, stamp, submissions, issuer)
+
+
+func _run_observed(world: Variant, stamp: Variant, submissions: Variant, issuer: ResolutionContextIssuer) -> M5ObservedExecutionResult:
+	_capture_m4 = true
+	_captured_m4 = null
+	var observed: M5ObservedExecutionResult = M5ObservedExecutionResult.new()
+	observed.operation_result = _run("EXECUTE", world, stamp, submissions, issuer)
+	observed.m4_batch_artifact = _captured_m4.duplicate(true) if _captured_m4 != null else null
+	_capture_m4 = false
+	_captured_m4 = null
+	return observed
 
 
 static func process_contacts_v1(world: Variant, stamp: Variant, plan: Variant) -> M5OperationResult:
@@ -77,6 +94,9 @@ func _run(kind: String, world_value: Variant, stamp_value: Variant, request: Var
 		var binding: String = M5StageBoundary._validate_batch(scope, batch, issuer)
 		if not binding.is_empty():
 			return _fail(artifact, "M5_ARTIFACT_BINDING", binding)
+		if _capture_m4:
+			_captured_m4 = {"batch_resolution": batch.to_data_without_batch_artifact_hash_and_next_world().duplicate(true),
+				"batch_artifact_hash": batch.batch_artifact_hash}
 		if batch.batch_status == "REJECTED":
 			artifact.m4_batch_artifact_hash = batch.batch_artifact_hash
 			return _fail(artifact, "M5_M4_REJECTED", "m4.batch", batch.attempt_diagnostics[0].action_instance_id, batch.errors[0])
