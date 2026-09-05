@@ -2,7 +2,7 @@
 
 가상의 중세~르네상스 난세에서 한 개인의 선택과 변화가 주변 인물과 역사에 영향을 주는 개인 중심 시뮬레이션 게임 프로젝트다.
 
-M0 기반, M1 상태 모델, M2 하루·식량 진행기, M3 최초 판단 엔진과 M4 원자적 행동 결과 처리기를 완료했다. M3는 결과를 유도하지 않고 세 행동의 후보·효용·선택을 관찰하며, M4는 선택된 행동을 동결 규칙에 따라 객관적 세계에서 해소한다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
+M0 기반, M1 상태 모델, M2 하루·식량 진행기, M3 최초 판단 엔진, M4 원자적 행동 결과 처리기와 M5 인식·기억·관계 환류를 완료했다. M3는 결과를 유도하지 않고 세 행동의 후보·효용·선택을 관찰하며, M4는 선택된 행동을 동결 규칙에 따라 객관적 세계에서 해소한다. 이후 목표는 방대한 세계나 콘텐츠를 만드는 것이 아니라, 다음 인과 순환이 작은 범위에서 실제로 성립하는지 확인하는 것이다.
 
 > 인물의 성향·상태·관계·기억 → 판단과 선택 → 사건의 결과 → 인물과 세계의 변화 → 이후의 다른 판단
 
@@ -29,9 +29,9 @@ M0 기반, M1 상태 모델, M2 하루·식량 진행기, M3 최초 판단 엔�
 ## 현재 상태
 
 ```text
-STATUS = M0 PASS / M1 PASS / M2 PASS / M3 PASS / M4 PASS
-IMPLEMENTATION = FOUNDATION + STATE / TIME / FOOD + PURE DECISION EVALUATION + ATOMIC ACTION RESOLUTION
-AUTOMATED_VERIFICATION = M0-M4 LOCAL + LINUX + WINDOWS PASS
+STATUS = M0 PASS / M1 PASS / M2 PASS / M3 PASS / M4 PASS / M5 PASS
+IMPLEMENTATION = FOUNDATION + STATE / TIME / FOOD + PURE DECISION EVALUATION + ATOMIC ACTION RESOLUTION + SOCIAL FEEDBACK
+AUTOMATED_VERIFICATION = M0-M5 LOCAL + LINUX + WINDOWS PASS
 GUI_VERIFICATION = WINDOWS EDITOR F5 PASS / 2026-09-01
 FIRST_PROTOTYPE = DROUGHT / PROVISIONAL
 ENGINE = GODOT 4.7.2 STABLE STANDARD
@@ -42,12 +42,16 @@ M3 = COMPLETE / MECHANICS PASS / BEHAVIOR OBSERVED
 M4 = COMPLETE / MECHANICS PASS / BEHAVIOR OBSERVED
 M4 DESIGN = DECISIONS 23-24 APPROVED / FROZEN
 M5 DESIGN = DECISIONS 25-26 v0.2 + VECTORS v0.2 APPROVED
-M5 IMPLEMENTATION = IMPLEMENTED / LOCAL FULL GATE PASS / REVIEW DRAFT
+M5 IMPLEMENTATION = MERGED / VERIFIED
 M5 FCAL = ERRATUM 01 APPLIED / HUNGER 40 REJECTION REGRESSION PRESERVED
-M5 HEALTH ERROR ORDER = FIXED / LOCAL REGRESSION PASS / REVIEW PENDING
+M5 HEALTH ERROR ORDER = FIXED / FINAL REVIEW PASS / CLOSED
+M6-0 DESIGN = v0.2 + CONTACT WORDING CLARIFICATION / CANONICAL / USER APPROVED
+M6-0 IMPLEMENTATION = NOT AUTHORIZED / NOT STARTED
 ```
 
-M5는 Schema 5의 인식·전언·기억·관계·성향 환류를 구현했다. 허용된 FCAL 초기 hunger 40→37 보정을 별도 정오표로 적용해 28일 검증을 완료했고, 원래 40 사례는 건강 0 경계에서의 거부·원자성 회귀 시험으로 보존한다. 최종 검토의 M5-IMPL-B01은 Schema 5 건강 검사 순서를 인물 ID로 고정해 수정했다. 정순·역순 및 각각의 저장 재개에서 실패 결과 전체와 입력 불변성을 검사하며, 로컬 M5 1,915개 검사는 모두 통과했다. 세부 결과는 [M5 구현·검증 기록](docs/m5-implementation.md), 현재 HEAD의 Linux·Windows 결과는 [PR #14](https://github.com/MSAC-lab/game/pull/14)에서 확인한다. 최종 구현 재검토는 대기 중이다.
+M5는 Schema 5의 인식·전언·기억·관계·성향 환류를 구현했다. 허용된 FCAL 초기 hunger 40→37 보정을 별도 정오표로 적용해 28일 검증을 완료했고, 원래 40 사례는 건강 0 경계에서의 거부·원자성 회귀 시험으로 보존한다. 최종 검토의 M5-IMPL-B01은 Schema 5 건강 검사 순서를 인물 ID로 고정해 수정했다. 정순·역순 및 각각의 저장 재개에서 실패 결과 전체와 입력 불변성을 검사하며, 로컬 M5 1,915개 검사는 모두 통과했다. 세부 결과는 [M5 구현·검증 기록](docs/m5-implementation.md), 현재 HEAD의 Linux·Windows 결과는 [PR #14](https://github.com/MSAC-lab/game/pull/14)에서 확인한다. 최종 구현 재검토와 병합 후 검증은 PASS로 확정됐다. M5 완료 기준선은 `main@6d4aa8ad607b42c1ee6472c1b72b9d85b90ce369`, tree `9ef2415eb25eef9a5b6d5b0b7d17fbd3fe1dd6e1`이며 [병합 후 CI](https://github.com/MSAC-lab/game/actions/runs/33958806277)도 성공했다.
+
+다음 단계인 [M6-0 최소 자동 진행·관찰 계약 v0.2](docs/decisions/m6-0-v0.2.md)는 사용자 설계 정본 승인을 받았다. 기존 작은 인과 루프를 반복 실행·관찰하는 선행 단계이며, 기존 M6의 60명·행동군 확장 완료를 뜻하지 않는다. 자동 판단 대상이 없어도 유효한 접촉쌍은 처리한다. M6-0 구현은 별도 승인 전까지 미착수다.
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다.
 
