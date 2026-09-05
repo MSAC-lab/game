@@ -1,4 +1,4 @@
-name: M0-M5 verification
+name: M0-M6-0 verification
 
 on:
   pull_request:
@@ -85,6 +85,19 @@ jobs:
         with:
           name: m5-evidence-linux
           path: builds/m5-runtime-evidence.*
+          if-no-files-found: error
+
+      - name: Run M6-0 autonomous progression contract gate
+        shell: bash
+        run: |
+          python tools/verify_m60.py --godot ".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+
+      - name: Preserve M6-0 execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m60-evidence-linux
+          path: builds/m60-runtime-evidence.*
           if-no-files-found: error
 
   windows-smoke:
@@ -174,6 +187,20 @@ jobs:
           path: builds/m5-runtime-evidence.*
           if-no-files-found: error
 
+      - name: Run M6-0 autonomous progression contract gate
+        shell: pwsh
+        run: |
+          python tools/verify_m60.py --godot ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
+          exit $LASTEXITCODE
+
+      - name: Preserve M6-0 execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m60-evidence-windows
+          path: builds/m60-runtime-evidence.*
+          if-no-files-found: error
+
   m5-determinism:
     name: M5 / Linux-Windows evidence equality
     needs: [linux-smoke, windows-smoke]
@@ -197,4 +224,34 @@ jobs:
           if paths[0].read_bytes() != paths[1].read_bytes():
               raise SystemExit("M5 platform records differ")
           print("M5 Linux/Windows execution records are byte-identical; each platform's contract gate retains its own status.")
+          PY
+
+  m60-determinism:
+    name: M6-0 / Linux-Windows evidence equality
+    needs: [linux-smoke, windows-smoke]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download both platform records
+        uses: actions/download-artifact@v4
+        with:
+          pattern: m60-evidence-*
+          path: evidence
+
+      - name: Compare full native execution records
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          paths = sorted(Path("evidence").glob("*/m60-runtime-evidence.json"))
+          if len(paths) != 2:
+              raise SystemExit("Both Linux and Windows execution records are required")
+          if paths[0].read_bytes() != paths[1].read_bytes():
+              raise SystemExit("M6-0 platform records differ")
+          for path in paths:
+              record = json.loads(path.read_text(encoding="utf-8"))
+              if record["m60_status"] != "PASS" or record["failures"]:
+                  raise SystemExit("Each native contract gate must pass")
+          print("M6-0 Linux/Windows execution records are byte-identical; both native gates passed.")
           PY
