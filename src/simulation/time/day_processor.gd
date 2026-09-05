@@ -134,7 +134,15 @@ static func _compare_household_ids(left: HouseholdState, right: HouseholdState) 
 	return left.id < right.id
 
 
-static func _advance_schema4(current_world: WorldState) -> DayAdvanceResult:
+static func _advance_m5(scope: M5OperationScope) -> DayAdvanceResult:
+	if not scope.is_owned() or scope.operation_kind != "CLOSE":
+		return DayAdvanceResult.failure(["unowned M5 day scope"])
+	return _advance_schema4(scope.input_world, scope)
+
+
+static func _advance_schema4(current_world: WorldState, scope: M5OperationScope = null) -> DayAdvanceResult:
+	if current_world.schema_version == 5 and (scope == null or not scope.owns_input(current_world)):
+		return DayAdvanceResult.failure(["Schema 5 day processing requires M5 scope"])
 	var input_errors: Array[String] = StateValidator.validate_world(current_world)
 	input_errors.append_array(
 		M4Rules.validate_world_manifest(current_world, ["resource", "resolution"])
@@ -174,9 +182,12 @@ static func _advance_schema4(current_world: WorldState) -> DayAdvanceResult:
 	if not phase_error.is_empty():
 		return DayAdvanceResult.failure([phase_error])
 
-	var transaction_errors: Array[String] = ResourceService.apply_transactions(
-		next_world, plan.resource_transactions
-	)
+	var transaction_errors: Array[String]
+	if scope != null:
+		scope.register_stage(next_world)
+		transaction_errors = ResourceService._apply_m5(scope, next_world, plan.resource_transactions)
+	else:
+		transaction_errors = ResourceService.apply_transactions(next_world, plan.resource_transactions)
 	if not transaction_errors.is_empty():
 		return DayAdvanceResult.failure(transaction_errors)
 	phase_error = guard.advance(DayPhaseGuard.CONSUMPTION_APPLIED)
@@ -230,10 +241,10 @@ static func _advance_schema4(current_world: WorldState) -> DayAdvanceResult:
 	phase_error = guard.advance(DayPhaseGuard.DAY_END)
 	if not phase_error.is_empty():
 		return DayAdvanceResult.failure([phase_error])
-	var final_errors: Array[String] = StateValidator.validate_world(next_world)
+	var final_errors: Array[String] = (M5StageBoundary._validate_after_day_resources(scope, next_world, plan.resource_transactions) if scope != null else StateValidator.validate_world(next_world))
 	if not final_errors.is_empty():
 		return DayAdvanceResult.failure(final_errors)
-	if StateHasher.hash_world(next_world).is_empty():
+	if scope == null and StateHasher.hash_world(next_world).is_empty():
 		return DayAdvanceResult.failure(["failed to hash completed schema 4 day"])
 	return DayAdvanceResult.success(
 		next_world, plan.resource_transactions, before_total, after_total, consumed_total

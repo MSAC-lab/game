@@ -41,7 +41,11 @@ M2 = COMPLETE / PASS
 M3 = COMPLETE / MECHANICS PASS / BEHAVIOR OBSERVED
 M4 = COMPLETE / MECHANICS PASS / BEHAVIOR OBSERVED
 M4 DESIGN = DECISIONS 23-24 APPROVED / FROZEN
+M5 DESIGN = DECISIONS 25-26 v0.2 + VECTORS v0.2 APPROVED
+M5 IMPLEMENTATION = REVIEW DRAFT / HOLD (FCAL HEALTH BOUNDARY)
 ```
+
+M5는 Schema 5의 인식·전언·기억·관계·성향 환류를 구현했다. 정본 FCAL의 27일 종료가 기존 건강 커널의 사망 미구현 경계와 충돌하여 전체 완료 판정은 HOLD다. 재현 결과와 정본 보정 제안은 [M5 구현·검증 기록](docs/m5-implementation.md)에 있다.
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다.
 

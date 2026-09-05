@@ -13,7 +13,7 @@ static func validate_transactions(
 	world: WorldState, transactions: Array[ResourceTransactionRecord]
 ) -> Array[String]:
 	var errors: Array[String] = []
-	if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+	if world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		errors.append_array(M4Rules.validate_world_manifest(world, ["resource"]))
 	var simulated_quantities: Dictionary = {}
 	for store: ResourceStoreState in world.resource_stores:
@@ -34,17 +34,17 @@ static func validate_transactions(
 		if record.day_index < 0 or record.sequence_index < 0:
 			errors.append("resource transaction %s day and sequence must be non-negative" % record.id)
 		elif (
-			world.schema_version == WorldState.SCHEMA_VERSION_M4
+			world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]
 			and (record.day_index > 2147483647 or record.sequence_index > 2147483647)
 		):
 			errors.append("resource transaction %s day or sequence overflows schema 4" % record.id)
 		var sequence_key: String = (
 			str(record.sequence_index)
-			if world.schema_version == WorldState.SCHEMA_VERSION_M4
+			if world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]
 			else "%d:%d" % [record.day_index, record.sequence_index]
 		)
 		if sequence_keys.has(sequence_key):
-			if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+			if world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 				errors.append(
 					"duplicate resource transaction sequence identity: %s" % sequence_key
 				)
@@ -110,6 +110,18 @@ static func validate_transactions(
 static func apply_transactions(
 	world: WorldState, transactions: Array[ResourceTransactionRecord]
 ) -> Array[String]:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M5:
+		return ["Schema 5 resource mutation requires M5 scope"]
+	return _apply(world, transactions)
+
+
+static func _apply_m5(scope: M5OperationScope, world: WorldState, transactions: Array[ResourceTransactionRecord]) -> Array[String]:
+	if not scope.owns_stage(world):
+		return ["unowned M5 resource stage"]
+	return _apply(world, transactions)
+
+
+static func _apply(world: WorldState, transactions: Array[ResourceTransactionRecord]) -> Array[String]:
 	var errors: Array[String] = validate_transactions(world, transactions)
 	if not errors.is_empty():
 		return errors

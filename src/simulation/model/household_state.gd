@@ -29,9 +29,10 @@ func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M1) -> Dictionary:
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
 		WorldState.SCHEMA_VERSION_M4,
+		WorldState.SCHEMA_VERSION_M5,
 	]:
 		data["resource_store_id"] = resource_store_id
-		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 			data["dependent_person_ids"] = dependent_person_ids.duplicate()
 	return data
 
@@ -50,9 +51,10 @@ static func from_data(
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
 		WorldState.SCHEMA_VERSION_M4,
+		WorldState.SCHEMA_VERSION_M5,
 	]:
 		state.resource_store_id = str(data.get("resource_store_id", ""))
-		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 			state.dependent_person_ids = ModelData.copy_string_array(
 				data.get("dependent_person_ids", [])
 			)

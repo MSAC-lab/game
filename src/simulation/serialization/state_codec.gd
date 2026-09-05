@@ -7,6 +7,8 @@ static func encode(
 	audit_records: Array[DecisionRecord],
 	resource_records: Array[ResourceTransactionRecord] = []
 ) -> String:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M5:
+		return M5SaveCodec.encode_checked(world, audit_records, resource_records).json_text
 	var audit_data: Array = []
 	for record: DecisionRecord in audit_records:
 		audit_data.append(record.to_data())
@@ -34,6 +36,8 @@ static func decode(json_text: String) -> Dictionary:
 		return _failure(["save root must be a dictionary"])
 
 	var envelope: Dictionary = json.data
+	if envelope.get("schema_version") == WorldState.SCHEMA_VERSION_M5:
+		return M5SaveCodec.decode_checked(json_text)
 	var errors: Array[String] = StateValidator.validate_envelope(envelope)
 	if typeof(envelope.get("audit")) != TYPE_ARRAY:
 		errors.append("audit must be an array")
@@ -152,7 +156,7 @@ static func _validate_resource_audit_record(
 	consumer_days: Dictionary,
 	sequence_keys: Dictionary
 ) -> String:
-	if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+	if world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		var expected_keys: Array[String] = [
 			"id",
 			"day_index",
@@ -191,7 +195,7 @@ static func _validate_resource_audit_record(
 	if int(data.get("day_index")) < 0 or int(data.get("sequence_index")) < 0:
 		return "resource_audit day and sequence must be non-negative"
 	if (
-		world.schema_version == WorldState.SCHEMA_VERSION_M4
+		world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]
 		and (
 			int(data.get("day_index")) > 2147483647
 			or int(data.get("sequence_index")) > 2147483647
@@ -204,11 +208,11 @@ static func _validate_resource_audit_record(
 		return "resource_audit reason_id must not be empty"
 	var sequence_key: String = (
 		str(int(data.get("sequence_index")))
-		if world.schema_version == WorldState.SCHEMA_VERSION_M4
+		if world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]
 		else "%d:%d" % [int(data.get("day_index")), int(data.get("sequence_index"))]
 	)
 	if sequence_keys.has(sequence_key):
-		if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+		if world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 			return "resource_audit has duplicate sequence identity: %s" % sequence_key
 		return "resource_audit has duplicate day and sequence index: %s" % sequence_key
 	sequence_keys[sequence_key] = true

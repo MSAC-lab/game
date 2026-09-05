@@ -10,10 +10,20 @@ static func resolve_trusted_v1(
 	batch_request_value: Variant,
 	trusted_context_issuer: ResolutionContextIssuer
 ) -> BatchResolutionRecord:
+	return _resolve(world_value, batch_request_value, trusted_context_issuer)
+
+
+static func _resolve_m5(scope: M5OperationScope, request: ResolutionBatchRequest, issuer: ResolutionContextIssuer) -> BatchResolutionRecord:
+	if not scope.is_owned():
+		return BatchResolutionRecord.rejected(null, "invalid_world")
+	return _resolve(scope.input_world, request, issuer, scope)
+
+
+static func _resolve(world_value: Variant, batch_request_value: Variant, trusted_context_issuer: ResolutionContextIssuer, scope: M5OperationScope = null) -> BatchResolutionRecord:
 	if not world_value is WorldState:
 		return BatchResolutionRecord.rejected(null, "invalid_world")
 	var world: WorldState = world_value
-	var candidates: Array[Dictionary] = _world_rejection_candidates(world)
+	var candidates: Array[Dictionary] = _world_rejection_candidates(world, scope)
 	if not batch_request_value is ResolutionBatchRequest:
 		candidates.append(_candidate("field_contract_violation"))
 		return reject_candidate(world, select_rejection_candidate(candidates))
@@ -50,7 +60,7 @@ static func resolve_trusted_v1(
 			str(preflight.get("reason_id", "arithmetic_overflow")),
 			str(preflight.get("action_instance_id", ""))
 		)
-	return _commit(world, intents, contexts, preliminary, actual_units)
+	return _commit(world, intents, contexts, preliminary, actual_units, scope)
 
 
 static func select_rejection_candidate(candidates: Array) -> Dictionary:
@@ -85,13 +95,13 @@ static func reject_candidate(world: WorldState, selected: Dictionary) -> BatchRe
 	)
 
 
-static func world_rejection_candidates(world: WorldState) -> Array[Dictionary]:
-	return _world_rejection_candidates(world)
+static func world_rejection_candidates(world: WorldState, scope: M5OperationScope = null) -> Array[Dictionary]:
+	return _world_rejection_candidates(world, scope)
 
 
-static func _world_rejection_candidates(world: WorldState) -> Array[Dictionary]:
+static func _world_rejection_candidates(world: WorldState, scope: M5OperationScope = null) -> Array[Dictionary]:
 	var candidates: Array[Dictionary] = []
-	if world.schema_version != WorldState.SCHEMA_VERSION_M4:
+	if world.schema_version != WorldState.SCHEMA_VERSION_M4 and (scope == null or not scope.owns_input(world)):
 		candidates.append(_candidate("invalid_world"))
 		return candidates
 	for error: String in StateValidator.validate_world(world):
@@ -699,7 +709,8 @@ static func _commit(
 	intents: Array[ActionIntent],
 	contexts: Array[ResolutionContext],
 	preliminary: Dictionary,
-	actual_units: Dictionary
+	actual_units: Dictionary,
+	scope: M5OperationScope = null
 ) -> BatchResolutionRecord:
 	var transactions: Array[ResourceTransactionRecord] = []
 	var outcomes: Array[ActionOutcomeRecord] = []
@@ -737,9 +748,12 @@ static func _commit(
 		"simulation_ruleset_hash": world.simulation_ruleset_hash,
 	}
 	var next_world: WorldState = WorldState.from_data(metadata, world.to_state_data())
-	var transaction_errors: Array[String] = ResourceService.apply_transactions(
-		next_world, transactions
-	)
+	var transaction_errors: Array[String]
+	if scope != null:
+		scope.register_stage(next_world)
+		transaction_errors = ResourceService._apply_m5(scope, next_world, transactions)
+	else:
+		transaction_errors = ResourceService.apply_transactions(next_world, transactions)
 	if not transaction_errors.is_empty():
 		return BatchResolutionRecord.rejected(world, "post_apply_invariant_failure")
 	next_world.next_resource_sequence_index = sequence_index
@@ -755,8 +769,14 @@ static func _commit(
 	var final_errors: Array[String] = reconciliation.get("errors", [])
 	if ResourceService.total_quantity(world) != ResourceService.total_quantity(next_world):
 		final_errors.append("M4 transfer conservation failed")
-	final_errors.append_array(StateValidator.validate_world(next_world))
-	var output_hash: String = StateHasher.hash_world(next_world)
+	var output_hash: String = ""
+	if scope != null:
+		final_errors.append_array(M5StageBoundary._validate_after_resolution(scope, next_world, transactions))
+		if final_errors.is_empty():
+			output_hash = M5StageBoundary._hash_stage(scope, "AFTER_RESOLUTION", next_world)
+	else:
+		final_errors.append_array(StateValidator.validate_world(next_world))
+		output_hash = StateHasher.hash_world(next_world)
 	if output_hash.is_empty():
 		final_errors.append("failed to hash committed schema 4 world")
 	if not final_errors.is_empty():

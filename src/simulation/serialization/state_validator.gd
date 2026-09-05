@@ -63,6 +63,8 @@ const SCHEMA4_PERSON_KEYS: Array[String] = [
 
 
 static func validate_envelope(envelope: Dictionary) -> Array[String]:
+	if envelope.get("schema_version") == WorldState.SCHEMA_VERSION_M5:
+		return M5StateValidator.validate_payload(envelope)
 	var errors: Array[String] = []
 	var schema_version: int = 0
 	if not _is_integer(envelope.get("schema_version")):
@@ -76,7 +78,7 @@ static func validate_envelope(envelope: Dictionary) -> Array[String]:
 			WorldState.SCHEMA_VERSION_M4,
 		]:
 			errors.append("unsupported schema_version: %s" % str(schema_version))
-	if schema_version == WorldState.SCHEMA_VERSION_M4:
+	if schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		var is_save_envelope: bool = (
 			envelope.has("audit") or envelope.has("resource_audit") or envelope.has("state_hash")
 		)
@@ -98,12 +100,15 @@ static func validate_envelope(envelope: Dictionary) -> Array[String]:
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
 		WorldState.SCHEMA_VERSION_M4,
+		WorldState.SCHEMA_VERSION_M5,
 	]:
 		_validate_state(envelope.get("state"), schema_version, errors)
 	return errors
 
 
 static func validate_world(world: WorldState) -> Array[String]:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M5 and not M5StateValidator.typed_safe(world):
+		return ["invalid Schema 5 model collection"]
 	return validate_envelope(StateHasher.state_payload(world))
 
 
@@ -171,7 +176,7 @@ static func _validate_state(
 		_forbid_key(state, "resource_stores", "schema 1 state", errors)
 	else:
 		_require_exact_string(state, "day_phase", WorldState.DAY_END_PHASE, "state", errors)
-	if schema_version == WorldState.SCHEMA_VERSION_M4:
+	if schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		_require_integer(state, "resolution_epoch", 0, 2147483647, "state", errors)
 		_require_integer(
 			state, "next_resource_sequence_index", 0, 2147483647, "state", errors
@@ -203,6 +208,7 @@ static func _validate_state(
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
 		WorldState.SCHEMA_VERSION_M4,
+		WorldState.SCHEMA_VERSION_M5,
 	]:
 		resource_stores = _index_collection(state, "resource_stores", errors)
 
@@ -215,7 +221,7 @@ static func _validate_state(
 	_validate_relations(relations, persons, errors)
 	_validate_events(events, persons, errors)
 	_validate_information(information, persons, events, resource_stores, schema_version, errors)
-	_validate_memories(memories, persons, events, information, errors)
+	_validate_memories(memories, persons, events, information, errors, schema_version)
 	_validate_persons(
 		persons, households, relations, information, memories, schema_version, errors
 	)
@@ -257,7 +263,7 @@ static func _validate_persons(
 ) -> void:
 	for person_id: Variant in persons.keys():
 		var person: Dictionary = persons[person_id]
-		if schema_version == WorldState.SCHEMA_VERSION_M4:
+		if schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 			_validate_exact_keyset(
 				person, SCHEMA4_PERSON_KEYS, "schema 4 person %s" % person_id, errors
 			)
@@ -286,7 +292,7 @@ static func _validate_persons(
 			var need_scores: Variant = person.get("need_scores")
 			if typeof(need_scores) != TYPE_DICTIONARY or not need_scores.has("hunger"):
 				errors.append("person %s.need_scores.hunger is required by schema 2" % person_id)
-		if schema_version == WorldState.SCHEMA_VERSION_M4:
+		if schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 			_validate_exact_score_dictionary(
 				person,
 				"aptitude_scores",
@@ -355,7 +361,7 @@ static func _validate_households(
 					"household %s.resource_store_id must reference its own household store"
 					% household_id
 					)
-			if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
+			if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 				_validate_reference_array(
 					household,
 					"dependent_person_ids",
@@ -390,6 +396,7 @@ static func _validate_resource_stores(
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
 		WorldState.SCHEMA_VERSION_M4,
+		WorldState.SCHEMA_VERSION_M5,
 	]:
 		return
 	for store_id: Variant in stores.keys():
@@ -398,7 +405,7 @@ static func _validate_resource_stores(
 		_require_string(store, "owner_id", "store %s" % store_id, errors)
 		_require_exact_string(store, "resource_type_id", "food", "store %s" % store_id, errors)
 		_require_integer(store, "quantity", 0, 2147483647, "store %s" % store_id, errors)
-		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 			_require_integer(store, "security_level", 0, 100, "store %s" % store_id, errors)
 		else:
 			_forbid_key(store, "security_level", "schema 2 store %s" % store_id, errors)
@@ -468,7 +475,7 @@ static func _validate_information(
 		_require_integer(
 			info, "learned_day_index", 0, 2147483647, "information %s" % info_id, errors
 		)
-		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4]:
+		if schema_version in [WorldState.SCHEMA_VERSION_M3, WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 			_validate_structured_information(
 				str(info_id), info, persons, resource_stores, structured_keys, errors
 			)
@@ -536,7 +543,8 @@ static func _validate_memories(
 	persons: Dictionary,
 	events: Dictionary,
 	information: Dictionary,
-	errors: Array[String]
+	errors: Array[String],
+	schema_version: int = WorldState.SCHEMA_VERSION_M1
 ) -> void:
 	for memory_id: Variant in memories.keys():
 		var memory: Dictionary = memories[memory_id]
@@ -544,9 +552,10 @@ static func _validate_memories(
 			_require_string(memory, key, "memory %s" % memory_id, errors)
 		_require_reference(memory, "owner_person_id", persons, "memory %s" % memory_id, errors)
 		_require_reference(memory, "linked_event_id", events, "memory %s" % memory_id, errors)
-		_require_reference(
-			memory, "linked_information_id", information, "memory %s" % memory_id, errors
-		)
+		if schema_version != WorldState.SCHEMA_VERSION_M5:
+			_require_reference(
+				memory, "linked_information_id", information, "memory %s" % memory_id, errors
+			)
 		_validate_reference_array(
 			memory, "related_person_ids", persons, "memory %s" % memory_id, errors
 		)

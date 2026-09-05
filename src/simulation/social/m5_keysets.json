@@ -1,0 +1,315 @@
+{
+  "aid_payload": [
+    "actual_units",
+    "requested_units",
+    "requester_person_id",
+    "responder_person_id",
+    "response_decision"
+  ],
+  "contact_pair": [
+    "id",
+    "person_a_id",
+    "person_b_id"
+  ],
+  "effect_receipt": [
+    "applied_day_index",
+    "applied_observation_id",
+    "applied_payload_hash",
+    "applied_revision",
+    "event_id",
+    "id",
+    "memory_id",
+    "owner_person_id"
+  ],
+  "event": [
+    "action_id",
+    "actor_ids",
+    "day_index",
+    "event_type",
+    "id",
+    "is_public",
+    "location_id",
+    "m5_origin",
+    "objective_payload",
+    "result_id",
+    "target_ids",
+    "witness_ids"
+  ],
+  "event_origin": [
+    "input_resolution_epoch",
+    "output_resolution_epoch",
+    "source_action_instance_id",
+    "source_context_id",
+    "source_outcome_hash"
+  ],
+  "execute_request_identity_element": [
+    "actor_person_id",
+    "decision_key",
+    "id",
+    "submitted_decision_hash"
+  ],
+  "experience_context": [
+    "C",
+    "K",
+    "N",
+    "action_instance_id",
+    "actor_person_id",
+    "decision_hash",
+    "family_protection",
+    "norm_adherence",
+    "voluntary"
+  ],
+  "field_change": [
+    "after_value",
+    "applied_delta",
+    "before_value",
+    "field_path",
+    "id",
+    "owner_person_id",
+    "requested_delta",
+    "target_id"
+  ],
+  "household": [
+    "dependency_load",
+    "dependent_person_ids",
+    "id",
+    "livelihood_id",
+    "member_ids",
+    "residence_id",
+    "resource_store_id",
+    "wealth_units"
+  ],
+  "information": [
+    "acquisition_type",
+    "belief_value",
+    "claim",
+    "confidence",
+    "current_source_person_id",
+    "fact_type_id",
+    "id",
+    "is_secret",
+    "learned_day_index",
+    "linked_event_id",
+    "original_source_person_id",
+    "owner_person_id",
+    "source_observation_id",
+    "subject_id",
+    "subject_kind"
+  ],
+  "memory": [
+    "core_eligible",
+    "emotion_scores",
+    "first_learned_day_index",
+    "id",
+    "importance",
+    "linked_event_id",
+    "linked_information_id",
+    "occurred_day_index",
+    "owner_person_id",
+    "perceived_action_id",
+    "perceived_result_id",
+    "related_person_ids",
+    "source_observation_id",
+    "tier"
+  ],
+  "next_ids": [
+    "decision",
+    "event",
+    "household",
+    "information",
+    "memory",
+    "person",
+    "resource_transaction"
+  ],
+  "operation_artifact": [
+    "algorithm_id",
+    "artifact_hash",
+    "defaulted_inputs",
+    "effect_applications",
+    "errors",
+    "field_changes",
+    "input_day_index",
+    "input_social_revision",
+    "input_state_hash",
+    "intermediate_state_hash",
+    "m4_batch_artifact_hash",
+    "maintenance_changes",
+    "observation_changes",
+    "operation_id",
+    "operation_kind",
+    "output_day_index",
+    "output_social_revision",
+    "output_state_hash",
+    "state_metrics",
+    "status"
+  ],
+  "operation_id_preimage": [
+    "algorithm_id",
+    "operation_kind",
+    "request_identity",
+    "stamp"
+  ],
+  "operation_result": [
+    "artifact",
+    "next_world",
+    "ok",
+    "resource_transactions"
+  ],
+  "payload": [
+    "ruleset_manifest",
+    "schema_version",
+    "simulation_ruleset_hash",
+    "state"
+  ],
+  "person": [
+    "alive",
+    "aptitude_scores",
+    "daily_food_need_units",
+    "display_name",
+    "emotion_scores",
+    "goal_ids",
+    "health",
+    "household_id",
+    "id",
+    "information_ids",
+    "memory_ids",
+    "need_scores",
+    "occupation_id",
+    "relation_ids",
+    "role_ids",
+    "severe_hunger_days",
+    "skill_scores",
+    "trait_scores",
+    "value_scores"
+  ],
+  "relation": [
+    "affection",
+    "fear",
+    "from_person_id",
+    "id",
+    "obligation",
+    "resentment",
+    "to_person_id",
+    "trust"
+  ],
+  "repeat_exposure": [
+    "action_family",
+    "id",
+    "low_risk_days",
+    "owner_person_id",
+    "trait_id"
+  ],
+  "report_storage_preimage": [
+    "acquisition_type",
+    "confidence",
+    "current_source_person_id",
+    "depth",
+    "event_id",
+    "is_secret",
+    "occurred_day_index",
+    "origin_view",
+    "original_source_person_id",
+    "owner_person_id",
+    "payload"
+  ],
+  "request_stamp": [
+    "day_index",
+    "input_state_hash",
+    "social_revision"
+  ],
+  "resource_store": [
+    "id",
+    "owner_id",
+    "owner_kind",
+    "quantity",
+    "resource_type_id",
+    "security_level"
+  ],
+  "save": [
+    "audit",
+    "resource_audit",
+    "ruleset_manifest",
+    "schema_version",
+    "simulation_ruleset_hash",
+    "social_audit",
+    "state",
+    "state_hash"
+  ],
+  "social_observation": [
+    "accepted",
+    "acquisition_type",
+    "confidence",
+    "conflicted",
+    "current_source_person_id",
+    "depth",
+    "event_id",
+    "first_accepted_day_index",
+    "first_learned_day_index",
+    "id",
+    "importance",
+    "is_secret",
+    "occurred_day_index",
+    "origin_view",
+    "original_source_person_id",
+    "owner_person_id",
+    "payload"
+  ],
+  "social_state": [
+    "last_closed_day_index",
+    "last_contact_day_index",
+    "last_integrated_resolution_epoch",
+    "last_settled_week_index",
+    "revision"
+  ],
+  "state": [
+    "day_index",
+    "day_phase",
+    "events",
+    "households",
+    "information",
+    "memories",
+    "next_ids",
+    "next_resource_sequence_index",
+    "persons",
+    "player_person_id",
+    "relations",
+    "repeat_exposures",
+    "resolution_epoch",
+    "resolved_decision_slot_ids",
+    "resource_stores",
+    "rng_seed_hex",
+    "rng_state_hex",
+    "scenario_id",
+    "season_id",
+    "social_effect_receipts",
+    "social_observations",
+    "social_state",
+    "traces",
+    "trait_pressures"
+  ],
+  "theft_self_payload": [
+    "actor_person_id",
+    "actual_units",
+    "store_id"
+  ],
+  "theft_witness_payload": [
+    "actor_person_id",
+    "store_id",
+    "took_goods"
+  ],
+  "trace": [
+    "event_id",
+    "exists",
+    "id",
+    "occurred_day_index",
+    "source_action_instance_id",
+    "store_id",
+    "trace_type"
+  ],
+  "trait_pressure": [
+    "id",
+    "owner_person_id",
+    "pressure",
+    "trait_id"
+  ]
+}
