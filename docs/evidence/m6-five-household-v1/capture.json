@@ -1,0 +1,12 @@
+{
+  "base_commit": "478db4a3498a96d1a2ce3a5318c11d312afbc0e3",
+  "platform": "Linux",
+  "godot_version": "4.7.2.stable.official.ed1daf0bf",
+  "rules_unchanged": true,
+  "scenario_sha256": "400b0c18cc01ad75b632428971952f3163654a398b8e72ac5a0323a824322b78",
+  "observer_sha256": "02aa747873f77dbec253be939a51095960c3f9b73462a288f2c22e804933dffe",
+  "archive_sha256": "cc9938d7d35d5dbe475f8ff7229ca9ab0fd64c2a7bd098ae36b5adba305e57c0",
+  "archive_bytes": 5525233,
+  "archive_members": 44,
+  "baseline_capture": "Native run_m60.gd invoked directly; F00 JSON and checkpoint retained. Other invocations also retain stdout logs."
+}
