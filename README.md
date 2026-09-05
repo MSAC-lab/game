@@ -44,9 +44,10 @@ M4 DESIGN = DECISIONS 23-24 APPROVED / FROZEN
 M5 DESIGN = DECISIONS 25-26 v0.2 + VECTORS v0.2 APPROVED
 M5 IMPLEMENTATION = IMPLEMENTED / LOCAL FULL GATE PASS / REVIEW DRAFT
 M5 FCAL = ERRATUM 01 APPLIED / HUNGER 40 REJECTION REGRESSION PRESERVED
+M5 HEALTH ERROR ORDER = FIXED / LOCAL REGRESSION PASS / REVIEW PENDING
 ```
 
-M5는 Schema 5의 인식·전언·기억·관계·성향 환류를 구현했다. 허용된 FCAL 초기 hunger 40→37 보정을 별도 정오표로 적용해 28일 검증을 완료했고, 원래 40 사례는 건강 0 경계에서의 거부·원자성 회귀 시험으로 보존한다. 로컬 M5 1,831개 검사는 모두 통과했다. 세부 결과는 [M5 구현·검증 기록](docs/m5-implementation.md), 현재 HEAD의 Linux·Windows 결과는 [PR #14](https://github.com/MSAC-lab/game/pull/14)에서 확인한다.
+M5는 Schema 5의 인식·전언·기억·관계·성향 환류를 구현했다. 허용된 FCAL 초기 hunger 40→37 보정을 별도 정오표로 적용해 28일 검증을 완료했고, 원래 40 사례는 건강 0 경계에서의 거부·원자성 회귀 시험으로 보존한다. 최종 검토의 M5-IMPL-B01은 Schema 5 건강 검사 순서를 인물 ID로 고정해 수정했다. 정순·역순 및 각각의 저장 재개에서 실패 결과 전체와 입력 불변성을 검사하며, 로컬 M5 1,915개 검사는 모두 통과했다. 세부 결과는 [M5 구현·검증 기록](docs/m5-implementation.md), 현재 HEAD의 Linux·Windows 결과는 [PR #14](https://github.com/MSAC-lab/game/pull/14)에서 확인한다. 최종 구현 재검토는 대기 중이다.
 
 M1은 세 명의 기준 인물·가구·방향성 관계·사건·주관적 정보·기억을 정적 타입 상태로 표현한다. canonical JSON, SHA-256 상태 해시, 엄격한 ID·참조 검증과 M1-T01~T10을 포함한다.
 

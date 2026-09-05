@@ -47,6 +47,9 @@ def main() -> int:
     if not evidence.get("FCAL_health_boundary_regression", {}).get("passed", False):
         print("M5 FAIL: original hunger 40 rejection/atomicity regression did not pass.", file=sys.stderr)
         return 1
+    if not evidence.get("M5_health_error_order_regression", {}).get("passed", False):
+        print("M5 FAIL: health error order/save-resume regression did not pass.", file=sys.stderr)
+        return 1
     return 0
 
 

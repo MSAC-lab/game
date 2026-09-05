@@ -1,4 +1,4 @@
-Godot 4.7.2 Standard / Linux / M5 FCAL erratum 01 working tree
+Godot 4.7.2 Standard / Linux / M5-IMPL-B01 working tree
 
 smoke_test
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org

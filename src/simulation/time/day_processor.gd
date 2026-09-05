@@ -206,7 +206,12 @@ static func _advance_schema4(current_world: WorldState, scope: M5OperationScope 
 	if not phase_error.is_empty():
 		return DayAdvanceResult.failure([phase_error])
 
-	for person: PersonState in next_world.persons:
+	var health_persons: Array[PersonState] = next_world.persons
+	if next_world.schema_version == WorldState.SCHEMA_VERSION_M5:
+		# D26 section 7 selects same-stage health errors by entity ID.
+		health_persons = health_persons.duplicate()
+		health_persons.sort_custom(_compare_person_ids)
+	for person: PersonState in health_persons:
 		if not person.alive:
 			continue
 		var health_error: String = PersonDayUpdate.update_health(person)

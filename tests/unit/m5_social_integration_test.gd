@@ -10,6 +10,7 @@ var _group_completed: bool = false
 func run_all() -> Array[String]:
 	var groups: Array = [
 		["_test_initial_and_b01", []], ["_test_failures_and_stage_boundary", []],
+		["_test_health_error_order", []],
 		["_test_fcal", [false]], ["_test_fcal", [true]], ["_test_date_separated_memory", []],
 		["_test_numeric_and_conflict", []], ["_test_codec_and_authority", []],
 		["_test_capacity_feedback_and_purity", []], ["_test_m4_projection_vectors", []],
@@ -117,6 +118,67 @@ func _test_failures_and_stage_boundary() -> void:
 	var result: M5OperationResult = M5FixtureFactory.execute(overflow, "person:000001")
 	_expect(not result.ok and result.artifact.errors[0].code == "M5_ARITHMETIC_OVERFLOW", "M5-T17 late counter overflow")
 	_expect(not result.artifact.intermediate_state_hash.is_empty() and result.resource_transactions.is_empty(), "M5-T17 checkpoint retained and transaction discarded")
+	_group_completed = true
+
+
+func _test_health_error_order() -> void:
+	var failures_before: int = failures.size()
+	var world: WorldState = M5FixtureFactory.initial()
+	for person_id: String in ["person:000001", "person:000003"]:
+		var person: PersonState = world.find_person(person_id)
+		person.health = 5
+		person.need_scores.hunger = 100
+		person.severe_hunger_days = 1
+	for store: ResourceStoreState in world.resource_stores:
+		store.quantity = 0
+	var contacts: M5OperationResult = M5FixtureFactory.contacts(world)
+	_expect(contacts.ok, "M5-IMPL-B01 valid close prerequisite")
+	if not contacts.ok:
+		return
+	var expected_hash: String = StateHasher.hash_world(contacts.next_world)
+	var expected_result: String = ""
+	var cases: Array = []
+	for case_id: String in ["forward", "reverse", "forward_resumed", "reverse_resumed"]:
+		var source: WorldState = M5Data.clone(contacts.next_world)
+		if case_id.begins_with("reverse"):
+			source.persons.reverse()
+		var saved: Dictionary = M5SaveCodec.encode_checked(source)
+		_expect(saved.ok, "M5-IMPL-B01 valid save " + case_id)
+		if not saved.ok:
+			return
+		if case_id.ends_with("_resumed"):
+			var resumed: Dictionary = M5SaveCodec.decode_checked(saved.json_text)
+			_expect(resumed.ok, "M5-IMPL-B01 valid resume " + case_id)
+			if not resumed.ok:
+				return
+			source = resumed.world
+		var input_hash: String = StateHasher.hash_world(source)
+		_equal(input_hash, expected_hash, "M5-IMPL-B01 identical input hash " + case_id)
+		# Preserve array order as well as values; canonical JSON would hide reordering.
+		var raw_before: String = JSON.stringify(StateHasher.state_payload(source))
+		var closed: M5OperationResult = M5Facade.close_day_v1(source, M5RequestStamp.for_world(source))
+		_expect(not closed.ok and closed.next_world == null and closed.resource_transactions.is_empty(), "M5-IMPL-B01 rejected day is atomic " + case_id)
+		_equal(closed.artifact.status, "REJECTED", "M5-IMPL-B01 rejected status " + case_id)
+		_equal(closed.artifact.errors.size(), 1, "M5-IMPL-B01 one representative error " + case_id)
+		if closed.artifact.errors.size() == 1:
+			_equal(closed.artifact.errors[0].code, "M5_POST_APPLY_INVARIANT", "M5-IMPL-B01 error code " + case_id)
+			_equal(closed.artifact.errors[0].field_path, "state.persons.health", "M5-IMPL-B01 error field " + case_id)
+			_equal(closed.artifact.errors[0].entity_id, "person:000001", "M5-IMPL-B01 error priority " + case_id)
+		for key: String in ["observation_changes", "effect_applications", "field_changes", "maintenance_changes", "defaulted_inputs"]:
+			_equal(closed.artifact[key], [], "M5-IMPL-B01 no partial changes " + key + " " + case_id)
+		_equal(closed.artifact.intermediate_state_hash, "", "M5-IMPL-B01 no completed intermediate state " + case_id)
+		_equal(closed.artifact.output_state_hash, "", "M5-IMPL-B01 no output state " + case_id)
+		_equal(JSON.stringify(StateHasher.state_payload(source)), raw_before, "M5-IMPL-B01 raw input and array order unchanged " + case_id)
+		_equal(StateHasher.hash_world(source), input_hash, "M5-IMPL-B01 input hash unchanged " + case_id)
+		var after_save: Dictionary = M5SaveCodec.encode_checked(source)
+		_expect(after_save.ok, "M5-IMPL-B01 input remains saveable " + case_id)
+		_equal(after_save.json_text, saved.json_text, "M5-IMPL-B01 exact save unchanged " + case_id)
+		var result_json: String = StateCanonicalizer.canonical_json(closed.to_data())
+		if expected_result.is_empty():
+			expected_result = result_json
+		_equal(result_json, expected_result, "M5-IMPL-B01 identical full failure result " + case_id)
+		cases.append({"id": case_id, "input_state_hash": input_hash, "result": closed.to_data()})
+	runtime_evidence["M5_health_error_order_regression"] = {"id": "M5-IMPL-B01", "passed": failures.size() == failures_before, "cases": cases}
 	_group_completed = true
 
 
