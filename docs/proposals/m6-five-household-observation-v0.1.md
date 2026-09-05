@@ -123,9 +123,9 @@ S01–S05의 `owner_kind=household`, `owner_id=각 H`, `resource_type_id=food`, 
 
 | 대상 | `request_food_access` | `request_food_capacity` | `request_success_expectation` | `request_social_risk` |
 |---|---:|---:|---:|---:|
-| P04 | 80 | 80 | 80 | 20 |
-| P07 | 80 | 60 | 20 | 15 |
-| P10 | 80 | 30 | 35 | 15 |
+| P04 | 100 | 80 | 80 | 20 |
+| P07 | 100 | 60 | 20 | 15 |
+| P10 | 100 | 30 | 35 | 15 |
 
 각 A11 묶음에는 다음 5개 fact를 만든다. 최초 `confidence`는 모두 100이다.
 
