@@ -3,7 +3,7 @@ extends RefCounted
 
 
 static func state_payload(world: WorldState) -> Dictionary:
-	if world.schema_version == WorldState.SCHEMA_VERSION_M4:
+	if world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		return {
 			"schema_version": world.schema_version,
 			"ruleset_manifest": world.ruleset_manifest.duplicate(true),
@@ -19,6 +19,8 @@ static func state_payload(world: WorldState) -> Dictionary:
 
 
 static func hash_world(world: WorldState) -> String:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M5 and not StateValidator.validate_world(world).is_empty():
+		return ""
 	return hash_data(state_payload(world))
 
 

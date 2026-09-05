@@ -44,10 +44,11 @@ func to_data(schema_version: int = WorldState.SCHEMA_VERSION_M1) -> Dictionary:
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
 		WorldState.SCHEMA_VERSION_M4,
+		WorldState.SCHEMA_VERSION_M5,
 	]:
 		data["daily_food_need_units"] = daily_food_need_units
 		data["severe_hunger_days"] = severe_hunger_days
-	if schema_version == WorldState.SCHEMA_VERSION_M4:
+	if schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		data["aptitude_scores"] = aptitude_scores.duplicate(true)
 		data["skill_scores"] = skill_scores.duplicate(true)
 	return data
@@ -68,6 +69,7 @@ static func from_data(
 		WorldState.SCHEMA_VERSION_M2,
 		WorldState.SCHEMA_VERSION_M3,
 		WorldState.SCHEMA_VERSION_M4,
+		WorldState.SCHEMA_VERSION_M5,
 	]:
 		state.daily_food_need_units = int(data.get("daily_food_need_units", 0))
 		state.severe_hunger_days = int(data.get("severe_hunger_days", 0))
@@ -79,7 +81,7 @@ static func from_data(
 	state.information_ids = ModelData.copy_string_array(data.get("information_ids", []))
 	state.memory_ids = ModelData.copy_string_array(data.get("memory_ids", []))
 	state.relation_ids = ModelData.copy_string_array(data.get("relation_ids", []))
-	if schema_version == WorldState.SCHEMA_VERSION_M4:
+	if schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		state.aptitude_scores = ModelData.copy_string_int_dictionary(
 			data.get("aptitude_scores", {})
 		)

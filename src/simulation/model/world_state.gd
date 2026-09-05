@@ -5,8 +5,9 @@ const SCHEMA_VERSION_M1: int = 1
 const SCHEMA_VERSION_M2: int = 2
 const SCHEMA_VERSION_M3: int = 3
 const SCHEMA_VERSION_M4: int = 4
+const SCHEMA_VERSION_M5: int = 5
 const CURRENT_SCHEMA_VERSION: int = SCHEMA_VERSION_M4
-const SUPPORTED_SCHEMA_VERSION: int = CURRENT_SCHEMA_VERSION
+const SUPPORTED_SCHEMA_VERSION: int = SCHEMA_VERSION_M5
 const DAY_END_PHASE: String = "DAY_END"
 
 var schema_version: int = CURRENT_SCHEMA_VERSION
@@ -33,6 +34,13 @@ var resolution_epoch: int = 0
 var next_resource_sequence_index: int = 0
 var resolved_decision_slot_ids: Array[String] = []
 
+var social_state: SocialState = SocialState.new()
+var social_observations: Array[SocialObservationState] = []
+var social_effect_receipts: Array[SocialEffectReceipt] = []
+var traces: Array[TraceState] = []
+var trait_pressures: Array[TraitPressureState] = []
+var repeat_exposures: Array[RepeatExposureState] = []
+
 
 func to_state_data() -> Dictionary:
 	var person_data: Array = []
@@ -52,23 +60,30 @@ func to_state_data() -> Dictionary:
 		"persons": person_data,
 		"households": household_data,
 		"relations": ModelData.object_array_to_data(relations),
-		"events": ModelData.object_array_to_data(events),
-		"memories": ModelData.object_array_to_data(memories),
+		"events": _events_to_data(),
+		"memories": _memories_to_data(),
 	}
 	var information_data: Array = []
 	for fact: InformationState in information:
 		information_data.append(fact.to_data(schema_version))
 	data["information"] = information_data
-	if schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4]:
+	if schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4, SCHEMA_VERSION_M5]:
 		data["day_phase"] = day_phase
 		var resource_store_data: Array = []
 		for store: ResourceStoreState in resource_stores:
 			resource_store_data.append(store.to_data(schema_version))
 		data["resource_stores"] = resource_store_data
-	if schema_version == SCHEMA_VERSION_M4:
+	if schema_version in [SCHEMA_VERSION_M4, SCHEMA_VERSION_M5]:
 		data["resolution_epoch"] = resolution_epoch
 		data["next_resource_sequence_index"] = next_resource_sequence_index
 		data["resolved_decision_slot_ids"] = resolved_decision_slot_ids.duplicate()
+	if schema_version == SCHEMA_VERSION_M5:
+		data["social_state"] = social_state.to_data()
+		data["social_observations"] = ModelData.object_array_to_data(social_observations)
+		data["social_effect_receipts"] = ModelData.object_array_to_data(social_effect_receipts)
+		data["traces"] = ModelData.object_array_to_data(traces)
+		data["trait_pressures"] = ModelData.object_array_to_data(trait_pressures)
+		data["repeat_exposures"] = ModelData.object_array_to_data(repeat_exposures)
 	return data
 
 
@@ -77,14 +92,14 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 	world.schema_version = int(metadata.get("schema_version", 0))
 	world.ruleset_id = str(metadata.get("ruleset_id", ""))
 	world.ruleset_hash = str(metadata.get("ruleset_hash", ""))
-	if world.schema_version == SCHEMA_VERSION_M4:
+	if world.schema_version in [SCHEMA_VERSION_M4, SCHEMA_VERSION_M5]:
 		var manifest_value: Variant = metadata.get("ruleset_manifest", {})
 		if typeof(manifest_value) == TYPE_DICTIONARY:
 			world.ruleset_manifest = manifest_value.duplicate(true)
 		world.simulation_ruleset_hash = str(metadata.get("simulation_ruleset_hash", ""))
 	world.scenario_id = str(state_data.get("scenario_id", ""))
 	world.day_index = int(state_data.get("day_index", 0))
-	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4]:
+	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4, SCHEMA_VERSION_M5]:
 		world.day_phase = str(state_data.get("day_phase", ""))
 	world.season_id = str(state_data.get("season_id", ""))
 	world.rng_seed_hex = str(state_data.get("rng_seed_hex", ""))
@@ -100,7 +115,7 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 	for item: Variant in household_data:
 		world.households.append(HouseholdState.from_data(item, world.schema_version))
 
-	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4]:
+	if world.schema_version in [SCHEMA_VERSION_M2, SCHEMA_VERSION_M3, SCHEMA_VERSION_M4, SCHEMA_VERSION_M5]:
 		var resource_store_data: Array = state_data.get("resource_stores", [])
 		for item: Variant in resource_store_data:
 			world.resource_stores.append(ResourceStoreState.from_data(item, world.schema_version))
@@ -111,7 +126,7 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 
 	var event_data: Array = state_data.get("events", [])
 	for item: Variant in event_data:
-		world.events.append(EventRecord.from_data(item))
+		world.events.append(EventRecord.from_data(item, world.schema_version))
 
 	var information_data: Array = state_data.get("information", [])
 	for item: Variant in information_data:
@@ -119,9 +134,9 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 
 	var memory_data: Array = state_data.get("memories", [])
 	for item: Variant in memory_data:
-		world.memories.append(MemoryState.from_data(item))
+		world.memories.append(MemoryState.from_data(item, world.schema_version))
 
-	if world.schema_version == SCHEMA_VERSION_M4:
+	if world.schema_version in [SCHEMA_VERSION_M4, SCHEMA_VERSION_M5]:
 		world.resolution_epoch = int(state_data.get("resolution_epoch", 0))
 		world.next_resource_sequence_index = int(
 			state_data.get("next_resource_sequence_index", 0)
@@ -130,6 +145,18 @@ static func from_data(metadata: Dictionary, state_data: Dictionary) -> WorldStat
 			state_data.get("resolved_decision_slot_ids", [])
 		)
 
+	if world.schema_version == SCHEMA_VERSION_M5:
+		world.social_state = SocialState.from_data(state_data["social_state"])
+		for item: Dictionary in state_data["social_observations"]:
+			world.social_observations.append(SocialObservationState.from_data(item))
+		for item: Dictionary in state_data["social_effect_receipts"]:
+			world.social_effect_receipts.append(SocialEffectReceipt.from_data(item))
+		for item: Dictionary in state_data["traces"]:
+			world.traces.append(TraceState.from_data(item))
+		for item: Dictionary in state_data["trait_pressures"]:
+			world.trait_pressures.append(TraitPressureState.from_data(item))
+		for item: Dictionary in state_data["repeat_exposures"]:
+			world.repeat_exposures.append(RepeatExposureState.from_data(item))
 	return world
 
 
@@ -152,3 +179,17 @@ func find_resource_store(store_id: String) -> ResourceStoreState:
 		if store.id == store_id:
 			return store
 	return null
+
+
+func _events_to_data() -> Array:
+	var data: Array = []
+	for item: EventRecord in events:
+		data.append(item.to_data(schema_version))
+	return data
+
+
+func _memories_to_data() -> Array:
+	var data: Array = []
+	for item: MemoryState in memories:
+		data.append(item.to_data(schema_version))
+	return data

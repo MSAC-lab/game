@@ -1,0 +1,111 @@
+Godot 4.7.2 Standard / Linux / M5-IMPL-B01 working tree
+
+smoke_test
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+M0_SMOKE_PASS engine=4.7.2-stable (official)
+
+m1_test_runner
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: M1-T01 decode succeeds: []
+PASS: M1-T01 save/restore preserves state and audit exactly
+PASS: M1-T02 unordered collection order does not affect state hash
+PASS: M1-T03 relation change affects state hash
+PASS: M1-T04 duplicate ID is rejected
+PASS: M1-T05 broken reference is rejected
+PASS: M1-T06 unknown schema is rejected explicitly
+PASS: M1-T07 player ID selects a PersonState
+PASS: M1-T07 no separate PlayerState model exists
+PASS: M1-T08 simulation models are RefCounted and not Nodes
+PASS: M1-T09 fixture decodes
+PASS: M1-T09 RNG seed restores exactly
+PASS: M1-T09 RNG state restores exactly
+PASS: M1-T09 ID counters restore exactly
+PASS: M1-T09 restored allocator emits the same next ID
+PASS: M1-T10 canonical JSON matches frozen fixture
+PASS: M1-T10 SHA-256 matches frozen fixture
+PASS: ActionDefinition round-trip preserves static ruleset data
+PASS: non-integral state number is rejected
+PASS: non-bool state value is rejected
+PASS: audit-only DecisionRecord does not affect future state hash
+M1 PASS: all state-model and serialization tests passed.
+
+m2_test_runner
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: M2-T01 one atomic day succeeds: []
+PASS: M2-T01 completed day increments day_index once
+PASS: M2-T01 input world remains unchanged
+PASS: M2-T01 schema 2 envelope round-trips: []
+PASS: M2-T01 restored schema 2 world has identical hash
+PASS: M2-T02 prerequisite day succeeds: []
+PASS: M2-T02 sufficient household stores fully feed every person
+PASS: M2-T02 day one consumes exact total need of 14
+PASS: M2-T03 same shortage inputs produce identical allocation
+PASS: M2-T03 day-index remainder starts at canonical first person
+PASS: M2-T03 remainder start rotates with day index
+PASS: M2-T03 shortage never creates or loses food
+PASS: M2-T04 prerequisite day succeeds: []
+PASS: M2-T04 before food equals after food plus consumption
+PASS: M2-T05 prerequisite day succeeds: []
+PASS: M2-T05 each person has at most one consumption transaction per day
+PASS: M2-T06 full meal reduces hunger by 6
+PASS: M2-T06 half of need raises hunger by 12
+PASS: M2-T06 zero of need 2 raises hunger by 24
+PASS: M2-T06 zero of need 1 raises hunger by 24
+PASS: M2-T07 health updates succeed
+PASS: M2-T07 first severe-hunger day causes no damage
+PASS: M2-T07 second severe-hunger day causes 5 damage
+PASS: M2-T07 leaving threshold resets severe-day counter
+PASS: M2-T08 both ten-day runs succeed
+PASS: M2-T08 every daily state hash is reproducible
+PASS: M2-T08 day 10 leaves only granary food
+PASS: M2-T08 ten days consume exactly 81 food
+PASS: M2-T09 day-end save decodes: []
+PASS: M2-T09 resumed five-day run succeeds
+PASS: M2-T09 five-day save/resume equals continuous ten-day state
+PASS: M2-T10 skipped phase is rejected
+PASS: M2-T10 expected phase is accepted
+PASS: M2-T10 duplicate or reverse phase is rejected
+PASS: M2-T11 fixture generation succeeds
+PASS: M2-T11 day-10 canonical JSON matches frozen artifact
+PASS: M2-T11 day-10 SHA-256 matches frozen artifact
+PASS: M2-T12 every daily store delta is explained by the ledger
+PASS: M2-R01 schema 1 canonical JSON remains frozen
+PASS: M2-R01 schema 1 SHA-256 remains frozen
+PASS: M2-R02 prerequisite day succeeds: []
+PASS: M2-R02 RNG seed is unchanged
+PASS: M2-R02 RNG state is unchanged
+PASS: M2-R03 invalid input day fails
+PASS: M2-R03 failed day returns no next world
+PASS: M2-R03 failed day returns no partial transactions
+PASS: M2-R03 failed day leaves input state untouched
+PASS: M2-R04 schema 1 excludes M2 top-level state fields
+PASS: M2-R04 schema 2 requires M2 top-level state fields
+PASS: M2-R04 schema 1 household retains only legacy food fields
+PASS: M2-R04 schema 2 household uses only resource store reference
+PASS: M2-R05 explicit granary transfer applies
+PASS: M2-R05 transfer conserves total food
+PASS: M2-R05 transfer ledger reconciles
+PASS: M2-R06 prerequisite day succeeds: []
+PASS: M2-R06 ResourceTransactionRecord changes do not affect future state hash
+PASS: M2-R07 direct quantity manipulation is detected as unexplained
+PASS: M2-R08 death boundary fails explicitly
+PASS: M2-R08 death boundary returns no next world
+PASS: M2-R08 death boundary returns no partial ledger
+PASS: M2-R08 death-boundary failure leaves input unchanged
+M2 PASS: all time, resource, hunger, health, and regression tests passed.
+
+m3_test_runner
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+M3 PASS: all decision mechanics tests passed; behavior remains observational.
+
+m4_test_runner
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+M4 PASS: schema 4 and atomic action-resolution tests passed.
+
+boot
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org

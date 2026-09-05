@@ -1,0 +1,218 @@
+{
+  "algorithm_id": "m5-social-integration-v2",
+  "appraisal": {
+    "aid_given": {
+      "emotion": {},
+      "importance": 35,
+      "relation": {
+        "affection": 1
+      }
+    },
+    "aid_hearsay": {
+      "emotion": {},
+      "importance_base": 30,
+      "relation": {}
+    },
+    "aid_offered_zero": {
+      "emotion": {
+        "fear": 1
+      },
+      "importance": 40,
+      "relation": {}
+    },
+    "aid_received": {
+      "emotion": {
+        "anger": -2,
+        "fear": -4
+      },
+      "importance": 40,
+      "relation": {
+        "affection": 2,
+        "obligation": 3,
+        "resentment": -1,
+        "trust": 4
+      },
+      "scale": "received_ratio"
+    },
+    "aid_refused_high": {
+      "emotion": {
+        "anger": 3,
+        "fear": 2
+      },
+      "importance": 45,
+      "need_threshold": 60,
+      "relation": {
+        "resentment": 3,
+        "trust": -2
+      }
+    },
+    "aid_refused_low": {
+      "emotion": {
+        "anger": 1,
+        "fear": 1
+      },
+      "importance": 45,
+      "relation": {
+        "resentment": 1,
+        "trust": -1
+      }
+    },
+    "aid_responder_zero": {
+      "emotion": {},
+      "importance": 20,
+      "relation": {}
+    },
+    "algorithm_id": "m5-minimal-appraisal-v1",
+    "missing_self_score": 0,
+    "theft_observer": {
+      "anger_per_q": 1,
+      "fear_if_goods": 1,
+      "hearsay_delta_divisor": 200,
+      "hearsay_importance_divisor": 100,
+      "importance_base": 50,
+      "importance_per_q": 10,
+      "norm_threshold": 50,
+      "property_threshold": 50,
+      "q_base": 1,
+      "resentment_per_q": 1,
+      "trust_per_q": -2
+    },
+    "theft_self": {
+      "conflict_threshold": 40,
+      "fear_divisor": 20,
+      "guilt_delta": 3,
+      "importance_base": 50,
+      "importance_conflict_add": 20,
+      "importance_risk_add": 10,
+      "importance_risk_threshold": 60
+    }
+  },
+  "arithmetic": {
+    "batch_delta_policy": "snapshot_sum_then_clamp_v1",
+    "round_div": "half_away_from_zero_v1",
+    "score_max": 100,
+    "score_min": 0,
+    "stored_integer_max": 2147483647
+  },
+  "belief": {
+    "algorithm_id": "m5-request-expectation-v1",
+    "confidence_increment": 10,
+    "divisor": 4,
+    "hearsay_learning": false,
+    "legacy_memory_reference_policy": "stable_current_fact_identity_historical_memory_v2",
+    "new_confidence": 80,
+    "old_weight": 3,
+    "sample_scale": 100,
+    "sample_weight": 1,
+    "writable_fact": "request_success_expectation"
+  },
+  "boundary": {
+    "algorithm_id": "m5-native-staged-world-v1",
+    "day_internal_increment": 1,
+    "legacy_schema_max": 4,
+    "m4_internal_epoch_gap": 1,
+    "public_api_policy": "facade_only_schema5_v1",
+    "public_epoch_gap": 0,
+    "scope_id_domain": "m5-operation-scope-v1",
+    "stage_hash_domain": "m5-stage-state-v1",
+    "state_hash_domain": "schema5_payload"
+  },
+  "clock": {
+    "action_after_contact": false,
+    "close_clock": "completed_input_day",
+    "days_per_week": 7,
+    "initial_last_closed_day": -1,
+    "initial_last_contact_day": -1,
+    "initial_last_settled_week": -1,
+    "origin_day": 0,
+    "transaction_clock": "input_day_plus_one"
+  },
+  "contact": {
+    "algorithm_id": "m5-contact-snapshot-v1",
+    "confidence_loss_base": 10,
+    "confidence_loss_trust_divisor": 5,
+    "max_claims_per_direction": 2,
+    "max_depth": 3,
+    "max_partners_per_person": 3,
+    "max_recent_send_age": 13,
+    "missing_relation_score": 0,
+    "named_recipient_relevance": 20,
+    "passes_per_day": 1,
+    "same_pass_forwarding": false,
+    "secret_self_theft": true,
+    "selection_order": "share_score_desc_importance_desc_first_learned_desc_id_asc",
+    "share_min_score": 20,
+    "share_relation_divisor": 3,
+    "share_self_fear_divisor": 2,
+    "share_threat_divisor": 2
+  },
+  "maintenance": {
+    "algorithm_id": "m5-memory-maintenance-v1",
+    "anger_daily_decay": 3,
+    "compress_effect": "none",
+    "core_cap": 8,
+    "fear_daily_decay": 2,
+    "guilt_daily_decay": 1,
+    "important_cap": 24,
+    "important_threshold": 70,
+    "new_core_allowed": false,
+    "new_memory_after_receipt": "never",
+    "priority_order": "importance_desc_first_learned_desc_id_asc",
+    "recent_cap": 64,
+    "recent_max_age": 13
+  },
+  "observation": {
+    "acceptance_threshold": 60,
+    "algorithm_id": "m5-owner-observation-v1",
+    "conflict_barrier_policy": "strictly_higher_rank_required_v1",
+    "conflict_policy": "compatible_best_rank_storage_total_order_v2",
+    "direct_confidence": 100,
+    "direct_rank": 2,
+    "event_effect_policy": "first_acceptance_once",
+    "first_learned_policy": "first_receipt_never_refresh",
+    "hearsay_rank": 1,
+    "observation_retention": "no_gc_v1",
+    "one_current_record_per_owner_event": true,
+    "receipt_retention": "no_gc_v1",
+    "storage_representative_policy": "depth_sources_report_hash_canonical_json_v2"
+  },
+  "operation": {
+    "artifact_algorithm_id": "m5-operation-artifact-v2",
+    "execute_submission_algorithm_id": "m5-execute-submission-id-v1",
+    "failure_checkpoint_policy": "only_fully_validated_checkpoints_v2",
+    "failure_error_policy": "one_rank_path_entity_cause_ordered_error_v2",
+    "failure_social_arrays": "always_empty_v2",
+    "identity_checkpoint": "after_world_stamp_phase_request_validation_v2",
+    "request_identity_algorithm_id": "m5-operation-id-v2"
+  },
+  "pressure": {
+    "accumulator_max": 100,
+    "accumulator_min": -100,
+    "algorithm_id": "m5-norm-pressure-v1",
+    "base_magnitude": 1,
+    "conflict_add_threshold": 60,
+    "justification_family_margin": 20,
+    "justification_need_threshold": 60,
+    "major_conflict_threshold": 60,
+    "major_magnitude": 4,
+    "major_need_threshold": 80,
+    "major_risk_threshold": 60,
+    "min_conflict": 40,
+    "other_trait_changes": false,
+    "repeat_divisors": [
+      1,
+      2,
+      4
+    ],
+    "repeat_exhausted_divisor": 0,
+    "repeat_low_risk_below": 40,
+    "repeat_window_days": 7,
+    "residual_policy": "subtract_actual_applied_delta_only",
+    "risk_add_threshold": 40,
+    "trait_id": "norm_adherence",
+    "weekly_delta_limit": 2,
+    "weekly_threshold": 5
+  },
+  "ruleset_id": "drought-prototype-social-v2",
+  "schema_version": 5
+}

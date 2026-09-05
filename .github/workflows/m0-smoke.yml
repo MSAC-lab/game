@@ -1,4 +1,4 @@
-name: M0-M4 verification
+name: M0-M5 verification
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ jobs:
   linux-smoke:
     name: Linux / Godot 4.7.2
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
@@ -74,10 +74,23 @@ jobs:
           godot=".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           "$godot" --headless --path . --script res://tests/m4_test_runner.gd
 
+      - name: Run M5 social integration contract gate
+        shell: bash
+        run: |
+          python tools/verify_m5.py --godot ".godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+
+      - name: Preserve M5 execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5-evidence-linux
+          path: builds/m5-runtime-evidence.*
+          if-no-files-found: error
+
   windows-smoke:
     name: Windows / Godot 4.7.2
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
@@ -146,3 +159,42 @@ jobs:
           $godot = ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
           & $godot --headless --path . --script res://tests/m4_test_runner.gd
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run M5 social integration contract gate
+        shell: pwsh
+        run: |
+          python tools/verify_m5.py --godot ".godot-bin/Godot_v$env:GODOT_VERSION-stable_win64_console.exe"
+          exit $LASTEXITCODE
+
+      - name: Preserve M5 execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5-evidence-windows
+          path: builds/m5-runtime-evidence.*
+          if-no-files-found: error
+
+  m5-determinism:
+    name: M5 / Linux-Windows evidence equality
+    needs: [linux-smoke, windows-smoke]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download both platform records
+        uses: actions/download-artifact@v4
+        with:
+          pattern: m5-evidence-*
+          path: evidence
+
+      - name: Compare full native execution records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          paths = sorted(Path("evidence").glob("*/m5-runtime-evidence.json"))
+          if len(paths) != 2:
+              raise SystemExit("Both Linux and Windows execution records are required")
+          if paths[0].read_bytes() != paths[1].read_bytes():
+              raise SystemExit("M5 platform records differ")
+          print("M5 Linux/Windows execution records are byte-identical; each platform's contract gate retains its own status.")
+          PY

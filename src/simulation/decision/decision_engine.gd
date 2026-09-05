@@ -48,7 +48,7 @@ static func _validate_request(world: WorldState, request: DecisionRequest) -> Ar
 			errors.append("M3 decision engine requires ruleset %s" % M3DecisionRules.RULESET_ID)
 		if world.ruleset_hash != M3DecisionRules.ruleset_hash():
 			errors.append("M3 decision engine ruleset_hash mismatch")
-	elif world.schema_version == WorldState.SCHEMA_VERSION_M4:
+	elif world.schema_version in [WorldState.SCHEMA_VERSION_M4, WorldState.SCHEMA_VERSION_M5]:
 		errors.append_array(M4Rules.validate_world_manifest(world, ["decision"]))
 	else:
 		errors.append("M3 decision engine requires schema 3")

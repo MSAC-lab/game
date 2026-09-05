@@ -54,6 +54,8 @@ static func validate_implementation_hashes() -> Array[String]:
 static func validate_world_manifest(
 	world: WorldState, authoritative_components: Array[String]
 ) -> Array[String]:
+	if world.schema_version == WorldState.SCHEMA_VERSION_M5:
+		return M5Rules.validate_world_manifest(world, authoritative_components)
 	var errors: Array[String] = []
 	if world.schema_version != WorldState.SCHEMA_VERSION_M4:
 		errors.append("schema 4 ruleset manifest required")

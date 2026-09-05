@@ -7,11 +7,21 @@ static func execute_decisions_v1(
 	decision_submissions_value: Variant,
 	trusted_context_issuer: ResolutionContextIssuer
 ) -> BatchResolutionRecord:
+	return _execute(world_value, decision_submissions_value, trusted_context_issuer)
+
+
+static func _execute_m5(scope: M5OperationScope, submissions: Variant, issuer: ResolutionContextIssuer) -> BatchResolutionRecord:
+	if not scope.is_owned():
+		return BatchResolutionRecord.rejected(null, "invalid_world")
+	return _execute(scope.input_world, submissions, issuer, scope)
+
+
+static func _execute(world_value: Variant, decision_submissions_value: Variant, trusted_context_issuer: ResolutionContextIssuer, scope: M5OperationScope = null) -> BatchResolutionRecord:
 	if not world_value is WorldState:
 		return BatchResolutionRecord.rejected(null, "invalid_world")
 	var world: WorldState = world_value
 	var world_candidates: Array[Dictionary] = AtomicActionResolver.world_rejection_candidates(
-		world
+		world, scope
 	)
 	if not world_candidates.is_empty():
 		return AtomicActionResolver.reject_candidate(
@@ -79,9 +89,11 @@ static func execute_decisions_v1(
 	var request: ResolutionBatchRequest = ResolutionBatchRequest.new()
 	request.intents = intents
 	request.execution_contexts = contexts
-	return AtomicActionResolver.resolve_trusted_v1(
-		world, request, trusted_context_issuer
-	)
+	if scope != null:
+		scope.intents = intents
+		scope.contexts = contexts
+		return AtomicActionResolver._resolve_m5(scope, request, trusted_context_issuer)
+	return AtomicActionResolver.resolve_trusted_v1(world, request, trusted_context_issuer)
 
 
 static func _intent_less(left: ActionIntent, right: ActionIntent) -> bool:
